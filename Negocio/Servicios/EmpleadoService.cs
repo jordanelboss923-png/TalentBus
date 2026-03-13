@@ -1,5 +1,6 @@
 ﻿using Datos.Repositorios;
 using Entidades;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace Negocio.Servicios
@@ -31,6 +32,8 @@ namespace Negocio.Servicios
         {
             return repo.ProbarConexion();
         }
+
+        
 
     }
 

@@ -26,9 +26,11 @@ namespace Datos.Repositorios
         public SqlDataReader Listar()
         {
             SqlConnection con = new ConexionDB().AbrirConexion();
-
             SqlCommand cmd = new SqlCommand(
-                "SELECT Cedula, Nombre, Apellido, SalarioBase FROM Empleado", con);
+                @"SELECT e.Cedula, e.Nombre, e.Apellido, 
+                 c.NombreCargo, e.SalarioBase, e.FechaIngreso
+          FROM Empleado e
+          INNER JOIN Cargo c ON e.IdCargo = c.Id", con);
 
             return cmd.ExecuteReader();
         }
@@ -36,11 +38,18 @@ namespace Datos.Repositorios
         {
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
-                SqlCommand cmd = new SqlCommand(
-                    "DELETE FROM Empleado WHERE Cedula = @Cedula", con);
+                // Primero elimina el detalle de nómina relacionado
+                SqlCommand cmdDetalle = new SqlCommand(
+                    @"DELETE FROM NominaDetalle 
+              WHERE IdEmpleado = (SELECT Id FROM Empleado WHERE Cedula = @Cedula)", con);
+                cmdDetalle.Parameters.AddWithValue("@Cedula", cedula);
+                cmdDetalle.ExecuteNonQuery();
 
-                cmd.Parameters.AddWithValue("@Cedula", cedula);
-                cmd.ExecuteNonQuery();
+                // Luego elimina el empleado
+                SqlCommand cmdEmpleado = new SqlCommand(
+                    "DELETE FROM Empleado WHERE Cedula = @Cedula", con);
+                cmdEmpleado.Parameters.AddWithValue("@Cedula", cedula);
+                cmdEmpleado.ExecuteNonQuery();
             }
         }
         public void Actualizar(Empleado emp)

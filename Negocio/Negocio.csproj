@@ -42,7 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Servicios\CargoService.cs" />
+    <Compile Include="Servicios\DeduccionService.cs" />
     <Compile Include="Servicios\EmpleadoService.cs" />
+    <Compile Include="Servicios\NominaService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Datos\Datos.csproj">
