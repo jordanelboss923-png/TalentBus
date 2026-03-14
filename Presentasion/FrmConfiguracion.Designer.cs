@@ -39,9 +39,12 @@
             // 
             // dgvDeducciones
             // 
+            this.dgvDeducciones.AllowUserToAddRows = false;
+            this.dgvDeducciones.AllowUserToDeleteRows = false;
             this.dgvDeducciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDeducciones.Location = new System.Drawing.Point(139, 99);
             this.dgvDeducciones.Name = "dgvDeducciones";
+            this.dgvDeducciones.ReadOnly = true;
             this.dgvDeducciones.Size = new System.Drawing.Size(392, 150);
             this.dgvDeducciones.TabIndex = 0;
             this.dgvDeducciones.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDeducciones_CellContentClick);
