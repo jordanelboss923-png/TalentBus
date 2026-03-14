@@ -87,9 +87,12 @@
             // 
             // dgvCargos
             // 
+            this.dgvCargos.AllowUserToAddRows = false;
+            this.dgvCargos.AllowUserToDeleteRows = false;
             this.dgvCargos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvCargos.Location = new System.Drawing.Point(12, 40);
             this.dgvCargos.Name = "dgvCargos";
+            this.dgvCargos.ReadOnly = true;
             this.dgvCargos.Size = new System.Drawing.Size(404, 195);
             this.dgvCargos.TabIndex = 4;
             this.dgvCargos.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCargos_CellContentClick);
