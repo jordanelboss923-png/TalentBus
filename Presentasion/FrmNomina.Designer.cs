@@ -105,10 +105,13 @@
             // 
             // dgvNomina
             // 
+            this.dgvNomina.AllowUserToAddRows = false;
+            this.dgvNomina.AllowUserToDeleteRows = false;
             this.dgvNomina.BackgroundColor = System.Drawing.Color.IndianRed;
             this.dgvNomina.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvNomina.Location = new System.Drawing.Point(62, 72);
             this.dgvNomina.Name = "dgvNomina";
+            this.dgvNomina.ReadOnly = true;
             this.dgvNomina.Size = new System.Drawing.Size(426, 195);
             this.dgvNomina.TabIndex = 6;
             // 

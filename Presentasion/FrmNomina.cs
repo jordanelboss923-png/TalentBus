@@ -233,6 +233,9 @@ namespace Presentasion
             dgv.DataSource = dt;
             dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgv.EnableHeadersVisualStyles = false;
+            dgv.AllowUserToAddRows = false;
+            dgv.AllowUserToDeleteRows = false;
+            dgv.AllowUserToResizeColumns = false;
 
             frmResumen.Controls.Add(dgv);
             frmResumen.ShowDialog();
