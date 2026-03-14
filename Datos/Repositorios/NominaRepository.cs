@@ -93,11 +93,11 @@ namespace Datos.Repositorios
                         cmdDetalle.ExecuteNonQuery();
                     }
 
-                    trans.Commit(); // ✅ Todo salió bien
+                    trans.Commit(); //  Todo salió bien
                 }
                 catch
                 {
-                    trans.Rollback(); // ❌ Algo falló, se revierte todo
+                    trans.Rollback(); //  Algo falló, se revierte todo
                     throw;
                 }
             }
@@ -117,7 +117,7 @@ namespace Datos.Repositorios
               FROM NominaDetalle nd
               INNER JOIN Empleado e ON nd.IdEmpleado = e.Id
               INNER JOIN Cargo    c ON e.IdCargo     = c.Id
-              WHERE nd.IdNomina = (SELECT MAX(Id) FROM Nomina) -- ✅ Solo la última
+              WHERE nd.IdNomina = (SELECT MAX(Id) FROM Nomina) --  Solo la última
               GROUP BY c.Departamento", con);
                 DataTable dt = new DataTable();
                 da.Fill(dt);

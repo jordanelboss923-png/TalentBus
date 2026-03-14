@@ -95,6 +95,7 @@ namespace Presentasion
             if (cmbEmpleado.SelectedValue == null)
             { MessageBox.Show("Selecciona un empleado."); return; }
 
+            int horasExtra = 0;
             if (!string.IsNullOrWhiteSpace(txtHorasExtra.Text))
             {
                 if (!int.TryParse(txtHorasExtra.Text, out int horas))
@@ -112,6 +113,16 @@ namespace Presentasion
 
         private void btnCalcularTodos_Click_1(object sender, EventArgs e)
         {
+            int horasExtra = 0;
+            if (!string.IsNullOrWhiteSpace(txtHorasExtra.Text))
+            {
+                if (!int.TryParse(txtHorasExtra.Text, out horasExtra))
+                { MessageBox.Show("Las horas extra deben ser un número válido."); return; }
+
+                if (horasExtra < 0 || horasExtra > 80)
+                { MessageBox.Show("Las horas extra deben estar entre 0 y 80."); return; }
+            }
+
             dgvNomina.Rows.Clear();
             foreach (DataRow emp in dtEmpleados.Rows)
                 AgregarFilaNomina(emp);
@@ -132,6 +143,13 @@ namespace Presentasion
             foreach (DataRow row in dtEmpleados.Rows)
                 row["HorasExtra"] = string.IsNullOrWhiteSpace(txtHorasExtra.Text)
                                     ? 0 : Convert.ToInt32(txtHorasExtra.Text);
+
+            int horasExtra = 0;
+            if (!string.IsNullOrWhiteSpace(txtHorasExtra.Text))
+            {
+                if (!int.TryParse(txtHorasExtra.Text, out horasExtra))
+                { MessageBox.Show("Las horas extra deben ser un número."); return; }
+            }
 
             servicio.GenerarNomina(dtEmpleados);
             MessageBox.Show("Nómina generada y guardada correctamente. ✅");

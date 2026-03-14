@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -74,9 +75,20 @@ namespace Presentasion
                 return;
             }
 
-            servicio.Eliminar(Convert.ToInt32(txtId.Text));
-            MessageBox.Show("Cargo eliminado.");
-            btnListar_Click_1(null, null);
+            try
+            {
+                servicio.Eliminar(Convert.ToInt32(txtId.Text));
+                MessageBox.Show("Cargo eliminado correctamente.");
+                btnListar_Click_1(null, null);
+            }
+            catch (SqlException ex) when (ex.Number == 547)
+            {
+                MessageBox.Show("No se puede eliminar este cargo porque tiene empleados asignados.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al eliminar: " + ex.Message);
+            }
         }
 
         private void btnActualizar_Click_1(object sender, EventArgs e)

@@ -39,7 +39,14 @@ namespace Presentasion
                 return;
             }
 
-            decimal porcentaje = Convert.ToDecimal(txtPorcentaje.Text);
+            // ✅ Primero valida
+            if (!decimal.TryParse(txtPorcentaje.Text, out decimal porcentaje))
+            { MessageBox.Show("El porcentaje debe ser un número válido."); return; }
+
+            if (porcentaje < 0 || porcentaje > 100)
+            { MessageBox.Show("El porcentaje debe estar entre 0 y 100."); return; }
+
+            // ✅ Luego guarda
             servicio.Actualizar(idSeleccionado, porcentaje);
             MessageBox.Show("Porcentaje actualizado correctamente.");
             CargarDeducciones();

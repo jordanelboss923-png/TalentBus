@@ -27,7 +27,7 @@ namespace Presentasion
         }
         private void FrmEmpleados_Load(object sender, EventArgs e)
         {
-            // Ya se carga en el constructor, no hace falta aquí
+           // Ya se carga en el constructor, no hace falta aquí
         }
         
         void ConfigurarColumnas()
@@ -59,7 +59,7 @@ namespace Presentasion
 
         private void btnRegistrar_Click_1(object sender, EventArgs e)
         {
-            // ✅ Validar que haya un cargo seleccionado
+            //  Validar que haya un cargo seleccionado
             if (cmbCargo.SelectedValue == null)
             {
                 MessageBox.Show("Por favor selecciona un cargo.");
@@ -97,10 +97,21 @@ namespace Presentasion
                 IdCargo = Convert.ToInt32(cmbCargo.SelectedValue), // ✅ Id real
                 SalarioBase = decimal.Parse(txtSalario.Text)
             };
+            try
+            {
+                servicio.Registrar(emp);
+                MessageBox.Show("Empleado registrado correctamente.");
+                CargarCargos();
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                MessageBox.Show("Ya existe un empleado con esa cédula.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al registrar: " + ex.Message);
+            }
 
-            servicio.Registrar(emp);
-            MessageBox.Show("Empleado registrado");
-            CargarCargos(); // Refresca el combo luego de registrar
         }
 
         private void btnListar_Click_1(object sender, EventArgs e)
@@ -141,8 +152,11 @@ namespace Presentasion
                 Apellido = txtApellido.Text,
                 IdCargo = Convert.ToInt32(cmbCargo.SelectedValue),
                 SalarioBase = decimal.Parse(txtSalario.Text)
-            };
 
+
+            };
+            if (!decimal.TryParse(txtSalario.Text, out decimal salario))
+            { MessageBox.Show("El salario debe ser un número válido."); return; }
             servicio.Actualizar(emp);
             MessageBox.Show("Empleado actualizado");
         }
@@ -151,5 +165,54 @@ namespace Presentasion
         {
             // No hacer nada aquí
         }
+
+        // Cédula - solo números y guiones
+        private void txtCedula_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != '-' && e.KeyChar != (char)Keys.Back)
+                e.Handled = true;
+        }
+
+        // Nombre - solo letras y espacios
+        private void txtNombre_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsLetter(e.KeyChar) && e.KeyChar != ' ' && e.KeyChar != (char)Keys.Back)
+                e.Handled = true;
+        }
+
+        // Apellido - solo letras y espacios
+        private void txtApellido_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsLetter(e.KeyChar) && e.KeyChar != ' ' && e.KeyChar != (char)Keys.Back)
+                e.Handled = true;
+        }
+
+        // Salario - solo números y punto
+        private void txtSalario_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != '.' && e.KeyChar != (char)Keys.Back)
+                e.Handled = true;
+        }
+
+        // Advertencia cuando se pasa del límite
+        private void txtCedula_TextChanged(object sender, EventArgs e)
+        {
+            if (txtCedula.Text.Length > 15)
+                MessageBox.Show("La cédula no puede tener más de 15 caracteres.");
+        }
+
+        private void txtNombre_TextChanged(object sender, EventArgs e)
+        {
+            if (txtNombre.Text.Length > 50)
+                MessageBox.Show("El nombre no puede tener más de 50 caracteres.");
+        }
+
+        private void txtApellido_TextChanged(object sender, EventArgs e)
+        {
+            if (txtApellido.Text.Length > 50)
+                MessageBox.Show("El apellido no puede tener más de 50 caracteres.");
+        }
     }
+
+
 }

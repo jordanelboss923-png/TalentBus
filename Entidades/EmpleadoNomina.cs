@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entidades
 {
-    // HERENCIA: EmpleadoNomina "es un" Empleado
+    
     // Agrega todo lo relacionado a cálculos de nómina
     public class EmpleadoNomina : Empleado
     {
@@ -28,7 +28,7 @@ namespace Entidades
             return "Empleado en Nómina";
         }
 
-        // ── MÉTODOS COMO FUNCIONES (retornan valores) ──────────────────
+        // ── MÉTODOS COMO FUNCIONES 
 
         // AFP: 2.87% del salario
         public decimal CalcularAFP()
@@ -53,13 +53,13 @@ namespace Entidades
             else return (79776m + (anual - 867123m) * 0.25m) / 12;
         }
 
-        // Horas extra = (Salario/240) * 1.35 * horas
+        
         public decimal CalcularHorasExtra()
         {
             return (SalarioBase / 240) * 1.35m * HorasExtra;
         }
 
-        // Salario Neto final
+        
         public decimal CalcularNeto()
         {
             return SalarioBase
