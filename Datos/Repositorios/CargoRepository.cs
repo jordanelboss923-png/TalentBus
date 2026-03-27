@@ -1,12 +1,13 @@
-﻿using Datos.Conexion;
-using Entidades;
+﻿using Entidades;
 using System.Data.SqlClient;
 using System.Data;
+using CapaDatos;
 
 namespace Datos.Repositorios
 {
     public class CargoRepository
     {
+        ConexionDB conexion = new ConexionDB();
         public void Insertar(Cargo cargo)
         {
             using (SqlConnection con = new ConexionDB().AbrirConexion())
@@ -16,8 +17,14 @@ namespace Datos.Repositorios
                 cmd.Parameters.AddWithValue("@Nombre", cargo.NombreCargo);
                 cmd.Parameters.AddWithValue("@Depto", cargo.Departamento);
                 cmd.ExecuteNonQuery();
+
             }
+
+
+
+
         }
+
 
         public DataTable Listar()
         {

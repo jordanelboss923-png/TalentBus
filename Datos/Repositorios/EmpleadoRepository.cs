@@ -1,6 +1,7 @@
-﻿using Datos.Conexion;
-using System.Data.SqlClient;
+﻿using CapaDatos;
 using Entidades;
+using System.Data.SqlClient;
+
 namespace Datos.Repositorios
 {
     public class EmpleadoRepository

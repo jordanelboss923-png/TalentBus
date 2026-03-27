@@ -1,4 +1,4 @@
-﻿using Datos.Conexion;
+﻿using CapaDatos;
 using Entidades;
 using System;
 using System.Data;
