@@ -1,5 +1,4 @@
 ﻿using Datos.Repositorios;
-using Entidades;
 using System.Data;
 
 namespace Negocio.Servicios
@@ -8,9 +7,9 @@ namespace Negocio.Servicios
     {
         CargoRepository repo = new CargoRepository();
 
-        public void Registrar(Cargo cargo)
+        public void Registrar(string NombreCargo, string Departamento)
         {
-            repo.Insertar(cargo);
+            repo.Insertar(NombreCargo, Departamento);
         }
 
         public DataTable Listar()
@@ -23,9 +22,9 @@ namespace Negocio.Servicios
             repo.Eliminar(id);
         }
 
-        public void Actualizar(Cargo cargo)
+        public void Actualizar(string NombreCargo, string Departamento, int Id)
         {
-            repo.Actualizar(cargo);
+            repo.Actualizar(NombreCargo, Departamento, Id);
         }
     }
 }

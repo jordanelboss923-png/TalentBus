@@ -1,5 +1,4 @@
 ﻿using Datos.Repositorios;
-using Entidades;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -9,9 +8,9 @@ namespace Negocio.Servicios
     {
         EmpleadoRepository repo = new EmpleadoRepository();
 
-        public void Registrar(Empleado emp)
+        public void Registrar(string Cedula, string Nombre, string Apellido, int IdCargo, decimal SalarioBase)
         {
-            repo.Insertar(emp);
+            repo.Insertar(Cedula, Nombre, Apellido, IdCargo, SalarioBase);
         }
 
         public SqlDataReader Listar()
@@ -24,9 +23,9 @@ namespace Negocio.Servicios
             repo.Eliminar(cedula);
         }
 
-        public void Actualizar(Empleado emp)
+        public void Actualizar(string Cedula, string Nombre, string Apellido, decimal SalarioBase)
         {
-            repo.Actualizar(emp);
+            repo.Actualizar(Cedula, Nombre, Apellido, SalarioBase);
         }
         public bool ProbarConexion()
         {

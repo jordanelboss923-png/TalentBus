@@ -1,11 +1,11 @@
 ﻿using Datos.Conexion;
 using System.Data.SqlClient;
-using Entidades;
+
 namespace Datos.Repositorios
 {
     public class EmpleadoRepository
     {
-        public void Insertar(Empleado emp)
+        public void Insertar(string Cedula, string Nombre, string Apellido, int IdCargo, decimal SalarioBase)
         {
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
@@ -14,11 +14,11 @@ namespace Datos.Repositorios
                               VALUES (@Cedula, @Nombre, @Apellido, @IdCargo, @Salario)";
 
                 SqlCommand cmd = new SqlCommand(sql, con);
-                cmd.Parameters.AddWithValue("@Cedula", emp.Cedula);
-                cmd.Parameters.AddWithValue("@Nombre", emp.Nombre);
-                cmd.Parameters.AddWithValue("@Apellido", emp.Apellido);
-                cmd.Parameters.AddWithValue("@IdCargo", emp.IdCargo);
-                cmd.Parameters.AddWithValue("@Salario", emp.SalarioBase);
+                cmd.Parameters.AddWithValue("@Cedula", Cedula);
+                cmd.Parameters.AddWithValue("@Nombre", Nombre);
+                cmd.Parameters.AddWithValue("@Apellido", Apellido);
+                cmd.Parameters.AddWithValue("@IdCargo", IdCargo);
+                cmd.Parameters.AddWithValue("@Salario", SalarioBase);
 
                 cmd.ExecuteNonQuery();
             }
@@ -52,7 +52,7 @@ namespace Datos.Repositorios
                 cmdEmpleado.ExecuteNonQuery();
             }
         }
-        public void Actualizar(Empleado emp)
+        public void Actualizar(string Cedula, string Nombre, string Apellido, decimal SalarioBase)
         {
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
@@ -63,10 +63,10 @@ namespace Datos.Repositorios
                               WHERE Cedula = @Cedula";
 
                 SqlCommand cmd = new SqlCommand(sql, con);
-                cmd.Parameters.AddWithValue("@Nombre", emp.Nombre);
-                cmd.Parameters.AddWithValue("@Apellido", emp.Apellido);
-                cmd.Parameters.AddWithValue("@Salario", emp.SalarioBase);
-                cmd.Parameters.AddWithValue("@Cedula", emp.Cedula);
+                cmd.Parameters.AddWithValue("@Nombre", Nombre);
+                cmd.Parameters.AddWithValue("@Apellido", Apellido);
+                cmd.Parameters.AddWithValue("@Salario", SalarioBase);
+                cmd.Parameters.AddWithValue("@Cedula", Cedula);
 
                 cmd.ExecuteNonQuery();
             }

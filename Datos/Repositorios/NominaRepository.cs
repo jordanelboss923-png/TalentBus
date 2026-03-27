@@ -1,5 +1,4 @@
 ﻿using Datos.Conexion;
-using Entidades;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -23,9 +22,7 @@ namespace Datos.Repositorios
             }
         }
 
-        public void GenerarNomina(DataTable empleados,
-                                   decimal pctAFP,
-                                   decimal pctARS)
+        public void GenerarNomina(DataTable empleados, decimal pctAFP, decimal pctARS)
         {
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {

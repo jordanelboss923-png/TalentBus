@@ -1,5 +1,5 @@
 ﻿using Datos.Conexion;
-using Entidades;
+
 using System.Data.SqlClient;
 using System.Data;
 
@@ -7,14 +7,14 @@ namespace Datos.Repositorios
 {
     public class CargoRepository
     {
-        public void Insertar(Cargo cargo)
+        public void Insertar(string NombreCargo, string Departamento)
         {
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(
                     "INSERT INTO Cargo (NombreCargo, Departamento) VALUES (@Nombre, @Depto)", con);
-                cmd.Parameters.AddWithValue("@Nombre", cargo.NombreCargo);
-                cmd.Parameters.AddWithValue("@Depto", cargo.Departamento);
+                cmd.Parameters.AddWithValue("@Nombre", NombreCargo);
+                cmd.Parameters.AddWithValue("@Depto", Departamento);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -42,7 +42,7 @@ namespace Datos.Repositorios
             }
         }
 
-        public void Actualizar(Cargo cargo)
+        public void Actualizar(string NombreCargo, string Departamento, int Id)
         {
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
@@ -51,9 +51,9 @@ namespace Datos.Repositorios
                       NombreCargo  = @Nombre, 
                       Departamento = @Depto 
                       WHERE Id = @Id", con);
-                cmd.Parameters.AddWithValue("@Nombre", cargo.NombreCargo);
-                cmd.Parameters.AddWithValue("@Depto", cargo.Departamento);
-                cmd.Parameters.AddWithValue("@Id", cargo.Id);
+                cmd.Parameters.AddWithValue("@Nombre", NombreCargo);
+                cmd.Parameters.AddWithValue("@Depto", Departamento);
+                cmd.Parameters.AddWithValue("@Id", Id);
                 cmd.ExecuteNonQuery();
             }
         }

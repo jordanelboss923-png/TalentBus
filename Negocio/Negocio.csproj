@@ -52,10 +52,6 @@
       <Project>{a3baa9f1-8880-4ede-a71f-8dd455577079}</Project>
       <Name>Datos</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Entidades\Entidades.csproj">
-      <Project>{757a1c47-0bf8-4763-8cde-30e8fd3937fc}</Project>
-      <Name>Entidades</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Abstractas\" />

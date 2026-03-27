@@ -1,4 +1,4 @@
-﻿using Entidades;
+﻿
 using Negocio.Servicios;
 using System;
 using System.Collections.Generic;
@@ -42,13 +42,7 @@ namespace Presentasion
             if (string.IsNullOrWhiteSpace(txtDepartamento.Text))
             { MessageBox.Show("El departamento es requerido."); return; }
 
-            Cargo cargo = new Cargo
-            {
-                NombreCargo = txtNombre.Text,
-                Departamento = txtDepartamento.Text
-            };
-
-            servicio.Registrar(cargo);
+            servicio.Registrar(txtNombre.Text, txtDepartamento.Text);
             MessageBox.Show("Cargo registrado correctamente.");
             btnListar_Click_1(null, null);
         }
@@ -99,14 +93,9 @@ namespace Presentasion
                 return;
             }
 
-            Cargo cargo = new Cargo
-            {
-                Id = Convert.ToInt32(txtId.Text),
-                NombreCargo = txtNombre.Text,
-                Departamento = txtDepartamento.Text
-            };
+           
 
-            servicio.Actualizar(cargo);
+            servicio.Actualizar(txtNombre.Text, txtDepartamento.Text, Convert.ToInt32(txtId.Text));
             MessageBox.Show("Cargo actualizado.");
         btnListar_Click_1 (null, null);
         }
