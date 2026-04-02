@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Negocio.Servicios
 {
-    public class DeduccionService
+    public class DeduccionesCN
     {
         DeduccionesCD repo = new DeduccionesCD();
 

@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Negocio.Servicios
 {
-    public class CargoService
+    public class VolantesPagoCN
     {
         PosicionesCD repo = new PosicionesCD();
 

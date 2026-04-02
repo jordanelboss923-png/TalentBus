@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 
 namespace Negocio.Servicios
 {
-    public class EmpleadoService
+    public class EmpleadosCN
     {
         EmpleadosCD repo = new EmpleadosCD();
 

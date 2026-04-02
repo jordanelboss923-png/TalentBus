@@ -41,11 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Asistencia\AsistenciaCN.cs" />
+    <Compile Include="BaseCN.cs" />
+    <Compile Include="Configuracion\AsignacionesCN.cs" />
+    <Compile Include="Configuracion\DepartamentosCN.cs" />
+    <Compile Include="Configuracion\PosicionesCN.cs" />
+    <Compile Include="Empleados\DeduccionesEmpleadoCN.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Servicios\CargoService.cs" />
-    <Compile Include="Servicios\DeduccionService.cs" />
-    <Compile Include="Servicios\EmpleadoService.cs" />
-    <Compile Include="Servicios\NominaService.cs" />
+    <Compile Include="Nomina\VolantesPagoCN.cs" />
+    <Compile Include="Configuracion\DeduccionesCN.cs" />
+    <Compile Include="Empleados\EmpleadosCN.cs" />
+    <Compile Include="Empleados\AsignacionesEmpleadoCN.cs" />
+    <Compile Include="Seguridad\LogginCN.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Datos\Capa_Datos.csproj">
@@ -53,8 +60,6 @@
       <Name>Capa_Datos</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Abstractas\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

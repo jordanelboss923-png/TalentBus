@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Negocio.Empleados
 {
-    internal class DeduccionesEmpleadoCN
+    public class DeduccionesEmpleadoCN
     {
+
     }
 }

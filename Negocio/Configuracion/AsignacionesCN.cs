@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Negocio.Configuracion
 {
-    internal class AsignacionesCN
+    public class AsignacionesCN
     {
+
     }
 }

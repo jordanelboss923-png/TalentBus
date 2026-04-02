@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Negocio.Asistencia
 {
-    internal class AsistenciaCN
+    public class AsistenciaCN
     {
+
     }
 }

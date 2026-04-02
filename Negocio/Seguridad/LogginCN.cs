@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Negocio.Seguridad
 {
-    internal class LogginCN
+    public class LogginCN
     {
+
     }
 }

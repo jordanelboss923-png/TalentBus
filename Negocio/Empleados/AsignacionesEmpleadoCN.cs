@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Negocio.Servicios
 {
-    public class NominaService
+    public class AsignacionesEmpleadoCN
     {
         VolantesPagoCD repo = new VolantesPagoCD();
         DeduccionesCD repoDeduccion = new DeduccionesCD();
