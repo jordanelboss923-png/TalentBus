@@ -1,16 +1,26 @@
 ﻿using Datos.Conexion;
-
 using System;
 using System.Data;
 using System.Data.SqlClient;
 
+// ===============================================
+// Esta clase maneja las deducciones configurables
+// Ej: AFP, SFS, etc.
+// ===============================================
+
+// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
+// abrir la conexion con la base de datos
+
+// Modifica esta clase para usar la herencia de la clase BaseCD
+// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+
 namespace Datos.Repositorios
 {
-    public class DeduccionRepository
+    public class DeduccionesCD
     {
         public DataTable Listar()
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
                     "SELECT Id, Nombre, Tipo, Porcentaje FROM DeduccionBeneficio", con);
@@ -22,7 +32,7 @@ namespace Datos.Repositorios
 
         public void Actualizar(int id, decimal porcentaje)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(
                     "UPDATE DeduccionBeneficio SET Porcentaje = @Porcentaje WHERE Id = @Id", con);
@@ -34,7 +44,7 @@ namespace Datos.Repositorios
 
         public decimal ObtenerPorcentaje(string tipo)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(
                     "SELECT Porcentaje FROM DeduccionBeneficio WHERE Tipo = @Tipo", con);

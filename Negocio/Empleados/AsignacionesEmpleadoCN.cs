@@ -5,8 +5,8 @@ namespace Negocio.Servicios
 {
     public class NominaService
     {
-        NominaRepository repo = new NominaRepository();
-        DeduccionRepository repoDeduccion = new DeduccionRepository();
+        VolantesPagoCD repo = new VolantesPagoCD();
+        DeduccionesCD repoDeduccion = new DeduccionesCD();
 
         public DataTable ListarEmpleados()
         {

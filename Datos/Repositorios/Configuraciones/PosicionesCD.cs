@@ -3,13 +3,24 @@
 using System.Data.SqlClient;
 using System.Data;
 
+// =====================================================
+// Esta clase maneja los cargos con sus salarios
+// Ej: Gerente, Analista, Representante, Jardinero, etc.
+// =====================================================
+
+// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
+// abrir la conexion con la base de datos
+
+// Modifica esta clase para usar la herencia de la clase BaseCD
+// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+
 namespace Datos.Repositorios
 {
-    public class CargoRepository
+    public class PosicionesCD
     {
         public void Insertar(string NombreCargo, string Departamento)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(
                     "INSERT INTO Cargo (NombreCargo, Departamento) VALUES (@Nombre, @Depto)", con);
@@ -21,7 +32,7 @@ namespace Datos.Repositorios
 
         public DataTable Listar()
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
                     "SELECT Id, NombreCargo, Departamento FROM Cargo", con);
@@ -33,7 +44,7 @@ namespace Datos.Repositorios
 
         public void Eliminar(int id)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(
                     "DELETE FROM Cargo WHERE Id = @Id", con);
@@ -44,7 +55,7 @@ namespace Datos.Repositorios
 
         public void Actualizar(string NombreCargo, string Departamento, int Id)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(
                     @"UPDATE Cargo SET 

@@ -15,7 +15,7 @@ namespace Presentasion
 {
     public partial class FrmCargos : Form
     {
-        CargoService servicio = new CargoService();
+        VolantesPagoCN servicio = new VolantesPagoCN();
         public FrmCargos()
         {
             InitializeComponent();

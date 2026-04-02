@@ -6,7 +6,7 @@ namespace Negocio.Servicios
 {
     public class EmpleadoService
     {
-        EmpleadoRepository repo = new EmpleadoRepository();
+        EmpleadosCD repo = new EmpleadosCD();
 
         public void Registrar(string Cedula, string Nombre, string Apellido, int IdCargo, decimal SalarioBase)
         {

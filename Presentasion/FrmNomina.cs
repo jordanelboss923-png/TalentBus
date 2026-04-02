@@ -13,7 +13,7 @@ namespace Presentasion
 {
     public partial class FrmNomina : Form
     {
-        NominaService servicio = new NominaService();
+        AsignacionesEmpleadoCN servicio = new AsignacionesEmpleadoCN();
         DataTable dtEmpleados;
         public FrmNomina()
         {

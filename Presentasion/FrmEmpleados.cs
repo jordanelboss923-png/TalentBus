@@ -12,7 +12,7 @@ namespace Presentasion
 {
     public partial class FrmEmpleados : Form
     {
-        EmpleadoService servicio = new EmpleadoService();
+        EmpleadosCN servicio = new EmpleadosCN();
 
         // ✅ Una sola cadena de conexión centralizada
         private readonly string connStr =

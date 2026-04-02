@@ -5,7 +5,7 @@ namespace Negocio.Servicios
 {
     public class CargoService
     {
-        CargoRepository repo = new CargoRepository();
+        PosicionesCD repo = new PosicionesCD();
 
         public void Registrar(string NombreCargo, string Departamento)
         {

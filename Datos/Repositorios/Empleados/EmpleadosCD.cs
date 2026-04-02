@@ -1,13 +1,24 @@
 ﻿using Datos.Conexion;
 using System.Data.SqlClient;
 
+// =========================================================
+// Esta clase maneja los CRUD de los datos de cada empleado,
+// tambien indica el tipo de empleado (fijo, temporal, etc.)
+// =========================================================
+
+// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
+// abrir la conexion con la base de datos
+
+// Modifica esta clase para usar la herencia de la clase BaseCD
+// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+
 namespace Datos.Repositorios
 {
-    public class EmpleadoRepository
+    public class EmpleadosCD
     {
         public void Insertar(string Cedula, string Nombre, string Apellido, int IdCargo, decimal SalarioBase)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 string sql = @"INSERT INTO Empleado 
                               (Cedula, Nombre, Apellido, IdCargo, SalarioBase)
@@ -25,7 +36,7 @@ namespace Datos.Repositorios
         }
         public SqlDataReader Listar()
         {
-            SqlConnection con = new ConexionDB().AbrirConexion();
+            SqlConnection con = ConexionDB.AbrirConexion();
             SqlCommand cmd = new SqlCommand(
                 @"SELECT e.Cedula, e.Nombre, e.Apellido, 
                  c.NombreCargo, e.SalarioBase, e.FechaIngreso
@@ -36,7 +47,7 @@ namespace Datos.Repositorios
         }
         public void Eliminar(string cedula)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 // Primero elimina el detalle de nómina relacionado
                 SqlCommand cmdDetalle = new SqlCommand(
@@ -54,7 +65,7 @@ namespace Datos.Repositorios
         }
         public void Actualizar(string Cedula, string Nombre, string Apellido, decimal SalarioBase)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 string sql = @"UPDATE Empleado SET
                               Nombre = @Nombre,
@@ -73,7 +84,7 @@ namespace Datos.Repositorios
         }
         public bool ProbarConexion()
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 return con.State == System.Data.ConnectionState.Open;
             }
