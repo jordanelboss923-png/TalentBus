@@ -1,63 +1,38 @@
 ﻿using CapaDatos;
-<<<<<<< Updated upstream:Datos/Repositorios/DeduccionRepository.cs
-using Entidades;
-=======
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/DeduccionesCD.cs
 using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
-<<<<<<< Updated upstream:Datos/Repositorios/DeduccionRepository.cs
-namespace Datos.Repositorios
-{
-    public class DeduccionRepository
-=======
 namespace Capa_Datos
 {
-    public class DeduccionesCD : BaseCD
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/DeduccionesCD.cs
+    public class AsignacionesCD : BaseCD
     {
-        
         public string Nombre { get; set; }
         public decimal Porcentaje { get; set; }
         public string Descripcion { get; set; }
 
 
-        // TODO MÉTODO PROTEGIDO Nombre de tabla para Eliminar
+        // TODO metodo protegido Nombre de tabla para Eliminar
 
         protected override string ObtenerNombreTabla()
         {
-<<<<<<< Updated upstream:Datos/Repositorios/DeduccionRepository.cs
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
-            {
-                SqlDataAdapter da = new SqlDataAdapter(
-                    "SELECT Id, Nombre, Tipo, Porcentaje FROM DeduccionBeneficio", con);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
-            }
-=======
-            return "Deducciones";
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/DeduccionesCD.cs
+            return "Asignaciones";
         }
 
 
-        // TODO OBTENER TODAS LAS DEDUCCIONES síncrono
+        // TODO OBTENER TODAS LAS ASIGNACIONES síncrono
 
         public override DataTable ObtenerTodos()
         {
-<<<<<<< Updated upstream:Datos/Repositorios/DeduccionRepository.cs
-=======
             string query = @"SELECT Id, 
                                     Nombre, 
                                     Porcentaje, 
                                     Descripcion 
-                             FROM Deducciones";
+                             FROM Asignaciones";
 
             DataTable tabla = new DataTable();
 
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/DeduccionesCD.cs
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
@@ -71,7 +46,7 @@ namespace Capa_Datos
         }
 
 
-        // TODO OBTENER UNA DEDUCCIÓN POR SU ID síncrono
+        // TODO OBTENER UNA ASIGNACIÓN POR SU ID síncrono
 
         public override DataTable ObtenerPorId(int id)
         {
@@ -79,7 +54,7 @@ namespace Capa_Datos
                                     Nombre, 
                                     Porcentaje, 
                                     Descripcion 
-                             FROM Deducciones 
+                             FROM Asignaciones 
                              WHERE Id = @Id";
 
             DataTable tabla = new DataTable();
@@ -98,11 +73,11 @@ namespace Capa_Datos
         }
 
 
-        // TODO INSERTAR UNA NUEVA DEDUCCIÓN síncrono
+        // TODO INSERTAR UNA NUEVA ASIGNACIÓN síncrono
 
         public override bool Insertar()
         {
-            string query = @"INSERT INTO Deducciones (Nombre, Porcentaje, Descripcion) 
+            string query = @"INSERT INTO Asignaciones (Nombre, Porcentaje, Descripcion) 
                              VALUES (@Nombre, @Porcentaje, @Descripcion)";
 
             using (SqlConnection con = new ConexionDB().AbrirConexion())
@@ -119,19 +94,16 @@ namespace Capa_Datos
         }
 
 
-        //TODO ACTUALIZAR UNA DEDUCCIÓN EXISTENTE síncrono
+        // TODO ACTUALIZAR UNA ASIGNACIÓN EXISTENTE síncrono
 
         public override bool Actualizar(int id)
         {
-<<<<<<< Updated upstream:Datos/Repositorios/DeduccionRepository.cs
-=======
-            string query = @"UPDATE Deducciones 
+            string query = @"UPDATE Asignaciones 
                              SET Nombre      = @Nombre, 
                                  Porcentaje  = @Porcentaje, 
                                  Descripcion = @Descripcion 
                              WHERE Id = @Id";
 
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/DeduccionesCD.cs
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
@@ -147,7 +119,7 @@ namespace Capa_Datos
         }
 
 
-        // TODO OBTENER TODAS LAS DEDUCCIONES asíncrono
+        // TODO OBTENER TODAS LAS ASIGNACIONES asíncrono
 
         public override async Task<DataTable> ObtenerTodosAsync()
         {
@@ -155,7 +127,7 @@ namespace Capa_Datos
                                     Nombre, 
                                     Porcentaje, 
                                     Descripcion 
-                             FROM Deducciones";
+                             FROM Asignaciones";
 
             DataTable tabla = new DataTable();
 
@@ -172,7 +144,7 @@ namespace Capa_Datos
         }
 
 
-        // TODO OBTENER UNA DEDUCCIÓN POR ID asíncrono
+        // TODO OBTENER UNA ASIGNACIÓN POR ID asíncrono
 
         public override async Task<DataTable> ObtenerPorIdAsync(int id)
         {
@@ -180,7 +152,7 @@ namespace Capa_Datos
                                     Nombre, 
                                     Porcentaje, 
                                     Descripcion 
-                             FROM Deducciones 
+                             FROM Asignaciones 
                              WHERE Id = @Id";
 
             DataTable tabla = new DataTable();
@@ -199,11 +171,11 @@ namespace Capa_Datos
         }
 
 
-        // TODO INSERTAR UNA DEDUCCIÓN asíncrono
+        // TODO INSERTAR UNA ASIGNACIÓN asíncrono
 
         public override async Task<bool> InsertarAsync()
         {
-            string query = @"INSERT INTO Deducciones (Nombre, Porcentaje, Descripcion) 
+            string query = @"INSERT INTO Asignaciones (Nombre, Porcentaje, Descripcion) 
                              VALUES (@Nombre, @Porcentaje, @Descripcion)";
 
             using (SqlConnection con = new ConexionDB().AbrirConexion())
@@ -220,11 +192,11 @@ namespace Capa_Datos
         }
 
 
-        // TODO ACTUALIZAR UNA DEDUCCIÓN (asíncrono)
+        // TODO ACTUALIZAR UNA ASIGNACIÓN asíncrono
 
         public override async Task<bool> ActualizarAsync(int id)
         {
-            string query = @"UPDATE Deducciones 
+            string query = @"UPDATE Asignaciones 
                              SET Nombre      = @Nombre, 
                                  Porcentaje  = @Porcentaje, 
                                  Descripcion = @Descripcion 
