@@ -1,34 +1,27 @@
-﻿using CapaDatos;
-<<<<<<< Updated upstream:Datos/Repositorios/DeduccionRepository.cs
+﻿using Datos.Conexion;
 using Entidades;
-=======
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/DeduccionesCD.cs
 using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
-<<<<<<< Updated upstream:Datos/Repositorios/DeduccionRepository.cs
+// ===============================================
+// Esta clase maneja las deducciones configurables
+// Ej: AFP, SFS, etc.
+// ===============================================
+
+// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
+// abrir la conexion con la base de datos
+
+// Modifica esta clase para usar la herencia de la clase BaseCD
+// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+
 namespace Datos.Repositorios
 {
     public class DeduccionRepository
-=======
-namespace Capa_Datos
-{
-    public class DeduccionesCD : BaseCD
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/DeduccionesCD.cs
     {
-        
-        public string Nombre { get; set; }
-        public decimal Porcentaje { get; set; }
-        public string Descripcion { get; set; }
-
-
-        // TODO MÉTODO PROTEGIDO Nombre de tabla para Eliminar
-
-        protected override string ObtenerNombreTabla()
+        public DataTable Listar()
         {
-<<<<<<< Updated upstream:Datos/Repositorios/DeduccionRepository.cs
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
@@ -151,14 +144,6 @@ namespace Capa_Datos
 
         public override async Task<DataTable> ObtenerTodosAsync()
         {
-            string query = @"SELECT Id, 
-                                    Nombre, 
-                                    Porcentaje, 
-                                    Descripcion 
-                             FROM Deducciones";
-
-            DataTable tabla = new DataTable();
-
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
@@ -224,12 +209,6 @@ namespace Capa_Datos
 
         public override async Task<bool> ActualizarAsync(int id)
         {
-            string query = @"UPDATE Deducciones 
-                             SET Nombre      = @Nombre, 
-                                 Porcentaje  = @Porcentaje, 
-                                 Descripcion = @Descripcion 
-                             WHERE Id = @Id";
-
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);

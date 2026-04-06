@@ -41,24 +41,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Asistencia\AsistenciaCN.cs" />
+    <Compile Include="BaseCN.cs" />
+    <Compile Include="Configuracion\AsignacionesCN.cs" />
+    <Compile Include="Configuracion\DepartamentosCN.cs" />
+    <Compile Include="Configuracion\PosicionesCN.cs" />
+    <Compile Include="Empleados\DeduccionesEmpleadoCN.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Servicios\CargoService.cs" />
-    <Compile Include="Servicios\DeduccionService.cs" />
-    <Compile Include="Servicios\EmpleadoService.cs" />
-    <Compile Include="Servicios\NominaService.cs" />
+    <Compile Include="Nomina\VolantesPagoCN.cs" />
+    <Compile Include="Configuracion\DeduccionesCN.cs" />
+    <Compile Include="Empleados\EmpleadosCN.cs" />
+    <Compile Include="Empleados\AsignacionesEmpleadoCN.cs" />
+    <Compile Include="Seguridad\LogginCN.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Datos\Datos.csproj">
+    <ProjectReference Include="..\Datos\Capa_Datos.csproj">
       <Project>{a3baa9f1-8880-4ede-a71f-8dd455577079}</Project>
-      <Name>Datos</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Entidades\Entidades.csproj">
-      <Project>{757a1c47-0bf8-4763-8cde-30e8fd3937fc}</Project>
-      <Name>Entidades</Name>
+      <Name>Capa_Datos</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Abstractas\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

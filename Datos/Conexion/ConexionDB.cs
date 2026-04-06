@@ -1,22 +1,16 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace CapaDatos
+namespace Datos.Conexion
 {
     public class ConexionDB
     {
-        private SqlConnection Conexion = new SqlConnection("Server=localhost;DataBase=TalentBusDB;Integrated Security=true");
-        public SqlConnection AbrirConexion()
+        private static readonly string cadena =
+            "Server=localhost;Database=TalentBusDB;Trusted_Connection=True;";
+
+        public static SqlConnection AbrirConexion()
         {
-            if (Conexion.State == ConnectionState.Closed)
-                Conexion.Open();
-            return Conexion;
-        }
-        public SqlConnection CerrarConexion()
-        {
-            if (Conexion.State == ConnectionState.Open)
-                Conexion.Close();
-            return Conexion;
+            return new SqlConnection(cadena);
         }
     }
 }

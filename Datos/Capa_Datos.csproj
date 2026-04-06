@@ -41,18 +41,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Conexion\Conexion.cs" />
+    <Compile Include="BaseCD.cs" />
+    <Compile Include="Conexion\ConexionDB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositorios\CargoRepository.cs" />
-    <Compile Include="Repositorios\DeduccionRepository.cs" />
-    <Compile Include="Repositorios\EmpleadoRepository.cs" />
-    <Compile Include="Repositorios\NominaRepository.cs" />
+    <Compile Include="Repositorios\Asistencia\AsistenciaCD.cs" />
+    <Compile Include="Repositorios\Configuraciones\AsignacionesCD.cs" />
+    <Compile Include="Repositorios\Configuraciones\PosicionesCD.cs" />
+    <Compile Include="Repositorios\Configuraciones\DeduccionesCD.cs" />
+    <Compile Include="Repositorios\Configuraciones\DepartamentosCD.cs" />
+    <Compile Include="Repositorios\Empleados\AsignacionesEmpleadoCD.cs" />
+    <Compile Include="Repositorios\Empleados\DeduccionesEmpleadoCD.cs" />
+    <Compile Include="Repositorios\Empleados\EmpleadosCD.cs" />
+    <Compile Include="Repositorios\Nomina\VolantesPagoCD.cs" />
+    <Compile Include="Repositorios\Seguridad\LogginCD.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Entidades\Entidades.csproj">
-      <Project>{757a1c47-0bf8-4763-8cde-30e8fd3937fc}</Project>
-      <Name>Entidades</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

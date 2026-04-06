@@ -3,9 +3,9 @@ using System.Data;
 
 namespace Negocio.Servicios
 {
-    public class DeduccionService
+    public class DeduccionesCN
     {
-        DeduccionRepository repo = new DeduccionRepository();
+        DeduccionesCD repo = new DeduccionesCD();
 
         public DataTable Listar()
         {

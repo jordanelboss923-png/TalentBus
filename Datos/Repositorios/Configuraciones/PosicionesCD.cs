@@ -1,22 +1,32 @@
-<<<<<<< Updated upstream:Datos/Repositorios/CargoRepository.cs
-﻿using Entidades;
+using Datos.Conexion;
+
 using System.Data.SqlClient;
 using System.Data;
 using CapaDatos;
 
+// =====================================================
+// Esta clase maneja los cargos con sus salarios
+// Ej: Gerente, Analista, Representante, Jardinero, etc.
+// =====================================================
+
+// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
+// abrir la conexion con la base de datos
+
+// Modifica esta clase para usar la herencia de la clase BaseCD
+// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+
 namespace Datos.Repositorios
 {
-    public class CargoRepository
+    public class PosicionesCD
     {
-        ConexionDB conexion = new ConexionDB();
         public void Insertar(Cargo cargo)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(
                     "INSERT INTO Cargo (NombreCargo, Departamento) VALUES (@Nombre, @Depto)", con);
-                cmd.Parameters.AddWithValue("@Nombre", cargo.NombreCargo);
-                cmd.Parameters.AddWithValue("@Depto", cargo.Departamento);
+                cmd.Parameters.AddWithValue("@Nombre", NombreCargo);
+                cmd.Parameters.AddWithValue("@Depto", Departamento);
                 cmd.ExecuteNonQuery();
 
             }
@@ -29,46 +39,6 @@ namespace Datos.Repositorios
 
         public DataTable Listar()
         {
-=======
-﻿using CapaDatos;
-using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
-
-namespace Capa_Datos
-{
-    public class PosicionesCD : BaseCD
-    {
-        
-        public string Nombre { get; set; }
-        public decimal Salario { get; set; }
-        public int IdDepartamento { get; set; }
-
-
-        // TODO MÉTODO PROTEGIDO: Nombre de tabla para Eliminar
-
-        protected override string ObtenerNombreTabla()
-        {
-            return "Posiciones";
-        }
-
-
-        // TODO OBTENER TODAS LAS POSICIONES síncrono
-
-
-        public override DataTable ObtenerTodos()
-        {
-            string query = @"SELECT p.Id, 
-                                    p.Nombre, 
-                                    p.Salario, 
-                                    d.Nombre AS NombreDepartamento
-                             FROM Posiciones p
-                             INNER JOIN Departamentos d ON d.Id = p.IdDepartamento";
-
-            DataTable tabla = new DataTable();
-
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/PosicionesCD.cs
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
@@ -86,20 +56,6 @@ namespace Capa_Datos
 
         public override DataTable ObtenerPorId(int id)
         {
-<<<<<<< Updated upstream:Datos/Repositorios/CargoRepository.cs
-=======
-            string query = @"SELECT p.Id, 
-                                    p.Nombre, 
-                                    p.Salario, 
-                                    p.IdDepartamento,
-                                    d.Nombre AS NombreDepartamento
-                             FROM Posiciones p
-                             INNER JOIN Departamentos d ON d.Id = p.IdDepartamento
-                             WHERE p.Id = @Id";
-
-            DataTable tabla = new DataTable();
-
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/PosicionesCD.cs
             using (SqlConnection con = new ConexionDB().AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
@@ -113,41 +69,18 @@ namespace Capa_Datos
             return tabla;
         }
 
-
-        // TODO INSERTAR UNA NUEVA POSICIÓN síncrono
-
-
-        public override bool Insertar()
-        {
-            string query = @"INSERT INTO Posiciones (Nombre, Salario, IdDepartamento) 
-                             VALUES (@Nombre, @Salario, @IdDepartamento)";
-
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
-            {
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
-                cmd.Parameters.AddWithValue("@Salario", this.Salario);
-                cmd.Parameters.AddWithValue("@IdDepartamento", this.IdDepartamento);
-                con.Open();
-
-                int filasAfectadas = cmd.ExecuteNonQuery();
-                return filasAfectadas > 0;
-            }
-        }
-
-<<<<<<< Updated upstream:Datos/Repositorios/CargoRepository.cs
         public void Actualizar(Cargo cargo)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlCommand cmd = new SqlCommand(
                     @"UPDATE Cargo SET 
                       NombreCargo  = @Nombre, 
                       Departamento = @Depto 
                       WHERE Id = @Id", con);
-                cmd.Parameters.AddWithValue("@Nombre", cargo.NombreCargo);
-                cmd.Parameters.AddWithValue("@Depto", cargo.Departamento);
-                cmd.Parameters.AddWithValue("@Id", cargo.Id);
+                cmd.Parameters.AddWithValue("@Nombre", NombreCargo);
+                cmd.Parameters.AddWithValue("@Depto", Departamento);
+                cmd.Parameters.AddWithValue("@Id", Id);
                 cmd.ExecuteNonQuery();
 =======
 

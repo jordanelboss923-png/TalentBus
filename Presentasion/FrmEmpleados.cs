@@ -1,4 +1,4 @@
-﻿using Entidades;
+﻿
 using Negocio.Servicios;
 using System;
 using System.Data;
@@ -12,7 +12,7 @@ namespace Presentasion
 {
     public partial class FrmEmpleados : Form
     {
-        EmpleadoService servicio = new EmpleadoService();
+        EmpleadosCN servicio = new EmpleadosCN();
 
         // ✅ Una sola cadena de conexión centralizada
         private readonly string connStr =
@@ -89,17 +89,10 @@ namespace Presentasion
             if (cmbCargo.SelectedValue == null)
             { MessageBox.Show("Selecciona un cargo."); return; }
 
-            Empleado emp = new Empleado
-            {
-                Cedula = txtCedula.Text,
-                Nombre = txtNombre.Text,
-                Apellido = txtApellido.Text,
-                IdCargo = Convert.ToInt32(cmbCargo.SelectedValue), // ✅ Id real
-                SalarioBase = decimal.Parse(txtSalario.Text)
-            };
+           
             try
             {
-                servicio.Registrar(emp);
+                servicio.Registrar(txtCedula.Text, txtNombre.Text, txtApellido.Text, Convert.ToInt32(cmbCargo.SelectedValue), decimal.Parse(txtSalario.Text));
                 MessageBox.Show("Empleado registrado correctamente.");
                 CargarCargos();
             }
@@ -145,19 +138,10 @@ namespace Presentasion
                 return;
             }
 
-            Empleado emp = new Empleado
-            {
-                Cedula = txtCedula.Text,
-                Nombre = txtNombre.Text,
-                Apellido = txtApellido.Text,
-                IdCargo = Convert.ToInt32(cmbCargo.SelectedValue),
-                SalarioBase = decimal.Parse(txtSalario.Text)
-
-
-            };
+          
             if (!decimal.TryParse(txtSalario.Text, out decimal salario))
             { MessageBox.Show("El salario debe ser un número válido."); return; }
-            servicio.Actualizar(emp);
+            servicio.Actualizar(txtCedula.Text, txtNombre.Text, txtApellido.Text, decimal.Parse(txtSalario.Text));
             MessageBox.Show("Empleado actualizado");
         }
 

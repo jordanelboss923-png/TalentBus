@@ -3,10 +3,10 @@ using System.Data;
 
 namespace Negocio.Servicios
 {
-    public class NominaService
+    public class AsignacionesEmpleadoCN
     {
-        NominaRepository repo = new NominaRepository();
-        DeduccionRepository repoDeduccion = new DeduccionRepository();
+        VolantesPagoCD repo = new VolantesPagoCD();
+        DeduccionesCD repoDeduccion = new DeduccionesCD();
 
         public DataTable ListarEmpleados()
         {
