@@ -1,4 +1,4 @@
-﻿using CapaDatos;
+﻿using Capa_Datos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 // usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
 // abrir la conexion con la base de datos
 
+/* TODO ELIMINAR ESTO PARA QUITAR COMENTADO
 
 {
     {
@@ -25,3 +26,5 @@ using System.Threading.Tasks;
         }
     }
 }
+
+*/ // TODO ELIMINAR ESTO PARA QUITAR COMENTADO

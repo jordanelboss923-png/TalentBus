@@ -1,5 +1,4 @@
 ﻿using Datos.Conexion;
-using Entidades;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -15,6 +14,8 @@ using System.Threading.Tasks;
 
 // Modifica esta clase para usar la herencia de la clase BaseCD
 // ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+
+/* TODO ELIMINAR ESTO PARA QUITAR COMENTADO
 
 namespace Datos.Repositorios
 {
@@ -224,3 +225,5 @@ namespace Datos.Repositorios
         }
     }
 }
+
+*/ // TODO QUITAR ESTO PARA ELIMINAR COMENTADO

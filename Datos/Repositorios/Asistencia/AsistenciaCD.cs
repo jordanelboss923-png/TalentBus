@@ -1,4 +1,4 @@
-﻿using CapaDatos;
+﻿using Capa_Datos;
 using System;
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks;
 
+/*
 namespace Capa_Datos
 {
     public class AsistenciaCD : BaseCD
@@ -105,3 +106,5 @@ namespace Capa_Datos
         }
     }
 }
+
+*/

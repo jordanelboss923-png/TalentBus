@@ -1,8 +1,7 @@
 using Datos.Conexion;
-
 using System.Data.SqlClient;
 using System.Data;
-using CapaDatos;
+using Capa_Datos;
 
 // =====================================================
 // Esta clase maneja los cargos con sus salarios
@@ -14,6 +13,8 @@ using CapaDatos;
 
 // Modifica esta clase para usar la herencia de la clase BaseCD
 // ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+
+/* TODO ELIMINAR ESTE PARA QUITAR COMENTADO
 
 namespace Datos.Repositorios
 {
@@ -211,3 +212,5 @@ namespace Datos.Repositorios
         }
     }
 }
+
+*/ // TODO ELIMINAR ESTE PARA QUITAR COMENTADO

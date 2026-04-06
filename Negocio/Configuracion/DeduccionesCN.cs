@@ -1,6 +1,7 @@
 ﻿using Datos.Repositorios;
 using System.Data;
 
+/*
 namespace Negocio.Servicios
 {
     public class DeduccionesCN
@@ -23,3 +24,4 @@ namespace Negocio.Servicios
         }
     }
 }
+*/
