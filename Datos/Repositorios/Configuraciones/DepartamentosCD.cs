@@ -1,24 +1,28 @@
-﻿using System;
+﻿using Capa_Datos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-// ===========================================================
-// Esta clase maneja los distintos departamentos de la empresa
-// Ej: Contabilidad, Recursos Humanos, Reservaciones, etc.
-// ===========================================================
 
 // usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
 // abrir la conexion con la base de datos
 
-// Modifica esta clase para usar la herencia de la clase BaseCD
-// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+/* TODO ELIMINA ESTE PARA QUITAR COMENTADO
 
-namespace Datos.Repositorios
 {
-    public class DepartamentosCD
     {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
+                cmd.Parameters.AddWithValue("@Id", id);
+                await con.OpenAsync();
 
+                int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+                return filasAfectadas > 0;
+            }
+        }
     }
 }
+
+*/ // ELIMINAR ESTO PARA QUITAR COMENTADO

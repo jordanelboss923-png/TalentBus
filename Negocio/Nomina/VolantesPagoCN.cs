@@ -1,6 +1,7 @@
 ﻿using Datos.Repositorios;
 using System.Data;
 
+/*
 namespace Negocio.Servicios
 {
     public class VolantesPagoCN
@@ -28,3 +29,4 @@ namespace Negocio.Servicios
         }
     }
 }
+*/

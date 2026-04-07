@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
+/*
 namespace Negocio.Servicios
 {
     public class EmpleadosCN
@@ -37,3 +38,4 @@ namespace Negocio.Servicios
     }
 
 }
+*/

@@ -1,24 +1,30 @@
-﻿using System;
+﻿using Capa_Datos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-// =========================================
-// Esta clase maneja los bonos configurables
-// Ej: transporte, comisión, etc.
-// =========================================
 
 // usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
 // abrir la conexion con la base de datos
 
-// Modifica esta clase para usar la herencia de la clase BaseCD
-// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+/* TODO ELIMINAR ESTO PARA QUITAR COMENTADO
 
-namespace Datos.Repositorios
 {
-    public class AsignacionesCD
     {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
+                cmd.Parameters.AddWithValue("@Porcentaje", this.Porcentaje);
+                cmd.Parameters.AddWithValue("@Descripcion", this.Descripcion);
+                cmd.Parameters.AddWithValue("@Id", id);
+                await con.OpenAsync();
 
+                int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+                return filasAfectadas > 0;
+            }
+        }
     }
 }
+
+*/ // TODO ELIMINAR ESTO PARA QUITAR COMENTADO

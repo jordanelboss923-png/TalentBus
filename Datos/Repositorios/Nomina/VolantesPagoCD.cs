@@ -13,6 +13,9 @@ using System.Data.SqlClient;
 // Modifica esta clase para usar la herencia de la clase BaseCD
 // ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
 
+
+/* ELIMINAR ESTE PARA QUITAR COMENTADO
+
 namespace Datos.Repositorios
 {
     public class VolantesPagoCD
@@ -165,3 +168,4 @@ namespace Datos.Repositorios
         }
     }
 }
+*/ // TODO ELIMINAR ESTE PARA QUITAR COMENTADO

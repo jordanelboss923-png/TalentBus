@@ -1,6 +1,7 @@
 ﻿using Datos.Repositorios;
 using System.Data;
 
+/*
 namespace Negocio.Servicios
 {
     public class AsignacionesEmpleadoCN
@@ -45,3 +46,4 @@ namespace Negocio.Servicios
         }
     }
 }
+*/
