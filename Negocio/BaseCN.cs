@@ -35,28 +35,32 @@ namespace Negocio
 
         // MÉTODOS VIRTUALES
 
-        // Síncrono
+        // Sincrono
         public virtual (bool exito, string mensaje) Eliminar(int id)
         {
             if (id <= 0)
                 return (false, "ID no válido.");
 
             bool resultado = EjecutarEliminar(id);
-            return resultado
-                ? (true, $"{ObtenerNombreEntidad()} eliminado correctamente.")
-                : (false, $"No se pudo eliminar. {ObtenerNombreEntidad()} puede tener registros asociados.");
+
+            if (resultado)
+                return (true, $"{ObtenerNombreEntidad()} eliminado correctamente.");
+            else
+                return (false, $"No se pudo eliminar. {ObtenerNombreEntidad()} puede tener registros asociados.");
         }
 
-        // Asíncrono
+        // Asincrono
         public virtual async Task<(bool exito, string mensaje)> EliminarAsync(int id)
         {
             if (id <= 0)
                 return (false, "ID no válido.");
 
             bool resultado = await EjecutarEliminarAsync(id);
-            return resultado
-                ? (true, $"{ObtenerNombreEntidad()} eliminado correctamente.")
-                : (false, $"No se pudo eliminar. {ObtenerNombreEntidad()} puede tener registros asociados.");
+
+            if (resultado)
+                return (true, $"{ObtenerNombreEntidad()} eliminado correctamente.");
+            else
+                return (false, $"No se pudo eliminar. {ObtenerNombreEntidad()} puede tener registros asociados.");
         }
 
         // ─────────────────────────────────────────
