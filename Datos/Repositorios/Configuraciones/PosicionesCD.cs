@@ -1,148 +1,63 @@
-using Datos.Conexion;
-using System.Data.SqlClient;
-using System.Data;
 using Capa_Datos;
+using Datos.Conexion;
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Threading.Tasks;
 
-// =====================================================
-// Esta clase maneja los cargos con sus salarios
-// Ej: Gerente, Analista, Representante, Jardinero, etc.
-// =====================================================
-
-// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
-// abrir la conexion con la base de datos
-
-// Modifica esta clase para usar la herencia de la clase BaseCD
-// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
-
-/* TODO ELIMINAR ESTE PARA QUITAR COMENTADO
-
-namespace Datos.Repositorios
+namespace Datos.CD
 {
-    public class PosicionesCD
+    
+    public class PosicionesCD : BaseCD
     {
-        public void Insertar(Cargo cargo)
+        
+        public string Nombre { get; set; }
+        public decimal Salario { get; set; }
+        public int IdDepartamento { get; set; }
+
+        
+        protected override string ObtenerNombreTabla()
         {
-            using (SqlConnection con = ConexionDB.AbrirConexion())
-            {
-                SqlCommand cmd = new SqlCommand(
-                    "INSERT INTO Cargo (NombreCargo, Departamento) VALUES (@Nombre, @Depto)", con);
-                cmd.Parameters.AddWithValue("@Nombre", NombreCargo);
-                cmd.Parameters.AddWithValue("@Depto", Departamento);
-                cmd.ExecuteNonQuery();
-
-            }
-
-
-
-
+            return "Posiciones";
         }
 
-
-        public DataTable Listar()
+        
+        public override DataTable ObtenerTodos()
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
-            {
-                SqlCommand cmd = new SqlCommand(query, con);
-                con.Open();
-
-                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                adapter.Fill(tabla);
-            }
-
-            return tabla;
-        }
-
-
-        // TODO OBTENER UNA POSICIÓN POR SU ID síncrono
-
-        public override DataTable ObtenerPorId(int id)
-        {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
-            {
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@Id", id);
-                con.Open();
-
-                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                adapter.Fill(tabla);
-            }
-
-            return tabla;
-        }
-
-        public void Actualizar(Cargo cargo)
-        {
-            using (SqlConnection con = ConexionDB.AbrirConexion())
-            {
-                SqlCommand cmd = new SqlCommand(
-                    @"UPDATE Cargo SET 
-                      NombreCargo  = @Nombre, 
-                      Departamento = @Depto 
-                      WHERE Id = @Id", con);
-                cmd.Parameters.AddWithValue("@Nombre", NombreCargo);
-                cmd.Parameters.AddWithValue("@Depto", Departamento);
-                cmd.Parameters.AddWithValue("@Id", Id);
-                cmd.ExecuteNonQuery();
-=======
-
-        // TODO ACTUALIZAR UNA POSICIÓN EXISTENTE síncrono
-
-        public override bool Actualizar(int id)
-        {
-            string query = @"UPDATE Posiciones 
-                             SET Nombre         = @Nombre, 
-                                 Salario        = @Salario, 
-                                 IdDepartamento = @IdDepartamento 
-                             WHERE Id = @Id";
-
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
-            {
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
-                cmd.Parameters.AddWithValue("@Salario", this.Salario);
-                cmd.Parameters.AddWithValue("@IdDepartamento", this.IdDepartamento);
-                cmd.Parameters.AddWithValue("@Id", id);
-                con.Open();
-
-                int filasAfectadas = cmd.ExecuteNonQuery();
-                return filasAfectadas > 0;
-            }
-        }
-
-
-        // TODO OBTENER TODAS LAS POSICIONES asíncrono
-
-        public override async Task<DataTable> ObtenerTodosAsync()
-        {
-            string query = @"SELECT p.Id, 
-                                    p.Nombre, 
-                                    p.Salario, 
+            string query = @"SELECT p.Id,
+                                    p.Nombre,
+                                    p.Salario,
                                     d.Nombre AS NombreDepartamento
                              FROM Posiciones p
                              INNER JOIN Departamentos d ON d.Id = p.IdDepartamento";
 
             DataTable tabla = new DataTable();
 
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            try
             {
-                SqlCommand cmd = new SqlCommand(query, con);
-                await con.OpenAsync();
-
-                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                adapter.Fill(tabla);
+                using (SqlConnection con = ConexionDB.AbrirConexion())
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    con.Open();
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(tabla);
+                }
+            }
+            catch (SqlException ex)
+            {
+                
+                throw new Exception("Error al obtener posiciones: " + ex.Message);
             }
 
             return tabla;
         }
 
-
-        // TODO OBTENER UNA POSICIÓN POR ID asíncrono
-
-        public override async Task<DataTable> ObtenerPorIdAsync(int id)
+        
+        public override DataTable ObtenerPorId(int id)
         {
-            string query = @"SELECT p.Id, 
-                                    p.Nombre, 
-                                    p.Salario, 
+            string query = @"SELECT p.Id,
+                                    p.Nombre,
+                                    p.Salario,
                                     p.IdDepartamento,
                                     d.Nombre AS NombreDepartamento
                              FROM Posiciones p
@@ -151,66 +66,201 @@ namespace Datos.Repositorios
 
             DataTable tabla = new DataTable();
 
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            try
             {
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@Id", id);
-                await con.OpenAsync();
-
-                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                adapter.Fill(tabla);
+                using (SqlConnection con = ConexionDB.AbrirConexion())
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    con.Open();
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(tabla);
+                }
+            }
+            catch (SqlException ex)
+            {
+                
+                throw new Exception("Error al obtener posicion: " + ex.Message);
             }
 
             return tabla;
         }
 
-
-        // TODO INSERTAR UNA POSICIÓN asíncrono
-
-        public override async Task<bool> InsertarAsync()
+        
+        public override bool Insertar()
         {
-            string query = @"INSERT INTO Posiciones (Nombre, Salario, IdDepartamento) 
+            string query = @"INSERT INTO Posiciones (Nombre, Salario, IdDepartamento)
                              VALUES (@Nombre, @Salario, @IdDepartamento)";
 
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            try
             {
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
-                cmd.Parameters.AddWithValue("@Salario", this.Salario);
-                cmd.Parameters.AddWithValue("@IdDepartamento", this.IdDepartamento);
-                await con.OpenAsync();
-
-                int filasAfectadas = await cmd.ExecuteNonQueryAsync();
-                return filasAfectadas > 0;
+                using (SqlConnection con = ConexionDB.AbrirConexion())
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
+                    cmd.Parameters.AddWithValue("@Salario", this.Salario);
+                    cmd.Parameters.AddWithValue("@IdDepartamento", this.IdDepartamento);
+                    con.Open();
+                    int filas = cmd.ExecuteNonQuery();
+                    return filas > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                
+                throw new Exception("Error al insertar posicion: " + ex.Message);
             }
         }
 
-
-        // TODO ACTUALIZAR UNA POSICIÓN asíncrono
-
-        public override async Task<bool> ActualizarAsync(int id)
+        
+        public override bool Actualizar(int id)
         {
-            string query = @"UPDATE Posiciones 
-                             SET Nombre         = @Nombre, 
-                                 Salario        = @Salario, 
-                                 IdDepartamento = @IdDepartamento 
+            string query = @"UPDATE Posiciones
+                             SET Nombre         = @Nombre,
+                                 Salario        = @Salario,
+                                 IdDepartamento = @IdDepartamento
                              WHERE Id = @Id";
 
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            try
             {
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
-                cmd.Parameters.AddWithValue("@Salario", this.Salario);
-                cmd.Parameters.AddWithValue("@IdDepartamento", this.IdDepartamento);
-                cmd.Parameters.AddWithValue("@Id", id);
-                await con.OpenAsync();
+                using (SqlConnection con = ConexionDB.AbrirConexion())
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
+                    cmd.Parameters.AddWithValue("@Salario", this.Salario);
+                    cmd.Parameters.AddWithValue("@IdDepartamento", this.IdDepartamento);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    con.Open();
+                    int filas = cmd.ExecuteNonQuery();
+                    return filas > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                
+                throw new Exception("Error al actualizar posicion: " + ex.Message);
+            }
+        }
 
-                int filasAfectadas = await cmd.ExecuteNonQueryAsync();
-                return filasAfectadas > 0;
->>>>>>> Stashed changes:Datos/Repositorios/Configuraciones/PosicionesCD.cs
+        
+        public override async Task<DataTable> ObtenerTodosAsync()
+        {
+            string query = @"SELECT p.Id,
+                                    p.Nombre,
+                                    p.Salario,
+                                    d.Nombre AS NombreDepartamento
+                             FROM Posiciones p
+                             INNER JOIN Departamentos d ON d.Id = p.IdDepartamento";
+
+            DataTable tabla = new DataTable();
+
+            try
+            {
+                using (SqlConnection con = ConexionDB.AbrirConexion())
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    await con.OpenAsync();
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(tabla);
+                }
+            }
+            catch (SqlException ex)
+            {
+                
+                throw new Exception("Error al obtener posiciones: " + ex.Message);
+            }
+
+            return tabla;
+        }
+
+        
+        public override async Task<DataTable> ObtenerPorIdAsync(int id)
+        {
+            string query = @"SELECT p.Id,
+                                    p.Nombre,
+                                    p.Salario,
+                                    p.IdDepartamento,
+                                    d.Nombre AS NombreDepartamento
+                             FROM Posiciones p
+                             INNER JOIN Departamentos d ON d.Id = p.IdDepartamento
+                             WHERE p.Id = @Id";
+
+            DataTable tabla = new DataTable();
+
+            try
+            {
+                using (SqlConnection con = ConexionDB.AbrirConexion())
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    await con.OpenAsync();
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(tabla);
+                }
+            }
+            catch (SqlException ex)
+            {
+                
+                throw new Exception("Error al obtener posicion: " + ex.Message);
+            }
+
+            return tabla;
+        }
+
+        
+        public override async Task<bool> InsertarAsync()
+        {
+            string query = @"INSERT INTO Posiciones (Nombre, Salario, IdDepartamento)
+                             VALUES (@Nombre, @Salario, @IdDepartamento)";
+
+            try
+            {
+                using (SqlConnection con = ConexionDB.AbrirConexion())
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
+                    cmd.Parameters.AddWithValue("@Salario", this.Salario);
+                    cmd.Parameters.AddWithValue("@IdDepartamento", this.IdDepartamento);
+                    await con.OpenAsync();
+                    int filas = await cmd.ExecuteNonQueryAsync();
+                    return filas > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                
+                throw new Exception("Error al insertar posicion: " + ex.Message);
+            }
+        }
+
+        
+        public override async Task<bool> ActualizarAsync(int id)
+        {
+            string query = @"UPDATE Posiciones
+                             SET Nombre         = @Nombre,
+                                 Salario        = @Salario,
+                                 IdDepartamento = @IdDepartamento
+                             WHERE Id = @Id";
+
+            try
+            {
+                using (SqlConnection con = ConexionDB.AbrirConexion())
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Nombre", this.Nombre);
+                    cmd.Parameters.AddWithValue("@Salario", this.Salario);
+                    cmd.Parameters.AddWithValue("@IdDepartamento", this.IdDepartamento);
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    await con.OpenAsync();
+                    int filas = await cmd.ExecuteNonQueryAsync();
+                    return filas > 0;
+                }
+            }
+            catch (SqlException ex)
+            {
+                
+                throw new Exception("Error al actualizar posicion: " + ex.Message);
             }
         }
     }
 }
-
-*/ // TODO ELIMINAR ESTE PARA QUITAR COMENTADO
