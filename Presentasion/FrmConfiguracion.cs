@@ -13,7 +13,7 @@ namespace Presentasion
 {
     public partial class FrmConfiguracion : Form
     {
-        DeduccionService servicio = new DeduccionService();
+        DeduccionesCN servicio = new DeduccionesCN();
         int idSeleccionado = 0;
         public FrmConfiguracion()
         {

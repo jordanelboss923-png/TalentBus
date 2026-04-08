@@ -34,9 +34,15 @@ namespace Entidades
         public decimal CalcularAFP()
         {
             return SalarioBase * 0.0287m;
+
+            Console.WriteLine(  "Probando");
         }
 
         // ARS: 3.04% del salario
+
+        //Hola
+
+
         public decimal CalcularARS()
         {
             return SalarioBase * 0.0304m;
@@ -51,6 +57,8 @@ namespace Entidades
             else if (anual <= 624329m) return (anual - 416220m) * 0.15m / 12;
             else if (anual <= 867123m) return (31216m + (anual - 624329m) * 0.20m) / 12;
             else return (79776m + (anual - 867123m) * 0.25m) / 12;
+
+
         }
 
         

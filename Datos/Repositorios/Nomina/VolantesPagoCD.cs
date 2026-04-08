@@ -1,16 +1,28 @@
 ﻿using Datos.Conexion;
-using Entidades;
 using System;
 using System.Data;
 using System.Data.SqlClient;
 
+// ==========================================================================
+// Esta clase maneja el recibo de pago: subtotal, descuentos y neto a cobrar
+// ==========================================================================
+
+// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
+// abrir la conexion con la base de datos
+
+// Modifica esta clase para usar la herencia de la clase BaseCD
+// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
+
+
+/* ELIMINAR ESTE PARA QUITAR COMENTADO
+
 namespace Datos.Repositorios
 {
-    public class NominaRepository
+    public class VolantesPagoCD
     {
         public DataTable ListarEmpleados()
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
                     @"SELECT e.Id, e.Cedula, e.Nombre, e.Apellido, 
@@ -23,11 +35,9 @@ namespace Datos.Repositorios
             }
         }
 
-        public void GenerarNomina(DataTable empleados,
-                                   decimal pctAFP,
-                                   decimal pctARS)
+        public void GenerarNomina(DataTable empleados, decimal pctAFP, decimal pctARS)
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 
                 // TRANSACCIÓN: si algo falla, se revierte todo
@@ -105,7 +115,7 @@ namespace Datos.Repositorios
 
         public DataTable ResumenPorDepartamento()
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
                     @"SELECT 
@@ -135,7 +145,7 @@ namespace Datos.Repositorios
         }
         public DataTable ListarNominaCompleta()
         {
-            using (SqlConnection con = new ConexionDB().AbrirConexion())
+            using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
                     @"SELECT 
@@ -158,3 +168,4 @@ namespace Datos.Repositorios
         }
     }
 }
+*/ // TODO ELIMINAR ESTE PARA QUITAR COMENTADO
