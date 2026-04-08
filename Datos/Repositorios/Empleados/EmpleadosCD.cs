@@ -1,98 +1,214 @@
 ﻿using Capa_Datos;
+using Datos.Conexion;
+using System;
+using System.Data;
 using System.Data.SqlClient;
-
-// =========================================================
-// Esta clase maneja los CRUD de los datos de cada empleado,
-// tambien indica el tipo de empleado (fijo, temporal, etc.)
-// =========================================================
-
-// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
-// abrir la conexion con la base de datos
-
-// Modifica esta clase para usar la herencia de la clase BaseCD
-// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
-
-/*  TODO ELIMINAR ESTE PARA QUITAR COMENTADO
+using System.Threading.Tasks;
 
 namespace Datos.Repositorios
 {
-    public class EmpleadosCD
+    public class EmpleadosCD : BaseCD
     {
-        public void Insertar(string Cedula, string Nombre, string Apellido, int IdCargo, decimal SalarioBase)
+        protected override string ObtenerNombreTabla()
+        {
+            return "Empleados";
+        }
+
+        // ─────────────────────────────────────────────────────
+        // Propiedades para Insertar/Actualizar
+        // ─────────────────────────────────────────────────────
+        public string CodigoEmpleado { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public string Cedula { get; set; }
+        public int Tipo { get; set; } // 1 = Fijo, 2 = Por hora
+        public int IdPosicion { get; set; }
+
+        // ─────────────────────────────────────────────────────
+        // ObtenerTodos
+        // ─────────────────────────────────────────────────────
+        public override DataTable ObtenerTodos()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
-                string sql = @"INSERT INTO Empleado 
-                              (Cedula, Nombre, Apellido, IdCargo, SalarioBase)
-                              VALUES (@Cedula, @Nombre, @Apellido, @IdCargo, @Salario)";
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT e.Id, e.CodigoEmpleado, e.Nombre, e.Apellido,
+                             e.Cedula, e.Tipo, e.SalarioBase, e.FechaIngreso,
+                             p.Nombre AS Posicion
+                      FROM Empleados e
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID", con);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
 
+        public override async Task<DataTable> ObtenerTodosAsync()
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                await con.OpenAsync();
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT e.Id, e.CodigoEmpleado, e.Nombre, e.Apellido,
+                             e.Cedula, e.Tipo, e.SalarioBase, e.FechaIngreso,
+                             p.Nombre AS Posicion
+                      FROM Empleados e
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID", con);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        // ─────────────────────────────────────────────────────
+        // ObtenerPorId
+        // ─────────────────────────────────────────────────────
+        public override DataTable ObtenerPorId(int id)
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT e.Id, e.CodigoEmpleado, e.Nombre, e.Apellido,
+                             e.Cedula, e.Tipo, e.SalarioBase, e.FechaIngreso,
+                             p.Nombre AS Posicion
+                      FROM Empleados e
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID
+                      WHERE e.Id = @Id", con);
+                da.SelectCommand.Parameters.AddWithValue("@Id", id);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        public override async Task<DataTable> ObtenerPorIdAsync(int id)
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                await con.OpenAsync();
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT e.Id, e.CodigoEmpleado, e.Nombre, e.Apellido,
+                             e.Cedula, e.Tipo, e.SalarioBase, e.FechaIngreso,
+                             p.Nombre AS Posicion
+                      FROM Empleados e
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID
+                      WHERE e.Id = @Id", con);
+                da.SelectCommand.Parameters.AddWithValue("@Id", id);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        // ─────────────────────────────────────────────────────
+        // ObtenerPorCedula (extra útil)
+        // ─────────────────────────────────────────────────────
+        public DataTable ObtenerPorCedula(string cedula)
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT e.Id, e.CodigoEmpleado, e.Nombre, e.Apellido,
+                             e.Cedula, e.Tipo, e.SalarioBase, e.FechaIngreso,
+                             p.Nombre AS Posicion
+                      FROM Empleados e
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID
+                      WHERE e.Cedula = @Cedula", con);
+                da.SelectCommand.Parameters.AddWithValue("@Cedula", cedula);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        // ─────────────────────────────────────────────────────
+        // Insertar
+        // ─────────────────────────────────────────────────────
+        public override bool Insertar()
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                string sql = @"INSERT INTO Empleados
+                               (CodigoEmpleado, Nombre, Apellido, Cedula, Tipo, IdPosicion)
+                               VALUES (@Codigo, @Nombre, @Apellido, @Cedula, @Tipo, @IdPosicion)";
                 SqlCommand cmd = new SqlCommand(sql, con);
-                cmd.Parameters.AddWithValue("@Cedula", Cedula);
+                cmd.Parameters.AddWithValue("@Codigo", CodigoEmpleado);
                 cmd.Parameters.AddWithValue("@Nombre", Nombre);
                 cmd.Parameters.AddWithValue("@Apellido", Apellido);
-                cmd.Parameters.AddWithValue("@IdCargo", IdCargo);
-                cmd.Parameters.AddWithValue("@Salario", SalarioBase);
-
-                cmd.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Cedula", Cedula);
+                cmd.Parameters.AddWithValue("@Tipo", Tipo);
+                cmd.Parameters.AddWithValue("@IdPosicion", IdPosicion);
+                return cmd.ExecuteNonQuery() > 0;
             }
         }
-        public SqlDataReader Listar()
-        {
-            SqlConnection con = ConexionDB.AbrirConexion();
-            SqlCommand cmd = new SqlCommand(
-                @"SELECT e.Cedula, e.Nombre, e.Apellido, 
-                 c.NombreCargo, e.SalarioBase, e.FechaIngreso
-          FROM Empleado e
-          INNER JOIN Cargo c ON e.IdCargo = c.Id", con);
 
-            return cmd.ExecuteReader();
-        }
-        public void Eliminar(string cedula)
+        public override async Task<bool> InsertarAsync()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
-                // Primero elimina el detalle de nómina relacionado
-                SqlCommand cmdDetalle = new SqlCommand(
-                    @"DELETE FROM NominaDetalle 
-              WHERE IdEmpleado = (SELECT Id FROM Empleado WHERE Cedula = @Cedula)", con);
-                cmdDetalle.Parameters.AddWithValue("@Cedula", cedula);
-                cmdDetalle.ExecuteNonQuery();
-
-                // Luego elimina el empleado
-                SqlCommand cmdEmpleado = new SqlCommand(
-                    "DELETE FROM Empleado WHERE Cedula = @Cedula", con);
-                cmdEmpleado.Parameters.AddWithValue("@Cedula", cedula);
-                cmdEmpleado.ExecuteNonQuery();
+                string sql = @"INSERT INTO Empleados
+                               (CodigoEmpleado, Nombre, Apellido, Cedula, Tipo, IdPosicion)
+                               VALUES (@Codigo, @Nombre, @Apellido, @Cedula, @Tipo, @IdPosicion)";
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@Codigo", CodigoEmpleado);
+                cmd.Parameters.AddWithValue("@Nombre", Nombre);
+                cmd.Parameters.AddWithValue("@Apellido", Apellido);
+                cmd.Parameters.AddWithValue("@Cedula", Cedula);
+                cmd.Parameters.AddWithValue("@Tipo", Tipo);
+                cmd.Parameters.AddWithValue("@IdPosicion", IdPosicion);
+                await con.OpenAsync();
+                int filas = await cmd.ExecuteNonQueryAsync();
+                return filas > 0;
             }
         }
-        public void Actualizar(string Cedula, string Nombre, string Apellido, decimal SalarioBase)
+
+        // ─────────────────────────────────────────────────────
+        // Actualizar
+        // ─────────────────────────────────────────────────────
+        public override bool Actualizar(int id)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
-                string sql = @"UPDATE Empleado SET
-                              Nombre = @Nombre,
-                              Apellido = @Apellido,
-                              SalarioBase = @Salario
-                              WHERE Cedula = @Cedula";
-
+                string sql = @"UPDATE Empleados SET
+                               Nombre     = @Nombre,
+                               Apellido   = @Apellido,
+                               Cedula     = @Cedula,
+                               Tipo       = @Tipo,
+                               IdPosicion = @IdPosicion
+                               WHERE Id = @Id";
                 SqlCommand cmd = new SqlCommand(sql, con);
                 cmd.Parameters.AddWithValue("@Nombre", Nombre);
                 cmd.Parameters.AddWithValue("@Apellido", Apellido);
-                cmd.Parameters.AddWithValue("@Salario", SalarioBase);
                 cmd.Parameters.AddWithValue("@Cedula", Cedula);
-
-                cmd.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Tipo", Tipo);
+                cmd.Parameters.AddWithValue("@IdPosicion", IdPosicion);
+                cmd.Parameters.AddWithValue("@Id", id);
+                return cmd.ExecuteNonQuery() > 0;
             }
         }
-        public bool ProbarConexion()
+
+        public override async Task<bool> ActualizarAsync(int id)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
-                return con.State == System.Data.ConnectionState.Open;
+                string sql = @"UPDATE Empleados SET
+                               Nombre     = @Nombre,
+                               Apellido   = @Apellido,
+                               Cedula     = @Cedula,
+                               Tipo       = @Tipo,
+                               IdPosicion = @IdPosicion
+                               WHERE Id = @Id";
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@Nombre", Nombre);
+                cmd.Parameters.AddWithValue("@Apellido", Apellido);
+                cmd.Parameters.AddWithValue("@Cedula", Cedula);
+                cmd.Parameters.AddWithValue("@Tipo", Tipo);
+                cmd.Parameters.AddWithValue("@IdPosicion", IdPosicion);
+                cmd.Parameters.AddWithValue("@Id", id);
+                await con.OpenAsync();
+                int filas = await cmd.ExecuteNonQueryAsync();
+                return filas > 0;
             }
         }
-
     }
-
 }
-*/ // TODO ELIMINAR ESTE PARA QUITAR COMENTADO
