@@ -1,171 +1,280 @@
-﻿using Datos.Conexion;
+﻿using Capa_Datos;
+using Datos.Conexion;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
-// ==========================================================================
-// Esta clase maneja el recibo de pago: subtotal, descuentos y neto a cobrar
-// ==========================================================================
-
-// usa using (SqlConnection con = ConexionDB.AbrirConexion()) para
-// abrir la conexion con la base de datos
-
-// Modifica esta clase para usar la herencia de la clase BaseCD
-// ¡¡¡¡¡¡¡¡¡¡REVISA LA CLASE BaseCD!!!!!!!!!
-
-
-/* ELIMINAR ESTE PARA QUITAR COMENTADO
-
-namespace Datos.Repositorios
+namespace Datos.Repositorios.Nomina
 {
-    public class VolantesPagoCD
+    public class VolantesPagoCD : BaseCD
     {
-        public DataTable ListarEmpleados()
+        protected override string ObtenerNombreTabla()
+        {
+            return "SalarioST";
+        }
+
+        // ─────────────────────────────────────────────────────
+        // Propiedades para Insertar/Actualizar
+        // ─────────────────────────────────────────────────────
+        public int IdEmpleado { get; set; }
+        public decimal SueldoBase { get; set; }
+        public decimal Asignacion { get; set; }
+        public decimal Total { get; set; }
+        public DateTime FechaEfectividad { get; set; }
+
+        // ─────────────────────────────────────────────────────
+        // ObtenerTodos
+        // ─────────────────────────────────────────────────────
+        public override DataTable ObtenerTodos()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
-                    @"SELECT e.Id, e.Cedula, e.Nombre, e.Apellido, 
-                             c.NombreCargo, e.SalarioBase
-                      FROM Empleado e
-                      INNER JOIN Cargo c ON e.IdCargo = c.Id", con);
+                    @"SELECT s.Id,
+                             e.CodigoEmpleado,
+                             e.Nombre + ' ' + e.Apellido AS Empleado,
+                             p.Nombre                    AS Posicion,
+                             s.Sueldobase,
+                             s.Asignacion,
+                             s.Total,
+                             s.FechaEfectividad,
+                             s.FechaRegistro
+                      FROM SalarioST s
+                      INNER JOIN Empleados  e ON s.IdEmpleado  = e.Id
+                      INNER JOIN Posiciones p ON e.IdPosicion  = p.ID", con);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 return dt;
             }
         }
 
-        public void GenerarNomina(DataTable empleados, decimal pctAFP, decimal pctARS)
+        public override async Task<DataTable> ObtenerTodosAsync()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
-                
-                // TRANSACCIÓN: si algo falla, se revierte todo
-                SqlTransaction trans = con.BeginTransaction();
-
-                try
-                {
-                    // 1. Insertar cabecera Nomina
-                    SqlCommand cmdNomina = new SqlCommand(
-                        @"INSERT INTO Nomina (Fecha, TotalBruto, TotalDeducciones, TotalNeto)
-                          VALUES (GETDATE(), @Bruto, @Deducciones, @Neto);
-                          SELECT SCOPE_IDENTITY();", con, trans);
-
-                    decimal totalBruto = 0, totalDeducciones = 0, totalNeto = 0;
-
-                    foreach (DataRow row in empleados.Rows)
-                    {
-                        decimal salario = Convert.ToDecimal(row["SalarioBase"]);
-                        int horasExtra = Convert.ToInt32(row["HorasExtra"]);
-                        decimal afp = salario * (pctAFP / 100);
-                        decimal ars = salario * (pctARS / 100);
-                        decimal isr = CalcularISR(salario);
-                        decimal extras = (salario / 240) * 1.35m * horasExtra;
-                        decimal bruto = salario + extras;
-                        decimal deducciones = afp + ars + isr;
-                        decimal neto = bruto - deducciones;
-
-                        totalBruto += bruto;
-                        totalDeducciones += deducciones;
-                        totalNeto += neto;
-                    }
-
-                    cmdNomina.Parameters.AddWithValue("@Bruto", totalBruto);
-                    cmdNomina.Parameters.AddWithValue("@Deducciones", totalDeducciones);
-                    cmdNomina.Parameters.AddWithValue("@Neto", totalNeto);
-
-                    int idNomina = Convert.ToInt32(cmdNomina.ExecuteScalar());
-
-                    // 2. Insertar detalle por empleado
-                    foreach (DataRow row in empleados.Rows)
-                    {
-                        decimal salario = Convert.ToDecimal(row["SalarioBase"]);
-                        int horasExtra = Convert.ToInt32(row["HorasExtra"]);
-                        decimal afp = salario * (pctAFP / 100);
-                        decimal ars = salario * (pctARS / 100);
-                        decimal isr = CalcularISR(salario);
-                        decimal extras = (salario / 240) * 1.35m * horasExtra;
-                        decimal bruto = salario + extras;
-                        decimal deducciones = afp + ars + isr;
-                        decimal neto = bruto - deducciones;
-
-                        SqlCommand cmdDetalle = new SqlCommand(
-                            @"INSERT INTO NominaDetalle 
-                              (IdNomina, IdEmpleado, SalarioBruto, TotalDeducciones, SalarioNeto)
-                              VALUES (@IdNomina, @IdEmpleado, @Bruto, @Deducciones, @Neto)",
-                              con, trans);
-
-                        cmdDetalle.Parameters.AddWithValue("@IdNomina", idNomina);
-                        cmdDetalle.Parameters.AddWithValue("@IdEmpleado", Convert.ToInt32(row["Id"]));
-                        cmdDetalle.Parameters.AddWithValue("@Bruto", bruto);
-                        cmdDetalle.Parameters.AddWithValue("@Deducciones", deducciones);
-                        cmdDetalle.Parameters.AddWithValue("@Neto", neto);
-                        cmdDetalle.ExecuteNonQuery();
-                    }
-
-                    trans.Commit(); //  Todo salió bien
-                }
-                catch
-                {
-                    trans.Rollback(); //  Algo falló, se revierte todo
-                    throw;
-                }
+                await con.OpenAsync();
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT s.Id,
+                             e.CodigoEmpleado,
+                             e.Nombre + ' ' + e.Apellido AS Empleado,
+                             p.Nombre                    AS Posicion,
+                             s.Sueldobase,
+                             s.Asignacion,
+                             s.Total,
+                             s.FechaEfectividad,
+                             s.FechaRegistro
+                      FROM SalarioST s
+                      INNER JOIN Empleados  e ON s.IdEmpleado = e.Id
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID", con);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
             }
         }
 
-        public DataTable ResumenPorDepartamento()
+        // ─────────────────────────────────────────────────────
+        // ObtenerPorId
+        // ─────────────────────────────────────────────────────
+        public override DataTable ObtenerPorId(int id)
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT s.Id,
+                             e.CodigoEmpleado,
+                             e.Nombre + ' ' + e.Apellido AS Empleado,
+                             p.Nombre                    AS Posicion,
+                             s.Sueldobase,
+                             s.Asignacion,
+                             s.Total,
+                             s.FechaEfectividad,
+                             s.FechaRegistro
+                      FROM SalarioST s
+                      INNER JOIN Empleados  e ON s.IdEmpleado = e.Id
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID
+                      WHERE s.Id = @Id", con);
+                da.SelectCommand.Parameters.AddWithValue("@Id", id);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        public override async Task<DataTable> ObtenerPorIdAsync(int id)
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                await con.OpenAsync();
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT s.Id,
+                             e.CodigoEmpleado,
+                             e.Nombre + ' ' + e.Apellido AS Empleado,
+                             p.Nombre                    AS Posicion,
+                             s.Sueldobase,
+                             s.Asignacion,
+                             s.Total,
+                             s.FechaEfectividad,
+                             s.FechaRegistro
+                      FROM SalarioST s
+                      INNER JOIN Empleados  e ON s.IdEmpleado = e.Id
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID
+                      WHERE s.Id = @Id", con);
+                da.SelectCommand.Parameters.AddWithValue("@Id", id);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        // ─────────────────────────────────────────────────────
+        // ObtenerPorEmpleado (extra útil para el volante)
+        // ─────────────────────────────────────────────────────
+        public DataTable ObtenerPorEmpleado(int idEmpleado)
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT s.Id,
+                             e.CodigoEmpleado,
+                             e.Nombre + ' ' + e.Apellido AS Empleado,
+                             p.Nombre                    AS Posicion,
+                             s.Sueldobase,
+                             s.Asignacion,
+                             s.Total,
+                             s.FechaEfectividad,
+                             s.FechaRegistro
+                      FROM SalarioST s
+                      INNER JOIN Empleados  e ON s.IdEmpleado = e.Id
+                      INNER JOIN Posiciones p ON e.IdPosicion = p.ID
+                      WHERE s.IdEmpleado = @IdEmpleado
+                      ORDER BY s.FechaEfectividad DESC", con);
+                da.SelectCommand.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        // ─────────────────────────────────────────────────────
+        // ObtenerVolanteCompleto (incluye deducciones)
+        // ─────────────────────────────────────────────────────
+        public DataTable ObtenerVolanteCompleto(int idEmpleado, DateTime fechaEfectividad)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
                     @"SELECT 
-                c.Departamento,
-                COUNT(e.Id)               AS TotalEmpleados,
-                SUM(nd.SalarioBruto)      AS TotalBruto,
-                SUM(nd.TotalDeducciones)  AS TotalDeducciones,
-                SUM(nd.SalarioNeto)       AS TotalNeto
-              FROM NominaDetalle nd
-              INNER JOIN Empleado e ON nd.IdEmpleado = e.Id
-              INNER JOIN Cargo    c ON e.IdCargo     = c.Id
-              WHERE nd.IdNomina = (SELECT MAX(Id) FROM Nomina) --  Solo la última
-              GROUP BY c.Departamento", con);
+                             e.CodigoEmpleado,
+                             e.Nombre + ' ' + e.Apellido AS Empleado,
+                             p.Nombre                    AS Posicion,
+                             s.Sueldobase,
+                             s.Asignacion,
+                             s.Total                     AS TotalAsignado,
+                             ISNULL(SUM(de.Monto), 0)    AS TotalDeducciones,
+                             s.Total - ISNULL(SUM(de.Monto), 0) AS SalarioNeto,
+                             s.FechaEfectividad
+                      FROM SalarioST s
+                      INNER JOIN Empleados  e  ON s.IdEmpleado  = e.Id
+                      INNER JOIN Posiciones p  ON e.IdPosicion  = p.ID
+                      LEFT  JOIN DeduccionesEmpleado de 
+                             ON de.IdEmpleado       = s.IdEmpleado
+                            AND de.IdSubtotal       = s.Id
+                      WHERE s.IdEmpleado       = @IdEmpleado
+                        AND s.FechaEfectividad = @Fecha
+                      GROUP BY e.CodigoEmpleado, e.Nombre, e.Apellido,
+                               p.Nombre, s.Sueldobase, s.Asignacion,
+                               s.Total, s.FechaEfectividad", con);
+                da.SelectCommand.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                da.SelectCommand.Parameters.AddWithValue("@Fecha", fechaEfectividad);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 return dt;
             }
         }
-        public decimal CalcularISR(decimal salarioMensual)
-        {
-            decimal anual = salarioMensual * 12;
 
-            if (anual <= 416220m) return 0;
-            else if (anual <= 624329m) return (anual - 416220m) * 0.15m / 12;
-            else if (anual <= 867123m) return (31216m + (anual - 624329m) * 0.20m) / 12;
-            else return (79776m + (anual - 867123m) * 0.25m) / 12;
-        }
-        public DataTable ListarNominaCompleta()
+        // ─────────────────────────────────────────────────────
+        // Insertar
+        // ─────────────────────────────────────────────────────
+        public override bool Insertar()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
-                SqlDataAdapter da = new SqlDataAdapter(
-                    @"SELECT 
-                n.Fecha,
-                e.Nombre,
-                e.Apellido,
-                c.NombreCargo      AS Cargo,
-                nd.SalarioBruto,
-                nd.TotalDeducciones,
-                nd.SalarioNeto
-              FROM NominaDetalle nd
-              INNER JOIN Nomina   n ON nd.IdNomina   = n.Id
-              INNER JOIN Empleado e ON nd.IdEmpleado = e.Id
-              INNER JOIN Cargo    c ON e.IdCargo     = c.Id
-              ORDER BY n.Fecha DESC", con);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                return dt;
+                string sql = @"INSERT INTO SalarioST
+                               (IdEmpleado, Sueldobase, Asignacion, Total, FechaEfectividad)
+                               VALUES (@IdEmpleado, @Sueldobase, @Asignacion, @Total, @FechaEfectividad)";
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
+                cmd.Parameters.AddWithValue("@Sueldobase", SueldoBase);
+                cmd.Parameters.AddWithValue("@Asignacion", Asignacion);
+                cmd.Parameters.AddWithValue("@Total", Total);
+                cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public override async Task<bool> InsertarAsync()
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                string sql = @"INSERT INTO SalarioST
+                               (IdEmpleado, Sueldobase, Asignacion, Total, FechaEfectividad)
+                               VALUES (@IdEmpleado, @Sueldobase, @Asignacion, @Total, @FechaEfectividad)";
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
+                cmd.Parameters.AddWithValue("@Sueldobase", SueldoBase);
+                cmd.Parameters.AddWithValue("@Asignacion", Asignacion);
+                cmd.Parameters.AddWithValue("@Total", Total);
+                cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
+                await con.OpenAsync();
+                int filas = await cmd.ExecuteNonQueryAsync();
+                return filas > 0;
+            }
+        }
+
+        // ─────────────────────────────────────────────────────
+        // Actualizar
+        // ─────────────────────────────────────────────────────
+        public override bool Actualizar(int id)
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                string sql = @"UPDATE SalarioST SET
+                               Sueldobase       = @Sueldobase,
+                               Asignacion       = @Asignacion,
+                               Total            = @Total,
+                               FechaEfectividad = @FechaEfectividad
+                               WHERE Id = @Id";
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@Sueldobase", SueldoBase);
+                cmd.Parameters.AddWithValue("@Asignacion", Asignacion);
+                cmd.Parameters.AddWithValue("@Total", Total);
+                cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
+                cmd.Parameters.AddWithValue("@Id", id);
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public override async Task<bool> ActualizarAsync(int id)
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                string sql = @"UPDATE SalarioST SET
+                               Sueldobase       = @Sueldobase,
+                               Asignacion       = @Asignacion,
+                               Total            = @Total,
+                               FechaEfectividad = @FechaEfectividad
+                               WHERE Id = @Id";
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@Sueldobase", SueldoBase);
+                cmd.Parameters.AddWithValue("@Asignacion", Asignacion);
+                cmd.Parameters.AddWithValue("@Total", Total);
+                cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
+                cmd.Parameters.AddWithValue("@Id", id);
+                await con.OpenAsync();
+                int filas = await cmd.ExecuteNonQueryAsync();
+                return filas > 0;
             }
         }
     }
 }
-*/ // TODO ELIMINAR ESTE PARA QUITAR COMENTADO
