@@ -7,76 +7,79 @@ using System.Threading.Tasks;
 
 namespace Negocio
 {
+    // TODO Interfaz IOperacionesCN
     public interface IOperacionesCN
     {
-        // Métodos sincronos
+        // Métodos síncronos
         DataTable ObtenerTodos();
         DataTable ObtenerPorId(int id);
         (bool exito, string mensaje) Eliminar(int id);
 
-        // Métodos asincronos — llamadas asincronas al CD
+        // Métodos asíncronos
         Task<DataTable> ObtenerTodosAsync();
         Task<DataTable> ObtenerPorIdAsync(int id);
         Task<(bool exito, string mensaje)> EliminarAsync(int id);
+
+        /*
+        Nota: Insertar() y Actualizar() NO forman parte del contrato base
+        porque cada entidad tiene parámetros distintos.
+        */
     }
 
-    // CLASE ABSTRACTA
     public abstract class BaseCN : IOperacionesCN
     {
+        // ─────────────────────────────────────────
         // MÉTODOS ABSTRACTOS
+        // ─────────────────────────────────────────
 
-        // Síncronos
         public abstract DataTable ObtenerTodos();
         public abstract DataTable ObtenerPorId(int id);
-
-        // Asíncronos
         public abstract Task<DataTable> ObtenerTodosAsync();
         public abstract Task<DataTable> ObtenerPorIdAsync(int id);
 
+        // ─────────────────────────────────────────
         // MÉTODOS VIRTUALES
+        // ─────────────────────────────────────────
 
-        // Síncrono
         public virtual (bool exito, string mensaje) Eliminar(int id)
         {
             if (id <= 0)
                 return (false, "ID no válido.");
 
             bool resultado = EjecutarEliminar(id);
-            return resultado
-                ? (true, $"{ObtenerNombreEntidad()} eliminado correctamente.")
-                : (false, $"No se pudo eliminar. {ObtenerNombreEntidad()} puede tener registros asociados.");
+
+            if (!resultado)
+                return (false, $"No se pudo eliminar. {ObtenerNombreEntidad()} puede tener registros asociados.");
+
+            return (true, $"{ObtenerNombreEntidad()} eliminado correctamente.");
         }
 
-        // Asíncrono
         public virtual async Task<(bool exito, string mensaje)> EliminarAsync(int id)
         {
             if (id <= 0)
                 return (false, "ID no válido.");
 
             bool resultado = await EjecutarEliminarAsync(id);
-            return resultado
-                ? (true, $"{ObtenerNombreEntidad()} eliminado correctamente.")
-                : (false, $"No se pudo eliminar. {ObtenerNombreEntidad()} puede tener registros asociados.");
+
+            if (!resultado)
+                return (false, $"No se pudo eliminar. {ObtenerNombreEntidad()} puede tener registros asociados.");
+
+            return (true, $"{ObtenerNombreEntidad()} eliminado correctamente.");
         }
 
         // ─────────────────────────────────────────
-        // MÉTODOS ABSTRACTOS AUXILIARES
-        // Le permiten a BaseCN funcionar de forma genérica
-        // sin conocer los detalles de cada clase hija
+        // MÉTODOS ABSTRACTOS
         // ─────────────────────────────────────────
 
-        // Cada CN le dice a BaseCN cómo llamar al Eliminar de su CD
         protected abstract bool EjecutarEliminar(int id);
         protected abstract Task<bool> EjecutarEliminarAsync(int id);
-
-        // Cada CN le dice a BaseCN su nombre para los mensajes
-        // Ejemplo: "Departamento", "Deducción", "Asignación"
         protected abstract string ObtenerNombreEntidad();
 
         // ─────────────────────────────────────────
-        // MÉTODO NORMAL REUTILIZABLE
-        // Validación de campos de texto común para todas las CN
+        // MÉTODOS NORMALES
+        // Validaciones comunes disponibles para todas las clases hijas
         // ─────────────────────────────────────────
+
         protected (bool esValido, string mensaje) ValidarTexto(string valor,
                                                                 string nombreCampo,
                                                                 int longitudMaxima = 100)
@@ -90,7 +93,6 @@ namespace Negocio
             return (true, string.Empty);
         }
 
-        // Validación de porcentajes reutilizable
         protected (bool esValido, string mensaje) ValidarPorcentaje(decimal porcentaje)
         {
             if (porcentaje < 0 || porcentaje > 100)
@@ -99,7 +101,6 @@ namespace Negocio
             return (true, string.Empty);
         }
 
-        // Validación de IDs reutilizable
         protected (bool esValido, string mensaje) ValidarId(int id, string nombreCampo)
         {
             if (id <= 0)
