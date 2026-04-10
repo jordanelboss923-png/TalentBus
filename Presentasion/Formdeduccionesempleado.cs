@@ -51,7 +51,6 @@ namespace Presentacion
             btnNuevo.Click += BtnNuevo_Click;
             btnGuardar.Click += BtnGuardar_Click;
             btnCancelar.Click += BtnCancelar_Click;
-            btnEliminar.Click += BtnEliminar_Click;
 
             dgvDeducciones.CellClick += Grid_CellClick;
             dgvDeducciones.CellFormatting += (s, e) =>
@@ -68,9 +67,8 @@ namespace Presentacion
             ConfigurarHover(btnNuevo, ColorCyan, Color.FromArgb(0, 185, 205));
             ConfigurarHover(btnGuardar, ColorBotonAzul, Color.FromArgb(40, 100, 210));
             ConfigurarHover(btnCancelar, ColorPanel, Color.FromArgb(30, 42, 80));
-            ConfigurarHover(btnEliminar, ColorBotonRojo, Color.FromArgb(190, 45, 65));
 
-            foreach (Button btn in new[] { btnNuevo, btnGuardar, btnCancelar, btnEliminar })
+            foreach (Button btn in new[] { btnNuevo, btnGuardar, btnCancelar })
             {
                 btn.Region = CrearRegionRedondeada(btn.Size, 6);
                 btn.SizeChanged += (s, e) =>
@@ -160,7 +158,6 @@ namespace Presentacion
                     dgvDeducciones.Columns["IdDeduccion"].Visible = false;
 
                 AgregarColumnaBoton("Editar", Color.FromArgb(255, 180, 0), "btnEditar", Color.FromArgb(13, 17, 35));
-                AgregarColumnaBoton("Eliminar", ColorEliminar, "btnEliminar", ColorTexto);
 
                 lblMensaje.Text = $"{dt.Rows.Count} registro(s) encontrado(s)";
                 lblMensaje.ForeColor = ColorCyan;
@@ -206,7 +203,6 @@ namespace Presentacion
             LimpiarFormulario();
             lblTituloFormulario.Text = "Nueva Deducción de Empleado";
             btnGuardar.Text = "Guardar";
-            btnEliminar.Enabled = false;
             pnlFormulario.Visible = true;
             lblMensaje.Text = "";
             cmbEmpleado.Focus();
@@ -250,24 +246,11 @@ namespace Presentacion
 
                 lblTituloFormulario.Text = "Editar Deducción de Empleado";
                 btnGuardar.Text = "Actualizar";
-                btnEliminar.Enabled = true;
                 pnlFormulario.Visible = true;
                 lblMensaje.Text = "";
                 ActualizarPosicionGrid();
             }
-            else if (colName == "btnEliminar")
-            {
-                int id = Convert.ToInt32(row["Id"]);
-                if (MessageBox.Show(
-                        $"¿Eliminar esta deducción (ID: {id})?",
-                        "Confirmar eliminación",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning) == DialogResult.Yes)
-                {
-                    // TODO: implementar _cn.Eliminar(id)
-                    MostrarMensaje("Funcionalidad de eliminación pendiente.", false);
-                }
-            }
+
         }
 
         private async void BtnGuardar_Click(object sender, EventArgs e)
@@ -336,21 +319,9 @@ namespace Presentacion
                 btnGuardar.Enabled = true;
             }
         }
-
-        private void BtnEliminar_Click(object sender, EventArgs e)
-        {
-            if (_idSeleccionado <= 0) return;
-            if (MessageBox.Show(
-                    $"¿Eliminar esta deducción (ID: {_idSeleccionado})?",
-                    "Confirmar eliminación",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning) == DialogResult.Yes)
-            {
-                // TODO: implementar _cn.Eliminar(_idSeleccionado)
-                MostrarMensaje("Funcionalidad de eliminación pendiente.", false);
-            }
-        }
-
+ 
+       
+ 
         // ══════════════════════════════════════════════════════════════════
         //  HELPERS
         // ══════════════════════════════════════════════════════════════════
@@ -371,14 +342,13 @@ namespace Presentacion
             cmbTipo.SelectedIndex = 0;
             dtpFechaEfectividad.Value = DateTime.Today;
             btnGuardar.Text = "Guardar";
-            btnEliminar.Enabled = false;
             lblTituloFormulario.Text = "Nueva Deducción de Empleado";
             dgvDeducciones.ClearSelection();
         }
 
         private void RefrescarGrid()
         {
-            foreach (string col in new[] { "btnEditar", "btnEliminar" })
+            foreach (string col in new[] { "btnEditar" })
                 if (dgvDeducciones.Columns.Contains(col))
                     dgvDeducciones.Columns.Remove(col);
             CargarDatos();
@@ -468,10 +438,10 @@ namespace Presentacion
                 e.Graphics.DrawRectangle(p, 0, 0, pnl.Width - 1, pnl.Height - 1);
         }
 
-        /// <summary>
+        
         /// Obtiene el Id del volante de pago más reciente del empleado en SalarioST.
         /// Ese Id es el IdSubtotal requerido por la FK de DeduccionesEmpleado.
-        /// </summary>
+        
         private int ObtenerIdSubtotal(int idEmpleado)
         {
             try

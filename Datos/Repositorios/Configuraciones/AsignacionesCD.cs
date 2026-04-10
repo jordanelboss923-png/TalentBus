@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Datos.CD
 {
-    
+    // TODO: Capa de datos para la tabla Asignaciones, con métodos CRUD.
     public class AsignacionesCD : BaseCD
     {
         
@@ -15,13 +15,13 @@ namespace Datos.CD
         public decimal Porcentaje { get; set; }
         public string Descripcion { get; set; }
 
-        
+        //Todo: constructor para inicializar las propiedades
         protected override string ObtenerNombreTabla()
         {
             return "Asignaciones";
         }
 
-        
+        //TODO: implementación de los métodos CRUD utilizando ADO.NET, con manejo de excepciones y uso de parámetros para evitar SQL Injection.
         public override DataTable ObtenerTodos()
         {
             string query = @"SELECT Id,
@@ -32,6 +32,7 @@ namespace Datos.CD
 
             DataTable tabla = new DataTable();
 
+            // Manejo de excepciones para capturar errores de conexión o consulta
             try
             {
                 using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -51,7 +52,8 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+
+        // TODO: método para obtener una asignación por su ID, con manejo de excepciones y uso de parámetros para evitar SQL Injection.
         public override DataTable ObtenerPorId(int id)
         {
             string query = @"SELECT Id,
@@ -83,7 +85,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        // TODO: método para insertar una nueva asignación, con manejo de excepciones y uso de parámetros para evitar SQL Injection.
         public override bool Insertar()
         {
             string query = @"INSERT INTO Asignaciones (Nombre, Porcentaje, Descripcion)
@@ -109,7 +111,7 @@ namespace Datos.CD
             }
         }
 
-        
+        // TODO: método para actualizar una asignación existente, con manejo de excepciones y uso de parámetros para evitar SQL Injection.
         public override bool Actualizar(int id)
         {
             string query = @"UPDATE Asignaciones
@@ -139,7 +141,7 @@ namespace Datos.CD
             }
         }
 
-        
+        // TODO: versiones asíncronas de los métodos CRUD, utilizando async/await y manejo de excepciones.
         public override async Task<DataTable> ObtenerTodosAsync()
         {
             string query = @"SELECT Id,
@@ -169,7 +171,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        // TODO: método asíncrono para obtener una asignación por su ID, con manejo de excepciones y uso de parámetros para evitar SQL Injection.
         public override async Task<DataTable> ObtenerPorIdAsync(int id)
         {
             string query = @"SELECT Id,
@@ -201,7 +203,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //  TODO: método asíncrono para insertar una nueva asignación, con manejo de excepciones y uso de parámetros para evitar SQL Injection.
         public override async Task<bool> InsertarAsync()
         {
             string query = @"INSERT INTO Asignaciones (Nombre, Porcentaje, Descripcion)
@@ -227,7 +229,7 @@ namespace Datos.CD
             }
         }
 
-        
+        // TODO: método asíncrono para actualizar una asignación existente, con manejo de excepciones y uso de parámetros para evitar SQL Injection.
         public override async Task<bool> ActualizarAsync(int id)
         {
             string query = @"UPDATE Asignaciones

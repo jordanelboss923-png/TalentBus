@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Datos.CD
 {
-    
+    //TODO: Clase para manejar las operaciones CRUD de la tabla Posiciones, con métodos para obtener todas las posiciones, obtener una posición por id,
+    //insertar una nueva posición y actualizar una posición existente. Esta clase hereda de BaseCD, lo que le permite reutilizar el método Eliminar y su versión asíncrona.
     public class PosicionesCD : BaseCD
     {
         
@@ -15,13 +16,14 @@ namespace Datos.CD
         public decimal Salario { get; set; }
         public int IdDepartamento { get; set; }
 
-        
+        //TODO: Implementar el método ObtenerNombreTabla para retornar el nombre de la tabla "Posiciones", que es utilizado por los métodos heredados de BaseCD para construir las consultas SQL.
         protected override string ObtenerNombreTabla()
         {
             return "Posiciones";
         }
 
-        
+        //TODO: Implementar los métodos CRUD para la tabla Posiciones, utilizando consultas SQL parametrizadas para evitar inyecciones SQL.
+        //Cada método debe manejar las excepciones de SQL y lanzar una excepción genérica con un mensaje descriptivo en caso de error.
         public override DataTable ObtenerTodos()
         {
             string query = @"SELECT p.Id,
@@ -52,7 +54,8 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: El método ObtenerPorId debe recibir un id como parámetro, validar que sea un valor positivo y retornar la posición correspondiente a ese id.
+        //Si el id es inválido, debe lanzar una excepción ArgumentException.
         public override DataTable ObtenerPorId(int id)
         {
             string query = @"SELECT p.Id,
@@ -86,7 +89,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: El método Insertar debe utilizar los valores de las propiedades Nombre, Salario e IdDepartamento para insertar una nueva posición en la base de datos.
         public override bool Insertar()
         {
             string query = @"INSERT INTO Posiciones (Nombre, Salario, IdDepartamento)
@@ -112,7 +115,7 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: El método Actualizar debe recibir un id como parámetro, validar que sea un valor positivo y actualizar la posición correspondiente a ese id con los valores de las propiedades Nombre, Salario e IdDepartamento.
         public override bool Actualizar(int id)
         {
             string query = @"UPDATE Posiciones
@@ -142,7 +145,8 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: Implementar las versiones asíncronas de los métodos ObtenerTodos, ObtenerPorId, Insertar y Actualizar,
+        //utilizando las palabras clave async y await para realizar operaciones de base de datos de manera asíncrona.
         public override async Task<DataTable> ObtenerTodosAsync()
         {
             string query = @"SELECT p.Id,
@@ -173,7 +177,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: El método ObtenerPorIdAsync debe recibir un id como parámetro, validar que sea un valor positivo y retornar la posición correspondiente a ese id de manera asíncrona.
         public override async Task<DataTable> ObtenerPorIdAsync(int id)
         {
             string query = @"SELECT p.Id,
@@ -207,7 +211,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: El método InsertarAsync debe utilizar los valores de las propiedades Nombre, Salario e IdDepartamento para insertar una nueva posición en la base de datos de manera asíncrona.
         public override async Task<bool> InsertarAsync()
         {
             string query = @"INSERT INTO Posiciones (Nombre, Salario, IdDepartamento)
@@ -233,7 +237,8 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: El método ActualizarAsync debe recibir un id como parámetro, validar que sea un valor positivo y actualizar la posición correspondiente
+        //a ese id con los valores de las propiedades Nombre, Salario e IdDepartamento de manera asíncrona.
         public override async Task<bool> ActualizarAsync(int id)
         {
             string query = @"UPDATE Posiciones

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Datos.CD
 {
-   
+    //TODO: Clase para manejar las operaciones CRUD de la tabla Deducciones, con métodos para obtener todas las deducciones, obtener por id, insertar y actualizar.
     public class DeduccionesCD : BaseCD
     {
         
@@ -15,13 +15,13 @@ namespace Datos.CD
         public decimal Porcentaje { get; set; }
         public string Descripcion { get; set; }
 
-       
+        //TODO: Método para obtener el nombre de la tabla, utilizado por la clase base para operaciones genéricas.
         protected override string ObtenerNombreTabla()
         {
             return "Deducciones";
         }
 
-        
+        //TODO: Implementación de los métodos CRUD, con manejo de excepciones y uso de parámetros para evitar inyección SQL.
         public override DataTable ObtenerTodos()
         {
             string query = @"SELECT Id,
@@ -51,7 +51,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: Método para obtener una deducción por su id, con manejo de excepciones y uso de parámetros.
         public override DataTable ObtenerPorId(int id)
         {
             string query = @"SELECT Id,
@@ -83,7 +83,7 @@ namespace Datos.CD
             return tabla;
         }
 
-       
+        //TODO: Método para insertar una nueva deducción, con manejo de excepciones y uso de parámetros.
         public override bool Insertar()
         {
             string query = @"INSERT INTO Deducciones (Nombre, Porcentaje, Descripcion)
@@ -109,7 +109,7 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: Método para actualizar una deducción existente, con manejo de excepciones y uso de parámetros.
         public override bool Actualizar(int id)
         {
             string query = @"UPDATE Deducciones
@@ -139,7 +139,7 @@ namespace Datos.CD
             }
         }
 
-       
+        //TODO: Implementación de las versiones asíncronas de los métodos CRUD, con manejo de excepciones y uso de parámetros.
         public override async Task<DataTable> ObtenerTodosAsync()
         {
             string query = @"SELECT Id,
@@ -169,7 +169,7 @@ namespace Datos.CD
             return tabla;
         }
 
-       
+        //TODO: Método asíncrono para obtener una deducción por su id, con manejo de excepciones y uso de parámetros.
         public override async Task<DataTable> ObtenerPorIdAsync(int id)
         {
             string query = @"SELECT Id,
@@ -201,7 +201,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: Método asíncrono para insertar una nueva deducción, con manejo de excepciones y uso de parámetros.
         public override async Task<bool> InsertarAsync()
         {
             string query = @"INSERT INTO Deducciones (Nombre, Porcentaje, Descripcion)
@@ -227,7 +227,7 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: Método asíncrono para actualizar una deducción existente, con manejo de excepciones y uso de parámetros.
         public override async Task<bool> ActualizarAsync(int id)
         {
             string query = @"UPDATE Deducciones

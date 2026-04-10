@@ -15,17 +15,12 @@
             this.lblTituloPagina = new System.Windows.Forms.Label();
             this.lblSubtituloPagina = new System.Windows.Forms.Label();
             this.btnNuevo = new System.Windows.Forms.Button();
-
             this.pnlFormulario = new System.Windows.Forms.Panel();
             this.lblTituloFormulario = new System.Windows.Forms.Label();
-
-            // Fila 1: Empleado (combo) | Asignación (combo)
             this.lblLblEmpleado = new System.Windows.Forms.Label();
             this.cmbEmpleado = new System.Windows.Forms.ComboBox();
             this.lblLblAsignacion = new System.Windows.Forms.Label();
             this.cmbAsignacion = new System.Windows.Forms.ComboBox();
-
-            // Fila 2: Tipo | Monto | Fecha
             this.lblLblTipo = new System.Windows.Forms.Label();
             this.cmbTipo = new System.Windows.Forms.ComboBox();
             this.lblLblMonto = new System.Windows.Forms.Label();
@@ -33,12 +28,8 @@
             this.txtMonto = new System.Windows.Forms.TextBox();
             this.lblLblFecha = new System.Windows.Forms.Label();
             this.dtpFechaEfectividad = new System.Windows.Forms.DateTimePicker();
-
-            // Botones
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnCancelar = new System.Windows.Forms.Button();
-            this.btnEliminar = new System.Windows.Forms.Button();
-
             this.lblMensaje = new System.Windows.Forms.Label();
             this.dgvAsignaciones = new System.Windows.Forms.DataGridView();
 
@@ -103,14 +94,12 @@
             this.pnlFormulario.Controls.Add(this.dtpFechaEfectividad);
             this.pnlFormulario.Controls.Add(this.btnGuardar);
             this.pnlFormulario.Controls.Add(this.btnCancelar);
-            this.pnlFormulario.Controls.Add(this.btnEliminar);
             this.pnlFormulario.Location = new System.Drawing.Point(16, 72);
             this.pnlFormulario.Name = "pnlFormulario";
-            this.pnlFormulario.Size = new System.Drawing.Size(868, 200);
+            this.pnlFormulario.Size = new System.Drawing.Size(868, 160);
             this.pnlFormulario.TabIndex = 1;
             this.pnlFormulario.Visible = false;
 
-            // lblTituloFormulario
             this.lblTituloFormulario.AutoSize = true;
             this.lblTituloFormulario.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.lblTituloFormulario.ForeColor = System.Drawing.Color.FromArgb(0, 210, 230);
@@ -119,7 +108,6 @@
             this.lblTituloFormulario.TabIndex = 0;
             this.lblTituloFormulario.Text = "Nueva Asignación de Empleado";
 
-            // ── Fila 1: Empleado | Asignación ────────────────────────────
             this.lblLblEmpleado.AutoSize = true;
             this.lblLblEmpleado.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblLblEmpleado.ForeColor = System.Drawing.Color.White;
@@ -156,7 +144,6 @@
             this.cmbAsignacion.Size = new System.Drawing.Size(240, 23);
             this.cmbAsignacion.TabIndex = 4;
 
-            // ── Fila 2: Tipo | Monto | Fecha ─────────────────────────────
             this.lblLblTipo.AutoSize = true;
             this.lblLblTipo.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblLblTipo.ForeColor = System.Drawing.Color.White;
@@ -222,7 +209,6 @@
             this.dtpFechaEfectividad.TabIndex = 10;
             this.dtpFechaEfectividad.Value = System.DateTime.Today;
 
-            // ── Botones ───────────────────────────────────────────────────
             this.btnGuardar.BackColor = System.Drawing.Color.FromArgb(30, 80, 180);
             this.btnGuardar.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnGuardar.FlatAppearance.BorderSize = 0;
@@ -249,20 +235,6 @@
             this.btnCancelar.TabIndex = 12;
             this.btnCancelar.Text = "Cancelar";
             this.btnCancelar.UseVisualStyleBackColor = false;
-
-            this.btnEliminar.BackColor = System.Drawing.Color.FromArgb(160, 30, 50);
-            this.btnEliminar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnEliminar.Enabled = false;
-            this.btnEliminar.FlatAppearance.BorderSize = 0;
-            this.btnEliminar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEliminar.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnEliminar.ForeColor = System.Drawing.Color.White;
-            this.btnEliminar.Location = new System.Drawing.Point(578, 152);
-            this.btnEliminar.Name = "btnEliminar";
-            this.btnEliminar.Size = new System.Drawing.Size(210, 28);
-            this.btnEliminar.TabIndex = 13;
-            this.btnEliminar.Text = "Eliminar";
-            this.btnEliminar.UseVisualStyleBackColor = false;
 
             // ── lblMensaje ────────────────────────────────────────────────
             this.lblMensaje.AutoSize = false;
@@ -311,7 +283,7 @@
                                           System.Windows.Forms.AnchorStyles.Right |
                                           System.Windows.Forms.AnchorStyles.Bottom;
 
-            // ── FrmAsignacionesEmpleado ───────────────────────────────────
+            // ── FrmAsignacionesEmpleado ────────────────────────────────────
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(13, 17, 35);
@@ -335,7 +307,6 @@
             this.ResumeLayout(false);
         }
 
-        // ── Declaraciones ──────────────────────────────────────────────────
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblTituloPagina;
         private System.Windows.Forms.Label lblSubtituloPagina;
@@ -355,7 +326,6 @@
         private System.Windows.Forms.DateTimePicker dtpFechaEfectividad;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnCancelar;
-        private System.Windows.Forms.Button btnEliminar;
         private System.Windows.Forms.Label lblMensaje;
         private System.Windows.Forms.DataGridView dgvAsignaciones;
     }

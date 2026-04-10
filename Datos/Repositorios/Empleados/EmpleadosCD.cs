@@ -9,14 +9,8 @@ namespace Datos.Repositorios
 {
     public class EmpleadosCD : BaseCD
     {
-        protected override string ObtenerNombreTabla()
-        {
-            return "Empleados";
-        }
+        protected override string ObtenerNombreTabla() => "Empleados";
 
-        // ─────────────────────────────────────────────────────
-        // Propiedades para Insertar/Actualizar
-        // ─────────────────────────────────────────────────────
         public string CodigoEmpleado { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get; set; }
@@ -24,9 +18,7 @@ namespace Datos.Repositorios
         public int Tipo { get; set; } // 1 = Fijo, 2 = Por hora
         public int IdPosicion { get; set; }
 
-        // ─────────────────────────────────────────────────────
-        // ObtenerTodos
-        // ─────────────────────────────────────────────────────
+        // ─── ObtenerTodos ─────────────────────────────────────────────────
         public override DataTable ObtenerTodos()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -60,9 +52,7 @@ namespace Datos.Repositorios
             }
         }
 
-        // ─────────────────────────────────────────────────────
-        // ObtenerPorId
-        // ─────────────────────────────────────────────────────
+        // ─── ObtenerPorId ─────────────────────────────────────────────────
         public override DataTable ObtenerPorId(int id)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -100,9 +90,7 @@ namespace Datos.Repositorios
             }
         }
 
-        // ─────────────────────────────────────────────────────
-        // ObtenerPorCedula (extra útil)
-        // ─────────────────────────────────────────────────────
+        // ─── ObtenerPorCedula ─────────────────────────────────────────────
         public DataTable ObtenerPorCedula(string cedula)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -121,9 +109,7 @@ namespace Datos.Repositorios
             }
         }
 
-        // ─────────────────────────────────────────────────────
-        // Insertar
-        // ─────────────────────────────────────────────────────
+        // ─── Insertar ─────────────────────────────────────────────────────
         public override bool Insertar()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -138,6 +124,7 @@ namespace Datos.Repositorios
                 cmd.Parameters.AddWithValue("@Cedula", Cedula);
                 cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 cmd.Parameters.AddWithValue("@IdPosicion", IdPosicion);
+                con.Open();
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
@@ -157,14 +144,11 @@ namespace Datos.Repositorios
                 cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 cmd.Parameters.AddWithValue("@IdPosicion", IdPosicion);
                 await con.OpenAsync();
-                int filas = await cmd.ExecuteNonQueryAsync();
-                return filas > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
         }
 
-        // ─────────────────────────────────────────────────────
-        // Actualizar
-        // ─────────────────────────────────────────────────────
+        // ─── Actualizar ───────────────────────────────────────────────────
         public override bool Actualizar(int id)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -183,6 +167,7 @@ namespace Datos.Repositorios
                 cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 cmd.Parameters.AddWithValue("@IdPosicion", IdPosicion);
                 cmd.Parameters.AddWithValue("@Id", id);
+                con.Open();
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
@@ -206,8 +191,7 @@ namespace Datos.Repositorios
                 cmd.Parameters.AddWithValue("@IdPosicion", IdPosicion);
                 cmd.Parameters.AddWithValue("@Id", id);
                 await con.OpenAsync();
-                int filas = await cmd.ExecuteNonQueryAsync();
-                return filas > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
         }
     }

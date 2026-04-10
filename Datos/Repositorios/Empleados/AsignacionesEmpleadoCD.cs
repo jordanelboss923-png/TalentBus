@@ -9,18 +9,17 @@ namespace Datos.Repositorios.Empleados
 {
     public class AsignacionesEmpleadoCD : BaseCD
     {
+        //TODO: clase para manejar las operaciones CRUD de la tabla AsignacionesEmpleado, con validaciones y manejo de errores.
         protected override string ObtenerNombreTabla() => "AsignacionesEmpleado";
 
-        // ─── Propiedades ──────────────────────────────────────────────────
-        // IdSubtotal eliminado: AsignacionesEmpleado NO tiene esa columna en BD.
-        // SalarioST se crea automáticamente via trigger trg_SalarioST_Calcular.
+        // Propiedades que corresponden a las columnas de la tabla AsignacionesEmpleado
         public int IdAsignacion { get; set; }
         public int IdEmpleado { get; set; }
         public int Tipo { get; set; } // 1=Mensual, 2=Quincenal
         public decimal Monto { get; set; }
         public DateTime FechaEfectividad { get; set; }
 
-        // ─── ObtenerTodos ─────────────────────────────────────────────────
+        //TODO: Métodos CRUD con validaciones y manejo de errores
         public override DataTable ObtenerTodos()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -44,6 +43,7 @@ namespace Datos.Repositorios.Empleados
             }
         }
 
+        //TODO: versión asíncrona de ObtenerTodos
         public override async Task<DataTable> ObtenerTodosAsync()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -68,7 +68,7 @@ namespace Datos.Repositorios.Empleados
             }
         }
 
-        // ─── ObtenerPorId ─────────────────────────────────────────────────
+        //TODO: Obtener por Id con validación de entrada y manejo de errores
         public override DataTable ObtenerPorId(int id)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -159,6 +159,7 @@ namespace Datos.Repositorios.Empleados
                 cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 cmd.Parameters.AddWithValue("@Monto", Monto);
                 cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
+                con.Open();
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
@@ -200,6 +201,7 @@ namespace Datos.Repositorios.Empleados
                 cmd.Parameters.AddWithValue("@Monto", Monto);
                 cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
                 cmd.Parameters.AddWithValue("@Id", id);
+                con.Open();
                 return cmd.ExecuteNonQuery() > 0;
             }
         }

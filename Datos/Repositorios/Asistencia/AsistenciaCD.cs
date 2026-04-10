@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Datos.CD
 {
-    
+    //TODO: Clase para manejar las operaciones CRUD de Asistencia, con métodos para obtener por empleado, y versiones asíncronas.
     public class AsistenciaCD : BaseCD
     {
         
@@ -21,7 +21,8 @@ namespace Datos.CD
             return "Asistencias";
         }
 
-        
+
+        /// Implementación de métodos CRUD
         public override DataTable ObtenerTodos()
         {
             string query = @"SELECT a.Id,
@@ -54,7 +55,8 @@ namespace Datos.CD
             return tabla;
         }
 
-       
+
+        //TODO: El método ObtenerPorId devuelve un DataTable con la información de la asistencia, incluyendo el nombre completo del empleado, en lugar de solo el IdEmpleado.
         public override DataTable ObtenerPorId(int id)
         {
             string query = @"SELECT a.Id,
@@ -88,7 +90,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: El método ObtenerPorEmpleado devuelve un DataTable con todas las asistencias de un empleado específico, ordenadas por fecha y hora descendente.
         public DataTable ObtenerPorEmpleado(int idEmpleado)
         {
             string query = @"SELECT a.Id,
@@ -123,7 +125,8 @@ namespace Datos.CD
             return tabla;
         }
 
-       
+
+        //TODO: El método Insertar agrega una nueva asistencia a la base de datos, utilizando los valores de IdEmpleado, Descripcion y FechaHora de la instancia actual. Devuelve true si la inserción fue exitosa.
         public override bool Insertar()
         {
             string query = @"INSERT INTO Asistencias (IdEmpleado, Descripcion)
@@ -148,7 +151,7 @@ namespace Datos.CD
             }
         }
 
-       
+        //TODO: El método Actualizar modifica la descripción de una asistencia existente, identificada por su Id. Devuelve true si la actualización fue exitosa.
         public override bool Actualizar(int id)
         {
             string query = @"UPDATE Asistencias
@@ -174,7 +177,7 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: Las versiones asíncronas de los métodos CRUD utilizan async/await para mejorar el rendimiento y la capacidad de respuesta de la aplicación.
         public override async Task<DataTable> ObtenerTodosAsync()
         {
             string query = @"SELECT a.Id,
@@ -207,7 +210,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        // TODO: El método ObtenerPorIdAsync devuelve un DataTable con la información de la asistencia, incluyendo el nombre completo del empleado, en lugar de solo el IdEmpleado.
         public override async Task<DataTable> ObtenerPorIdAsync(int id)
         {
             string query = @"SELECT a.Id,
@@ -241,7 +244,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        // TODO: El método ObtenerPorEmpleadoAsync devuelve un DataTable con todas las asistencias de un empleado específico, ordenadas por fecha y hora descendente.
         public override async Task<bool> InsertarAsync()
         {
             string query = @"INSERT INTO Asistencias (IdEmpleado, Descripcion)
@@ -266,7 +269,7 @@ namespace Datos.CD
             }
         }
 
-        
+        // TODO: El método ActualizarAsync modifica la descripción de una asistencia existente, identificada por su Id. Devuelve true si la actualización fue exitosa.
         public override async Task<bool> ActualizarAsync(int id)
         {
             string query = @"UPDATE Asistencias

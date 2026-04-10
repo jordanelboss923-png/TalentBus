@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 
 namespace Datos.CD
 {
-   
+    //TODO: Clase para manejar operaciones CRUD de Departamentos.
     public class DepartamentosCD : BaseCD
     {
         
         public string Nombre { get; set; }
 
-        
+        //TODO: implementar el método para obtener el nombre de la tabla, que será usado por los métodos heredados de BaseCD.
         protected override string ObtenerNombreTabla()
         {
             return "Departamentos";
         }
 
-       
+        //TODO: implementar los métodos CRUD heredados de BaseCD, usando ADO.NET para interactuar con la base de datos.
         public override DataTable ObtenerTodos()
         {
             string query = "SELECT Id, Nombre FROM Departamentos";
@@ -44,7 +44,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: implementar el método para obtener un departamento por su Id, usando un parámetro en la consulta SQL para evitar inyección de SQL.
         public override DataTable ObtenerPorId(int id)
         {
             string query = "SELECT Id, Nombre FROM Departamentos WHERE Id = @Id";
@@ -70,7 +70,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: implementar el método para insertar un nuevo departamento, usando un parámetro en la consulta SQL para evitar inyección de SQL.
         public override bool Insertar()
         {
             string query = "INSERT INTO Departamentos (Nombre) VALUES (@Nombre)";
@@ -93,7 +93,7 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: implementar el método para actualizar un departamento existente, usando parámetros en la consulta SQL para evitar inyección de SQL.
         public override bool Actualizar(int id)
         {
             string query = "UPDATE Departamentos SET Nombre = @Nombre WHERE Id = @Id";
@@ -117,7 +117,7 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: implementar las versiones asíncronas de los métodos CRUD, usando async/await y los métodos asíncronos de ADO.NET.
         public override async Task<DataTable> ObtenerTodosAsync()
         {
             string query = "SELECT Id, Nombre FROM Departamentos";
@@ -142,7 +142,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: implementar la versión asíncrona del método para obtener un departamento por su Id, usando un parámetro en la consulta SQL para evitar inyección de SQL.
         public override async Task<DataTable> ObtenerPorIdAsync(int id)
         {
             string query = "SELECT Id, Nombre FROM Departamentos WHERE Id = @Id";
@@ -168,7 +168,7 @@ namespace Datos.CD
             return tabla;
         }
 
-        
+        //TODO: implementar la versión asíncrona del método para insertar un nuevo departamento, usando un parámetro en la consulta SQL para evitar inyección de SQL.
         public override async Task<bool> InsertarAsync()
         {
             string query = "INSERT INTO Departamentos (Nombre) VALUES (@Nombre)";
@@ -191,7 +191,7 @@ namespace Datos.CD
             }
         }
 
-        
+        //TODO: implementar la versión asíncrona del método para actualizar un departamento existente, usando parámetros en la consulta SQL para evitar inyección de SQL.
         public override async Task<bool> ActualizarAsync(int id)
         {
             string query = "UPDATE Departamentos SET Nombre = @Nombre WHERE Id = @Id";
