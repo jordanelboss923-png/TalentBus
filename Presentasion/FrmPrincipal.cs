@@ -1,6 +1,7 @@
 ﻿using Negocio.Configuracion;
 using Negocios.Seguridad;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -23,16 +24,22 @@ namespace Presentacion
         private Button _tabActiva;
         private Timer _timer;
 
-        
+        // Estado de secciones desplegables
+        private Dictionary<string, bool> _seccionesExpandidas = new Dictionary<string, bool>
+        {
+            { "Config",    true },
+            { "Empleados", true },
+            { "Seguridad", true }
+        };
+
         public FrmPrincipal(string usuario)
         {
-            InitializeComponent(); 
-            _usuarioActual = usuario; // Guardar usuario para mostrar en bienvenida y controlar permisos
-            ConfigurarEventos(); // Configura eventos personalizados para la interfaz
-            IniciarReloj(); // Inicia el reloj para mostrar la hora actual en la barra de estado
+            InitializeComponent();
+            _usuarioActual = usuario;
+            ConfigurarEventos();
+            IniciarReloj();
         }
 
-        // Configura eventos personalizados para la interfaz, como arrastre de ventana, clicks en botones y tabs, hover en items del sidebar, etc.
         private void ConfigurarEventos()
         {
             // Arrastrar ventana
@@ -94,9 +101,7 @@ namespace Presentacion
                     e.Graphics.DrawLine(p, 0, 0, pnlStatusBar.Width, 0);
             };
 
-            
-
-            // Items del sidebar 
+            // Items del sidebar
             _itemActivo = pnlEmpleados;
             ConfigurarItem(pnlDepartamentos, barDepartamentos, bulletDepartamentos, lblDepartamentos, "Departamentos");
             ConfigurarItem(pnlPosiciones, barPosiciones, bulletPosiciones, lblPosiciones, "Posiciones");
@@ -105,10 +110,122 @@ namespace Presentacion
             ConfigurarItem(pnlEmpleados, barEmpleados, bulletEmpleados, lblEmpleados, "Empleados");
             ConfigurarItem(pnlAsistencias, barAsistencias, bulletAsistencias, lblAsistencias, "Asistencias");
             ConfigurarItem(pnlAccesoSistema, barAccesoSistema, bulletAccesoSistema, lblAccesoSistema, "AccesoSistema");
+
+            // ── Headers desplegables ────────────────────────────────────────
+            Panel[] itemsConfig = { pnlDepartamentos, pnlPosiciones, pnlDeducciones, pnlAsignaciones };
+            Panel[] itemsEmpleados = { pnlEmpleados, pnlAsistencias };
+            Panel[] itemsSeguridad = { pnlAccesoSistema };
+
+            // Añadir chevron al texto de cada header y hacerlos clickeables
+            lblSeccionConfig.Text = "CONFIGURACIÓN  ▾";
+            lblSeccionEmpleados.Text = "EMPLEADOS  ▾";
+            lblSeccionSeguridad.Text = "SEGURIDAD  ▾";
+
+            lblSeccionConfig.Cursor = Cursors.Hand;
+            lblSeccionEmpleados.Cursor = Cursors.Hand;
+            lblSeccionSeguridad.Cursor = Cursors.Hand;
+
+            lblSeccionConfig.Click += (s, e) => ToggleSeccion("Config", lblSeccionConfig, itemsConfig);
+            lblSeccionEmpleados.Click += (s, e) => ToggleSeccion("Empleados", lblSeccionEmpleados, itemsEmpleados);
+            lblSeccionSeguridad.Click += (s, e) => ToggleSeccion("Seguridad", lblSeccionSeguridad, itemsSeguridad);
         }
 
-        // Configura eventos de hover y click para un item del sidebar, recibiendo sus controles relacionados
-        // (barra lateral, bullet y label) y el tag que identifica el módulo a abrir
+        // Expande o colapsa una sección del sidebar con animación suave
+        private void ToggleSeccion(string key, Label lblHeader, Panel[] items)
+        {
+            bool abierto = _seccionesExpandidas[key];
+            _seccionesExpandidas[key] = !abierto;
+
+            // Rotar el chevron
+            if (lblHeader.Text.EndsWith("▾"))
+                lblHeader.Text = lblHeader.Text.Replace("▾", "▸");
+            else
+                lblHeader.Text = lblHeader.Text.Replace("▸", "▾");
+
+            // Animación suave
+            var timerAnim = new System.Windows.Forms.Timer { Interval = 10 };
+            int alturaActual = abierto ? items.Length * 28 : 0;
+            int alturaObjetivo = abierto ? 0 : items.Length * 28;
+            int paso = abierto ? -4 : 4;
+
+            timerAnim.Tick += (s, e) =>
+            {
+                alturaActual = Math.Max(0, Math.Min(items.Length * 28, alturaActual + paso));
+
+                foreach (var item in items)
+                    item.Visible = alturaActual > 0;
+
+                RecalcularPosiciones();
+
+                if (alturaActual == alturaObjetivo)
+                    timerAnim.Stop();
+            };
+            timerAnim.Start();
+        }
+
+        // Recalcula la posición vertical de cada header e item según el estado expandido/colapsado
+        private void RecalcularPosiciones()
+        {
+            int y = 10;
+
+            // Sección Configuración
+            lblSeccionConfig.Top = y;
+            y += lblSeccionConfig.Height + 4;
+
+            if (_seccionesExpandidas["Config"])
+            {
+                foreach (var item in new[] { pnlDepartamentos, pnlPosiciones, pnlDeducciones, pnlAsignaciones })
+                {
+                    item.Top = y;
+                    item.Visible = true;
+                    y += 28;
+                }
+            }
+            else
+            {
+                foreach (var item in new[] { pnlDepartamentos, pnlPosiciones, pnlDeducciones, pnlAsignaciones })
+                    item.Visible = false;
+            }
+
+            y += 8;
+
+            // Sección Empleados
+            lblSeccionEmpleados.Top = y;
+            y += lblSeccionEmpleados.Height + 4;
+
+            if (_seccionesExpandidas["Empleados"])
+            {
+                foreach (var item in new[] { pnlEmpleados, pnlAsistencias })
+                {
+                    item.Top = y;
+                    item.Visible = true;
+                    y += 28;
+                }
+            }
+            else
+            {
+                foreach (var item in new[] { pnlEmpleados, pnlAsistencias })
+                    item.Visible = false;
+            }
+
+            y += 8;
+
+            // Sección Seguridad
+            lblSeccionSeguridad.Top = y;
+            y += lblSeccionSeguridad.Height + 4;
+
+            if (_seccionesExpandidas["Seguridad"])
+            {
+                pnlAccesoSistema.Top = y;
+                pnlAccesoSistema.Visible = true;
+            }
+            else
+            {
+                pnlAccesoSistema.Visible = false;
+            }
+        }
+
+        // Configura eventos de hover y click para un item del sidebar
         private void ConfigurarItem(Panel item, Panel barra, Label bullet, Label lbl, string tag)
         {
             item.MouseEnter += (s, e) => { if (item != _itemActivo) item.BackColor = Color.FromArgb(20, 30, 58); };
@@ -120,7 +237,7 @@ namespace Presentacion
             bullet.Click += (s, e) => onClick();
         }
 
-        // Evento click para las tabs principales, cambia la tab activa y muestra la pantalla de bienvenida
+        // Evento click para las tabs principales
         private void Tab_Click(object sender, EventArgs e)
         {
             _tabActiva = (Button)sender;
@@ -133,7 +250,7 @@ namespace Presentacion
             MostrarBienvenida();
         }
 
-        // Evento Paint para las tabs, dibuja una línea inferior si es la tab activa
+        // Evento Paint para las tabs, dibuja línea inferior si es la tab activa
         private void Tab_Paint(object sender, PaintEventArgs e)
         {
             Button btn = (Button)sender;
@@ -144,7 +261,7 @@ namespace Presentacion
             }
         }
 
-        // Evento click para los items del sidebar, desactiva el item anterior, activa el nuevo y abre el módulo correspondiente
+        // Evento click para los items del sidebar
         private void Item_Click(Panel item, Panel barra, Label bullet, Label lbl, string tag)
         {
             // Desactivar anterior
@@ -173,10 +290,9 @@ namespace Presentacion
             AbrirModulo(tag);
         }
 
-        // Muestra la pantalla de bienvenida, limpiando cualquier sub-formulario abierto y dejando visibles solo los controles estáticos de bienvenida
+        // Muestra la pantalla de bienvenida
         private void MostrarBienvenida()
         {
-            // Limpiar sub-formularios, dejar visibles solo los controles estáticos
             foreach (Control c in pnlContenido.Controls)
                 if (c is Form) { c.Dispose(); }
 
@@ -186,10 +302,9 @@ namespace Presentacion
             pnlContenido.Controls.Add(lblSubBienvenida);
         }
 
-        // Abre el módulo correspondiente al tag recibido, creando una instancia del formulario asociado, configurándolo como hijo del panel de contenido y mostrándolo
+        // Abre el módulo correspondiente al tag recibido
         private void AbrirModulo(string tag)
         {
-            // Limpiar contenido anterior
             foreach (Control c in pnlContenido.Controls)
                 if (c is Form f) f.Dispose();
             pnlContenido.Controls.Clear();
@@ -219,7 +334,7 @@ namespace Presentacion
             }
         }
 
-        // Inicia un timer que actualiza la hora en la barra de estado cada segundo
+        // Inicia el reloj en la barra de estado
         private void IniciarReloj()
         {
             _timer = new Timer { Interval = 1000 };
@@ -227,7 +342,7 @@ namespace Presentacion
             _timer.Start();
         }
 
-        // Crea una región circular para aplicar a los botones de ventana, recibiendo el tamaño del botón
+        // Crea una región circular para los botones de ventana
         private Region CrearRegionCircular(int size)
         {
             GraphicsPath path = new GraphicsPath();
