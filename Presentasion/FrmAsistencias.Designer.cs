@@ -1,6 +1,6 @@
-﻿namespace Presentacion  // ← corregido "Presentasion" → "Presentacion"
+﻿namespace Presentacion
 {
-    partial class FrmEmpleados
+    partial class FrmAsistencias
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -17,9 +17,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(900, 600);
-            this.Name = "FrmEmpleados";
-            this.Text = "Empleados";
-            // ← eliminado: this.Load += ...FrmEmpleados_Load
+            this.Name = "FrmAsistencias";
+            this.Text = "Asistencias";
+            // ← esta línea NO debe estar aquí
             this.ResumeLayout(false);
         }
     }

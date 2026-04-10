@@ -27,9 +27,11 @@ namespace Datos.Repositorios.Seguridad
         // ─────────────────────────────────────────────────────
         private byte[] EncriptarClave(string clave)
         {
-            return Encoding.UTF8.GetBytes(clave);
+            using (var sha1 = System.Security.Cryptography.SHA1.Create())
+            {
+                return sha1.ComputeHash(Encoding.UTF8.GetBytes(clave));
+            }
         }
-
         // ─────────────────────────────────────────────────────
         // ObtenerTodos
         // ─────────────────────────────────────────────────────
@@ -185,14 +187,22 @@ namespace Datos.Repositorios.Seguridad
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 string sql = @"SELECT COUNT(1) 
-                               FROM Loggin 
-                               WHERE Usser = @Usser 
-                               AND   Clave = @Clave";
-                SqlCommand cmd = new SqlCommand(sql, con);
-                cmd.Parameters.AddWithValue("@Usser", usser);
-                cmd.Parameters.AddWithValue("@Clave", EncriptarClave(clave));
-                int resultado = Convert.ToInt32(cmd.ExecuteScalar());
-                return resultado > 0;
+                       FROM Loggin 
+                       WHERE Usser = @Usser 
+                       AND Clave = @Clave";
+
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.Add("@Usser", SqlDbType.VarChar).Value = usser;
+                    cmd.Parameters.Add("@Clave", SqlDbType.VarBinary).Value = EncriptarClave(clave);
+
+                    if (con.State != ConnectionState.Open)
+                        con.Open();
+
+                    int resultado = (int)cmd.ExecuteScalar();
+
+                    return resultado > 0;
+                }
             }
         }
 
