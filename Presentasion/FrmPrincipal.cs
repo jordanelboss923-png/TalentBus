@@ -10,7 +10,7 @@ namespace Presentacion
 {
     public partial class FrmPrincipal : Form
     {
-        // Colores personalizados para la interfaz 
+        // ── Colores ──────────────────────────────────────────────────────────
         private readonly Color ColorFondo = Color.FromArgb(13, 17, 35);
         private readonly Color ColorCyan = Color.FromArgb(0, 210, 230);
         private readonly Color ColorTexto = Color.White;
@@ -18,18 +18,18 @@ namespace Presentacion
         private readonly Color ColorItemActivo = Color.FromArgb(25, 35, 70);
         private readonly Color ColorBorde = Color.FromArgb(30, 40, 80);
 
-        // Variables para controlar estado de la interfaz
+        // ── Estado ───────────────────────────────────────────────────────────
         private string _usuarioActual;
         private Panel _itemActivo;
         private Button _tabActiva;
         private Timer _timer;
 
-        // Estado de secciones desplegables
         private Dictionary<string, bool> _seccionesExpandidas = new Dictionary<string, bool>
         {
             { "Config",    true },
             { "Empleados", true },
-            { "Seguridad", true }
+            { "Seguridad", true },
+            { "Nomina",    true }
         };
 
         public FrmPrincipal(string usuario)
@@ -40,9 +40,11 @@ namespace Presentacion
             IniciarReloj();
         }
 
+        // ════════════════════════════════════════════════════════════════════
+        //  CONFIGURACIÓN DE EVENTOS
+        // ════════════════════════════════════════════════════════════════════
         private void ConfigurarEventos()
         {
-            // Arrastrar ventana
             this.MouseDown += (s, e) => {
                 if (e.Button == MouseButtons.Left && e.Y < 50)
                 {
@@ -51,19 +53,17 @@ namespace Presentacion
                 }
             };
 
-            // Bordes redondeados en botones macOS
             btnCerrar.Region = CrearRegionCircular(14);
             btnMinimizar.Region = CrearRegionCircular(14);
             btnVerde.Region = CrearRegionCircular(14);
             pnlPuntito.Region = new Region(new RectangleF(0, 0, 8, 8));
 
-            // Clicks botones ventana
             btnCerrar.Click += (s, e) => Application.Exit();
             btnMinimizar.Click += (s, e) => this.WindowState = FormWindowState.Minimized;
 
-            // Tabs — Paint y Click
+            // Solo dos tabs: Entrada y Nómina
             _tabActiva = btnTabEntrada;
-            foreach (Button btn in new[] { btnTabEntrada, btnTabNomina, btnTabConsulta })
+            foreach (Button btn in new[] { btnTabEntrada, btnTabNomina })
             {
                 btn.Paint += Tab_Paint;
                 btn.Click += Tab_Click;
@@ -71,7 +71,6 @@ namespace Presentacion
                 btn.MouseLeave += (s, e) => { if ((Button)s != _tabActiva) ((Button)s).ForeColor = ColorSubTexto; };
             }
 
-            // Salir
             btnSalir.Click += (s, e) => {
                 if (MessageBox.Show("¿Deseas cerrar sesión?", "Salir",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -81,28 +80,20 @@ namespace Presentacion
                 }
             };
 
-            // Header — borde inferior
             pnlHeader.Paint += (s, e) => {
                 using (Pen p = new Pen(ColorBorde, 1))
-                    e.Graphics.DrawLine(p, 0, pnlHeader.Height - 1,
-                                           pnlHeader.Width, pnlHeader.Height - 1);
+                    e.Graphics.DrawLine(p, 0, pnlHeader.Height - 1, pnlHeader.Width, pnlHeader.Height - 1);
             };
-
-            // Sidebar — borde derecho
             pnlSidebar.Paint += (s, e) => {
                 using (Pen p = new Pen(ColorBorde, 1))
-                    e.Graphics.DrawLine(p, pnlSidebar.Width - 1, 0,
-                                           pnlSidebar.Width - 1, pnlSidebar.Height);
+                    e.Graphics.DrawLine(p, pnlSidebar.Width - 1, 0, pnlSidebar.Width - 1, pnlSidebar.Height);
             };
-
-            // StatusBar — borde superior
             pnlStatusBar.Paint += (s, e) => {
                 using (Pen p = new Pen(ColorBorde, 1))
                     e.Graphics.DrawLine(p, 0, 0, pnlStatusBar.Width, 0);
             };
 
-            // Items del sidebar
-            _itemActivo = pnlEmpleados;
+            // Items sidebar — Entrada
             ConfigurarItem(pnlDepartamentos, barDepartamentos, bulletDepartamentos, lblDepartamentos, "Departamentos");
             ConfigurarItem(pnlPosiciones, barPosiciones, bulletPosiciones, lblPosiciones, "Posiciones");
             ConfigurarItem(pnlDeducciones, barDeducciones, bulletDeducciones, lblDeducciones, "Deducciones");
@@ -111,12 +102,17 @@ namespace Presentacion
             ConfigurarItem(pnlAsistencias, barAsistencias, bulletAsistencias, lblAsistencias, "Asistencias");
             ConfigurarItem(pnlAccesoSistema, barAccesoSistema, bulletAccesoSistema, lblAccesoSistema, "AccesoSistema");
 
-            // ── Headers desplegables ────────────────────────────────────────
+            // Items sidebar — Nómina
+            ConfigurarItem(pnlVolantesLista, barVolantesLista, bulletVolantesLista, lblVolantesLista, "VolantesLista");
+            ConfigurarItem(pnlVolantesPago, barVolantesPago, bulletVolantesPago, lblVolantesPago, "VolantesPago");
+            ConfigurarItem(pnlDeduccionesEmpleado, barDeduccionesEmpleado, bulletDeduccionesEmpleado, lblDeduccionesEmpleado, "DeduccionesEmpleado");
+            ConfigurarItem(pnlAsignacionesEmpleado, barAsignacionesEmpleado, bulletAsignacionesEmpleado, lblAsignacionesEmpleado, "AsignacionesEmpleado");
+
+            // Headers desplegables — Entrada
             Panel[] itemsConfig = { pnlDepartamentos, pnlPosiciones, pnlDeducciones, pnlAsignaciones };
             Panel[] itemsEmpleados = { pnlEmpleados, pnlAsistencias };
             Panel[] itemsSeguridad = { pnlAccesoSistema };
 
-            // Añadir chevron al texto de cada header y hacerlos clickeables
             lblSeccionConfig.Text = "CONFIGURACIÓN  ▾";
             lblSeccionEmpleados.Text = "EMPLEADOS  ▾";
             lblSeccionSeguridad.Text = "SEGURIDAD  ▾";
@@ -128,21 +124,101 @@ namespace Presentacion
             lblSeccionConfig.Click += (s, e) => ToggleSeccion("Config", lblSeccionConfig, itemsConfig);
             lblSeccionEmpleados.Click += (s, e) => ToggleSeccion("Empleados", lblSeccionEmpleados, itemsEmpleados);
             lblSeccionSeguridad.Click += (s, e) => ToggleSeccion("Seguridad", lblSeccionSeguridad, itemsSeguridad);
+
+            // Headers desplegables — Nómina
+            Panel[] itemsNomina = { pnlVolantesLista, pnlVolantesPago, pnlDeduccionesEmpleado, pnlAsignacionesEmpleado };
+
+            lblSeccionNomina.Text = "NÓMINA  ▾";
+            lblSeccionNomina.Cursor = Cursors.Hand;
+            lblSeccionNomina.Click += (s, e) => ToggleSeccion("Nomina", lblSeccionNomina, itemsNomina);
+
+            _itemActivo = pnlEmpleados;
+            MostrarSidebarEntrada();
         }
 
-        // Expande o colapsa una sección del sidebar con animación suave
+        // ════════════════════════════════════════════════════════════════════
+        //  TABS
+        // ════════════════════════════════════════════════════════════════════
+        private void Tab_Click(object sender, EventArgs e)
+        {
+            _tabActiva = (Button)sender;
+
+            foreach (Button btn in new[] { btnTabEntrada, btnTabNomina })
+                btn.ForeColor = ColorSubTexto;
+
+            _tabActiva.ForeColor = ColorTexto;
+            _tabActiva.Invalidate();
+
+            if (_tabActiva == btnTabEntrada)
+            {
+                MostrarSidebarEntrada();
+                MostrarBienvenida();
+            }
+            else if (_tabActiva == btnTabNomina)
+            {
+                MostrarSidebarNomina();
+                MostrarBienvenida();
+            }
+        }
+
+        private void Tab_Paint(object sender, PaintEventArgs e)
+        {
+            Button btn = (Button)sender;
+            if (btn == _tabActiva)
+            {
+                using (Pen p = new Pen(ColorCyan, 2))
+                    e.Graphics.DrawLine(p, 0, btn.Height - 2, btn.Width, btn.Height - 2);
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        //  CONTROL DEL SIDEBAR POR TAB
+        // ════════════════════════════════════════════════════════════════════
+        private void MostrarSidebarEntrada()
+        {
+            lblSeccionNomina.Visible = false;
+            pnlVolantesLista.Visible = false;
+            pnlVolantesPago.Visible = false;
+            pnlDeduccionesEmpleado.Visible = false;
+            pnlAsignacionesEmpleado.Visible = false;
+
+            lblSeccionConfig.Visible = true;
+            lblSeccionEmpleados.Visible = true;
+            lblSeccionSeguridad.Visible = true;
+
+            RecalcularPosicionesEntrada();
+        }
+
+        private void MostrarSidebarNomina()
+        {
+            lblSeccionConfig.Visible = false;
+            lblSeccionEmpleados.Visible = false;
+            lblSeccionSeguridad.Visible = false;
+            pnlDepartamentos.Visible = false;
+            pnlPosiciones.Visible = false;
+            pnlDeducciones.Visible = false;
+            pnlAsignaciones.Visible = false;
+            pnlEmpleados.Visible = false;
+            pnlAsistencias.Visible = false;
+            pnlAccesoSistema.Visible = false;
+
+            lblSeccionNomina.Visible = true;
+            RecalcularPosicionesNomina();
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        //  SECCIONES DESPLEGABLES
+        // ════════════════════════════════════════════════════════════════════
         private void ToggleSeccion(string key, Label lblHeader, Panel[] items)
         {
             bool abierto = _seccionesExpandidas[key];
             _seccionesExpandidas[key] = !abierto;
 
-            // Rotar el chevron
             if (lblHeader.Text.EndsWith("▾"))
                 lblHeader.Text = lblHeader.Text.Replace("▾", "▸");
             else
                 lblHeader.Text = lblHeader.Text.Replace("▸", "▾");
 
-            // Animación suave
             var timerAnim = new System.Windows.Forms.Timer { Interval = 10 };
             int alturaActual = abierto ? items.Length * 28 : 0;
             int alturaObjetivo = abierto ? 0 : items.Length * 28;
@@ -151,11 +227,13 @@ namespace Presentacion
             timerAnim.Tick += (s, e) =>
             {
                 alturaActual = Math.Max(0, Math.Min(items.Length * 28, alturaActual + paso));
-
                 foreach (var item in items)
                     item.Visible = alturaActual > 0;
 
-                RecalcularPosiciones();
+                if (_tabActiva == btnTabEntrada || _tabActiva == null)
+                    RecalcularPosicionesEntrada();
+                else if (_tabActiva == btnTabNomina)
+                    RecalcularPosicionesNomina();
 
                 if (alturaActual == alturaObjetivo)
                     timerAnim.Stop();
@@ -163,23 +241,17 @@ namespace Presentacion
             timerAnim.Start();
         }
 
-        // Recalcula la posición vertical de cada header e item según el estado expandido/colapsado
-        private void RecalcularPosiciones()
+        private void RecalcularPosicionesEntrada()
         {
             int y = 10;
 
-            // Sección Configuración
             lblSeccionConfig.Top = y;
             y += lblSeccionConfig.Height + 4;
 
             if (_seccionesExpandidas["Config"])
             {
                 foreach (var item in new[] { pnlDepartamentos, pnlPosiciones, pnlDeducciones, pnlAsignaciones })
-                {
-                    item.Top = y;
-                    item.Visible = true;
-                    y += 28;
-                }
+                { item.Top = y; item.Visible = true; y += 28; }
             }
             else
             {
@@ -188,19 +260,13 @@ namespace Presentacion
             }
 
             y += 8;
-
-            // Sección Empleados
             lblSeccionEmpleados.Top = y;
             y += lblSeccionEmpleados.Height + 4;
 
             if (_seccionesExpandidas["Empleados"])
             {
                 foreach (var item in new[] { pnlEmpleados, pnlAsistencias })
-                {
-                    item.Top = y;
-                    item.Visible = true;
-                    y += 28;
-                }
+                { item.Top = y; item.Visible = true; y += 28; }
             }
             else
             {
@@ -209,23 +275,37 @@ namespace Presentacion
             }
 
             y += 8;
-
-            // Sección Seguridad
             lblSeccionSeguridad.Top = y;
             y += lblSeccionSeguridad.Height + 4;
 
             if (_seccionesExpandidas["Seguridad"])
+            { pnlAccesoSistema.Top = y; pnlAccesoSistema.Visible = true; }
+            else
+            { pnlAccesoSistema.Visible = false; }
+        }
+
+        private void RecalcularPosicionesNomina()
+        {
+            int y = 10;
+
+            lblSeccionNomina.Top = y;
+            y += lblSeccionNomina.Height + 4;
+
+            if (_seccionesExpandidas["Nomina"])
             {
-                pnlAccesoSistema.Top = y;
-                pnlAccesoSistema.Visible = true;
+                foreach (var item in new[] { pnlVolantesLista, pnlVolantesPago, pnlDeduccionesEmpleado, pnlAsignacionesEmpleado })
+                { item.Top = y; item.Visible = true; y += 28; }
             }
             else
             {
-                pnlAccesoSistema.Visible = false;
+                foreach (var item in new[] { pnlVolantesLista, pnlVolantesPago, pnlDeduccionesEmpleado, pnlAsignacionesEmpleado })
+                    item.Visible = false;
             }
         }
 
-        // Configura eventos de hover y click para un item del sidebar
+        // ════════════════════════════════════════════════════════════════════
+        //  ITEMS DEL SIDEBAR
+        // ════════════════════════════════════════════════════════════════════
         private void ConfigurarItem(Panel item, Panel barra, Label bullet, Label lbl, string tag)
         {
             item.MouseEnter += (s, e) => { if (item != _itemActivo) item.BackColor = Color.FromArgb(20, 30, 58); };
@@ -237,34 +317,8 @@ namespace Presentacion
             bullet.Click += (s, e) => onClick();
         }
 
-        // Evento click para las tabs principales
-        private void Tab_Click(object sender, EventArgs e)
-        {
-            _tabActiva = (Button)sender;
-
-            foreach (Button btn in new[] { btnTabEntrada, btnTabNomina, btnTabConsulta })
-                btn.ForeColor = ColorSubTexto;
-
-            _tabActiva.ForeColor = ColorTexto;
-            _tabActiva.Invalidate();
-            MostrarBienvenida();
-        }
-
-        // Evento Paint para las tabs, dibuja línea inferior si es la tab activa
-        private void Tab_Paint(object sender, PaintEventArgs e)
-        {
-            Button btn = (Button)sender;
-            if (btn == _tabActiva)
-            {
-                using (Pen p = new Pen(ColorCyan, 2))
-                    e.Graphics.DrawLine(p, 0, btn.Height - 2, btn.Width, btn.Height - 2);
-            }
-        }
-
-        // Evento click para los items del sidebar
         private void Item_Click(Panel item, Panel barra, Label bullet, Label lbl, string tag)
         {
-            // Desactivar anterior
             if (_itemActivo != null)
             {
                 _itemActivo.BackColor = Color.Transparent;
@@ -279,7 +333,6 @@ namespace Presentacion
                 }
             }
 
-            // Activar nuevo
             _itemActivo = item;
             item.BackColor = ColorItemActivo;
             barra.BackColor = ColorCyan;
@@ -290,7 +343,9 @@ namespace Presentacion
             AbrirModulo(tag);
         }
 
-        // Muestra la pantalla de bienvenida
+        // ════════════════════════════════════════════════════════════════════
+        //  MÓDULOS
+        // ════════════════════════════════════════════════════════════════════
         private void MostrarBienvenida()
         {
             foreach (Control c in pnlContenido.Controls)
@@ -302,7 +357,6 @@ namespace Presentacion
             pnlContenido.Controls.Add(lblSubBienvenida);
         }
 
-        // Abre el módulo correspondiente al tag recibido
         private void AbrirModulo(string tag)
         {
             foreach (Control c in pnlContenido.Controls)
@@ -312,6 +366,7 @@ namespace Presentacion
             Form frm = null;
             switch (tag)
             {
+                // Tab Entrada
                 case "Departamentos": frm = new FrmDepartamentos(); break;
                 case "Posiciones": frm = new FrmPosiciones(); break;
                 case "Deducciones": frm = new FrmDeducciones(); break;
@@ -319,7 +374,11 @@ namespace Presentacion
                 case "Empleados": frm = new FrmEmpleados(); break;
                 case "Asistencias": frm = new FrmAsistencias(); break;
                 case "AccesoSistema": frm = new FrmAccesoSistema(); break;
-                case "VolantesPago": frm = new FrmVolantesPago(); break;
+                // Tab Nómina
+                case "VolantesLista": frm = new FrmVolantesLista(); break;  // Volantes de Pago
+                case "VolantesPago": frm = new FrmVolantesPago(); break;  // Sueldo Neto
+                case "DeduccionesEmpleado": frm = new FrmDeduccionesEmpleado(); break;
+                case "AsignacionesEmpleado": frm = new FrmAsignacionesEmpleado(); break;
                 default: MostrarBienvenida(); return;
             }
 
@@ -334,7 +393,9 @@ namespace Presentacion
             }
         }
 
-        // Inicia el reloj en la barra de estado
+        // ════════════════════════════════════════════════════════════════════
+        //  HELPERS
+        // ════════════════════════════════════════════════════════════════════
         private void IniciarReloj()
         {
             _timer = new Timer { Interval = 1000 };
@@ -342,7 +403,6 @@ namespace Presentacion
             _timer.Start();
         }
 
-        // Crea una región circular para los botones de ventana
         private Region CrearRegionCircular(int size)
         {
             GraphicsPath path = new GraphicsPath();

@@ -47,8 +47,9 @@
     <Compile Include="Configuracion\DepartamentosCN.cs" />
     <Compile Include="Configuracion\PosicionesCN.cs" />
     <Compile Include="Empleados\DeduccionesEmpleadoCN.cs" />
+    <Compile Include="Nomina\VolantePagoCN.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Nomina\VolantesPagoCN.cs" />
+    <Compile Include="Nomina\SueldoNetoCN.cs" />
     <Compile Include="Configuracion\DeduccionesCN.cs" />
     <Compile Include="Empleados\EmpleadosCN.cs" />
     <Compile Include="Empleados\AsignacionesEmpleadoCN.cs" />

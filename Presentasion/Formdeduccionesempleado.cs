@@ -33,6 +33,7 @@ namespace Presentacion
         {
             InitializeComponent();
             ConfigurarEventos();
+            CargarCombos();
             CargarDatos();
         }
 
@@ -41,32 +42,34 @@ namespace Presentacion
         // ══════════════════════════════════════════════════════════════════
         private void ConfigurarEventos()
         {
-            // Bordes de paneles
             pnlFormulario.Paint += PnlBorde_Paint;
-            pnlNombre.Paint += PnlInput_Paint;
-            pnlDeduccion.Paint += PnlInput_Paint;
             pnlMonto.Paint += PnlInput_Paint;
 
-            // Posicionar btnNuevo dinámicamente a la derecha del header
             pnlHeader.Resize += (s, e) => btnNuevo.Left = pnlHeader.Width - btnNuevo.Width - 20;
             pnlHeader.HandleCreated += (s, e) => btnNuevo.Left = pnlHeader.Width - btnNuevo.Width - 20;
 
-            // Botones
             btnNuevo.Click += BtnNuevo_Click;
             btnGuardar.Click += BtnGuardar_Click;
             btnCancelar.Click += BtnCancelar_Click;
             btnEliminar.Click += BtnEliminar_Click;
 
-            // Grid
             dgvDeducciones.CellClick += Grid_CellClick;
+            dgvDeducciones.CellFormatting += (s, e) =>
+            {
+                if (e.RowIndex < 0) return;
+                if (dgvDeducciones.Columns[e.ColumnIndex].Name == "Tipo" && e.Value != null)
+                {
+                    int tipo = Convert.ToInt32(e.Value);
+                    e.Value = tipo == 1 ? "Mensual" : "Quincenal";
+                    e.FormattingApplied = true;
+                }
+            };
 
-            // Hover
             ConfigurarHover(btnNuevo, ColorCyan, Color.FromArgb(0, 185, 205));
             ConfigurarHover(btnGuardar, ColorBotonAzul, Color.FromArgb(40, 100, 210));
             ConfigurarHover(btnCancelar, ColorPanel, Color.FromArgb(30, 42, 80));
             ConfigurarHover(btnEliminar, ColorBotonRojo, Color.FromArgb(190, 45, 65));
 
-            // Regiones redondeadas
             foreach (Button btn in new[] { btnNuevo, btnGuardar, btnCancelar, btnEliminar })
             {
                 btn.Region = CrearRegionRedondeada(btn.Size, 6);
@@ -74,7 +77,6 @@ namespace Presentacion
                     ((Button)s).Region = CrearRegionRedondeada(((Button)s).Size, 6);
             }
 
-            // Solo números decimales en monto
             txtMonto.KeyPress += (s, e) =>
             {
                 if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
@@ -92,7 +94,41 @@ namespace Presentacion
         }
 
         // ══════════════════════════════════════════════════════════════════
-        //  CARGA DE DATOS
+        //  CARGA DE COMBOS
+        // ══════════════════════════════════════════════════════════════════
+        private void CargarCombos()
+        {
+            try
+            {
+                // ComboBox Empleados
+                DataTable dtEmp = _cn.MostrarEmpleados();
+                cmbEmpleado.DataSource = dtEmp;
+                cmbEmpleado.DisplayMember = "NombreCompleto";
+                cmbEmpleado.ValueMember = "Id";
+                cmbEmpleado.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cargar empleados: " + ex.Message, false);
+            }
+
+            try
+            {
+                // ComboBox Asignaciones
+                DataTable dtAsig = _cn.MostrarDeducciones();
+                cmbDeduccion.DataSource = dtAsig;
+                cmbDeduccion.DisplayMember = "Nombre";
+                cmbDeduccion.ValueMember = "Id";
+                cmbDeduccion.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cargar asignaciones: " + ex.Message, false);
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        //  CARGA DEL GRID
         // ══════════════════════════════════════════════════════════════════
         private async void CargarDatos()
         {
@@ -109,7 +145,7 @@ namespace Presentacion
                     dgvDeducciones.Columns["Id"].Visible = false;
 
                 RenombrarColumna("Empleado", "Empleado");
-                RenombrarColumna("Deduccion", "Deducción");
+                RenombrarColumna("Deduccion", "Asignación");
                 RenombrarColumna("Tipo", "Tipo");
                 RenombrarColumna("Monto", "Monto");
                 RenombrarColumna("FechaEfectividad", "Fecha Efect.");
@@ -118,15 +154,10 @@ namespace Presentacion
                 if (dgvDeducciones.Columns.Contains("Monto"))
                     dgvDeducciones.Columns["Monto"].DefaultCellStyle.Format = "N2";
 
-                // Formatear Tipo
-                foreach (DataGridViewRow row in dgvDeducciones.Rows)
-                {
-                    if (row.Cells["Tipo"].Value != null)
-                    {
-                        int tipo = Convert.ToInt32(row.Cells["Tipo"].Value);
-                        row.Cells["Tipo"].Value = tipo == 1 ? "Mensual" : "Quincenal";
-                    }
-                }
+                if (dgvDeducciones.Columns.Contains("IdEmpleado"))
+                    dgvDeducciones.Columns["IdEmpleado"].Visible = false;
+                if (dgvDeducciones.Columns.Contains("IdDeduccion"))
+                    dgvDeducciones.Columns["IdDeduccion"].Visible = false;
 
                 AgregarColumnaBoton("Editar", Color.FromArgb(255, 180, 0), "btnEditar", Color.FromArgb(13, 17, 35));
                 AgregarColumnaBoton("Eliminar", ColorEliminar, "btnEliminar", ColorTexto);
@@ -166,7 +197,7 @@ namespace Presentacion
         }
 
         // ══════════════════════════════════════════════════════════════════
-        //  EVENTOS DE BOTONES
+        //  EVENTOS BOTONES
         // ══════════════════════════════════════════════════════════════════
         private void BtnNuevo_Click(object sender, EventArgs e)
         {
@@ -178,7 +209,7 @@ namespace Presentacion
             btnEliminar.Enabled = false;
             pnlFormulario.Visible = true;
             lblMensaje.Text = "";
-            txtMonto.Focus();
+            cmbEmpleado.Focus();
             ActualizarPosicionGrid();
         }
 
@@ -200,11 +231,16 @@ namespace Presentacion
                 _idSeleccionado = Convert.ToInt32(row["Id"]);
                 _modoEdicion = true;
 
-                txtEmpleado.Text = row["Empleado"] == DBNull.Value ? "" : row["Empleado"].ToString();
-                txtDeduccion.Text = row["Deduccion"] == DBNull.Value ? "" : row["Deduccion"].ToString();
+                // Seleccionar empleado en el combo por valor
+                if (row.Table.Columns.Contains("IdEmpleado") && row["IdEmpleado"] != DBNull.Value)
+                    cmbEmpleado.SelectedValue = Convert.ToInt32(row["IdEmpleado"]);
 
-                string tipoStr = row["Tipo"].ToString();
-                cmbTipo.SelectedIndex = tipoStr == "Mensual" ? 0 : 1;
+                // Seleccionar asignación en el combo por valor
+                if (row.Table.Columns.Contains("IdAsignacion") && row["IdDeduccion"] != DBNull.Value)
+                    cmbDeduccion.SelectedValue = Convert.ToInt32(row["IdDeduccion"]);
+
+                int tipoVal = Convert.ToInt32(row["Tipo"]);
+                cmbTipo.SelectedIndex = tipoVal == 1 ? 0 : 1;
 
                 if (decimal.TryParse(row["Monto"].ToString(), out decimal monto))
                     txtMonto.Text = monto.ToString("F2");
@@ -244,19 +280,27 @@ namespace Presentacion
                 lblMensaje.Text = _modoEdicion ? "Actualizando..." : "Guardando...";
                 lblMensaje.ForeColor = ColorSubTexto;
 
-                int idAsignacion = 1; // TODO: reemplazar con combo enlazado a BD
-                int idEmpleado = 1; // TODO: reemplazar con combo enlazado a BD
-                int idSubtotal = 1; // TODO: reemplazar con subtotal calculado
+                int idDeduccion = Convert.ToInt32(cmbDeduccion.SelectedValue);
+                int idEmpleado = Convert.ToInt32(cmbEmpleado.SelectedValue);
+
+                // Obtener el IdSubtotal del volante más reciente del empleado
+                int idSubtotal = ObtenerIdSubtotal(idEmpleado);
+                if (idSubtotal <= 0)
+                {
+                    MostrarMensaje("El empleado no tiene un volante de pago registrado. Registre uno primero.", false);
+                    btnGuardar.Enabled = true;
+                    return;
+                }
                 int tipo = cmbTipo.SelectedIndex + 1;
                 decimal monto = decimal.Parse(txtMonto.Text);
                 DateTime fecha = dtpFechaEfectividad.Value.Date;
 
                 bool resultado;
                 if (_modoEdicion)
-                    resultado = await _cn.ActualizarAsync(_idSeleccionado, idAsignacion, idEmpleado,
+                    resultado = await _cn.ActualizarAsync(_idSeleccionado, idDeduccion, idEmpleado,
                                                           idSubtotal, tipo, monto, fecha);
                 else
-                    resultado = await _cn.InsertarAsync(idAsignacion, idEmpleado,
+                    resultado = await _cn.InsertarAsync(idDeduccion, idEmpleado,
                                                         idSubtotal, tipo, monto, fecha);
 
                 if (resultado)
@@ -321,8 +365,8 @@ namespace Presentacion
 
         private void LimpiarFormulario()
         {
-            txtEmpleado.Text = "";
-            txtDeduccion.Text = "";
+            cmbEmpleado.SelectedIndex = -1;
+            cmbDeduccion.SelectedIndex = -1;
             txtMonto.Text = "";
             cmbTipo.SelectedIndex = 0;
             dtpFechaEfectividad.Value = DateTime.Today;
@@ -356,6 +400,12 @@ namespace Presentacion
 
         private bool ValidarFormulario()
         {
+            if (cmbEmpleado.SelectedValue == null || cmbEmpleado.SelectedIndex < 0)
+            { MostrarMensaje("Debe seleccionar un empleado.", false); cmbEmpleado.Focus(); return false; }
+
+            if (cmbDeduccion.SelectedValue == null || cmbDeduccion.SelectedIndex < 0)
+            { MostrarMensaje("Debe seleccionar una deducción.", false); cmbDeduccion.Focus(); return false; }
+
             if (string.IsNullOrWhiteSpace(txtMonto.Text))
             { MostrarMensaje("El campo Monto es obligatorio.", false); txtMonto.Focus(); return false; }
 
@@ -365,8 +415,8 @@ namespace Presentacion
             if (cmbTipo.SelectedIndex < 0)
             { MostrarMensaje("Debe seleccionar un tipo de deducción.", false); cmbTipo.Focus(); return false; }
 
-            if (dtpFechaEfectividad.Value.Date > DateTime.Today)
-            { MostrarMensaje("La fecha de efectividad no puede ser futura.", false); dtpFechaEfectividad.Focus(); return false; }
+            if (dtpFechaEfectividad.Value.Date < DateTime.Today)
+            { MostrarMensaje("La fecha de efectividad no puede ser anterior a hoy.", false); dtpFechaEfectividad.Focus(); return false; }
 
             return true;
         }
@@ -416,6 +466,24 @@ namespace Presentacion
             Panel pnl = (Panel)sender;
             using (Pen p = new Pen(ColorBorde, 1))
                 e.Graphics.DrawRectangle(p, 0, 0, pnl.Width - 1, pnl.Height - 1);
+        }
+
+        /// <summary>
+        /// Obtiene el Id del volante de pago más reciente del empleado en SalarioST.
+        /// Ese Id es el IdSubtotal requerido por la FK de DeduccionesEmpleado.
+        /// </summary>
+        private int ObtenerIdSubtotal(int idEmpleado)
+        {
+            try
+            {
+                // Reutilizamos VolantesPagoCN para consultar el último salario
+                var cnVolantes = new Negocios.Nomina.VolantesPagoCN();
+                System.Data.DataTable dt = cnVolantes.ObtenerPorEmpleado(idEmpleado);
+                if (dt != null && dt.Rows.Count > 0)
+                    return Convert.ToInt32(dt.Rows[0]["Id"]);
+            }
+            catch { }
+            return 0;
         }
 
         private void FrmDeduccionesEmpleado_Load(object sender, EventArgs e) { }

@@ -33,6 +33,7 @@ namespace Presentacion
         {
             InitializeComponent();
             ConfigurarEventos();
+            CargarCombos();
             CargarDatos();
         }
 
@@ -41,32 +42,34 @@ namespace Presentacion
         // ══════════════════════════════════════════════════════════════════
         private void ConfigurarEventos()
         {
-            // Bordes de paneles
             pnlFormulario.Paint += PnlBorde_Paint;
-            pnlNombre.Paint += PnlInput_Paint;
-            pnlAsignacion.Paint += PnlInput_Paint;
             pnlMonto.Paint += PnlInput_Paint;
 
-            // Posicionar btnNuevo dinámicamente a la derecha del header
             pnlHeader.Resize += (s, e) => btnNuevo.Left = pnlHeader.Width - btnNuevo.Width - 20;
             pnlHeader.HandleCreated += (s, e) => btnNuevo.Left = pnlHeader.Width - btnNuevo.Width - 20;
 
-            // Botones
             btnNuevo.Click += BtnNuevo_Click;
             btnGuardar.Click += BtnGuardar_Click;
             btnCancelar.Click += BtnCancelar_Click;
             btnEliminar.Click += BtnEliminar_Click;
 
-            // Grid
             dgvAsignaciones.CellClick += Grid_CellClick;
+            dgvAsignaciones.CellFormatting += (s, e) =>
+            {
+                if (e.RowIndex < 0) return;
+                if (dgvAsignaciones.Columns[e.ColumnIndex].Name == "Tipo" && e.Value != null)
+                {
+                    int tipo = Convert.ToInt32(e.Value);
+                    e.Value = tipo == 1 ? "Mensual" : "Quincenal";
+                    e.FormattingApplied = true;
+                }
+            };
 
-            // Hover
             ConfigurarHover(btnNuevo, ColorCyan, Color.FromArgb(0, 185, 205));
             ConfigurarHover(btnGuardar, ColorBotonAzul, Color.FromArgb(40, 100, 210));
             ConfigurarHover(btnCancelar, ColorPanel, Color.FromArgb(30, 42, 80));
             ConfigurarHover(btnEliminar, ColorBotonRojo, Color.FromArgb(190, 45, 65));
 
-            // Regiones redondeadas
             foreach (Button btn in new[] { btnNuevo, btnGuardar, btnCancelar, btnEliminar })
             {
                 btn.Region = CrearRegionRedondeada(btn.Size, 6);
@@ -74,7 +77,6 @@ namespace Presentacion
                     ((Button)s).Region = CrearRegionRedondeada(((Button)s).Size, 6);
             }
 
-            // Solo números decimales en monto
             txtMonto.KeyPress += (s, e) =>
             {
                 if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
@@ -92,7 +94,41 @@ namespace Presentacion
         }
 
         // ══════════════════════════════════════════════════════════════════
-        //  CARGA DE DATOS
+        //  CARGA DE COMBOS
+        // ══════════════════════════════════════════════════════════════════
+        private void CargarCombos()
+        {
+            try
+            {
+                // ComboBox Empleados
+                DataTable dtEmp = _cn.MostrarEmpleados();
+                cmbEmpleado.DataSource = dtEmp;
+                cmbEmpleado.DisplayMember = "NombreCompleto";
+                cmbEmpleado.ValueMember = "Id";
+                cmbEmpleado.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cargar empleados: " + ex.Message, false);
+            }
+
+            try
+            {
+                // ComboBox Asignaciones
+                DataTable dtAsig = _cn.MostrarAsignaciones();
+                cmbAsignacion.DataSource = dtAsig;
+                cmbAsignacion.DisplayMember = "Nombre";
+                cmbAsignacion.ValueMember = "Id";
+                cmbAsignacion.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cargar asignaciones: " + ex.Message, false);
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        //  CARGA DEL GRID
         // ══════════════════════════════════════════════════════════════════
         private async void CargarDatos()
         {
@@ -118,15 +154,11 @@ namespace Presentacion
                 if (dgvAsignaciones.Columns.Contains("Monto"))
                     dgvAsignaciones.Columns["Monto"].DefaultCellStyle.Format = "N2";
 
-                // Formatear Tipo
-                foreach (DataGridViewRow row in dgvAsignaciones.Rows)
-                {
-                    if (row.Cells["Tipo"].Value != null)
-                    {
-                        int tipo = Convert.ToInt32(row.Cells["Tipo"].Value);
-                        row.Cells["Tipo"].Value = tipo == 1 ? "Mensual" : "Quincenal";
-                    }
-                }
+                // Ocultar columnas auxiliares que no se muestran al usuario
+                if (dgvAsignaciones.Columns.Contains("IdEmpleado"))
+                    dgvAsignaciones.Columns["IdEmpleado"].Visible = false;
+                if (dgvAsignaciones.Columns.Contains("IdAsignacion"))
+                    dgvAsignaciones.Columns["IdAsignacion"].Visible = false;
 
                 AgregarColumnaBoton("Editar", Color.FromArgb(255, 180, 0), "btnEditar", Color.FromArgb(13, 17, 35));
                 AgregarColumnaBoton("Eliminar", ColorEliminar, "btnEliminar", ColorTexto);
@@ -166,7 +198,7 @@ namespace Presentacion
         }
 
         // ══════════════════════════════════════════════════════════════════
-        //  EVENTOS DE BOTONES
+        //  EVENTOS BOTONES
         // ══════════════════════════════════════════════════════════════════
         private void BtnNuevo_Click(object sender, EventArgs e)
         {
@@ -178,7 +210,7 @@ namespace Presentacion
             btnEliminar.Enabled = false;
             pnlFormulario.Visible = true;
             lblMensaje.Text = "";
-            txtMonto.Focus();
+            cmbEmpleado.Focus();
             ActualizarPosicionGrid();
         }
 
@@ -200,11 +232,17 @@ namespace Presentacion
                 _idSeleccionado = Convert.ToInt32(row["Id"]);
                 _modoEdicion = true;
 
-                txtEmpleado.Text = row["Empleado"] == DBNull.Value ? "" : row["Empleado"].ToString();
-                txtAsignacion.Text = row["Asignacion"] == DBNull.Value ? "" : row["Asignacion"].ToString();
+                // Seleccionar empleado en el combo por valor
+                if (row.Table.Columns.Contains("IdEmpleado") && row["IdEmpleado"] != DBNull.Value)
+                    cmbEmpleado.SelectedValue = Convert.ToInt32(row["IdEmpleado"]);
 
-                string tipoStr = row["Tipo"].ToString();
-                cmbTipo.SelectedIndex = tipoStr == "Mensual" ? 0 : 1;
+                // Seleccionar asignación en el combo por valor
+                if (row.Table.Columns.Contains("IdAsignacion") && row["IdAsignacion"] != DBNull.Value)
+                    cmbAsignacion.SelectedValue = Convert.ToInt32(row["IdAsignacion"]);
+
+                // Tipo viene como byte/int desde BD — no como string
+                int tipoVal = Convert.ToInt32(row["Tipo"]);
+                cmbTipo.SelectedIndex = tipoVal == 1 ? 0 : 1;
 
                 if (decimal.TryParse(row["Monto"].ToString(), out decimal monto))
                     txtMonto.Text = monto.ToString("F2");
@@ -244,9 +282,8 @@ namespace Presentacion
                 lblMensaje.Text = _modoEdicion ? "Actualizando..." : "Guardando...";
                 lblMensaje.ForeColor = ColorSubTexto;
 
-                int idAsignacion = 1; // TODO: reemplazar con combo enlazado a BD
-                int idEmpleado = 1; // TODO: reemplazar con combo enlazado a BD
-                int idSubtotal = 1; // TODO: reemplazar con subtotal calculado
+                int idAsignacion = Convert.ToInt32(cmbAsignacion.SelectedValue);
+                int idEmpleado = Convert.ToInt32(cmbEmpleado.SelectedValue);
                 int tipo = cmbTipo.SelectedIndex + 1;
                 decimal monto = decimal.Parse(txtMonto.Text);
                 DateTime fecha = dtpFechaEfectividad.Value.Date;
@@ -254,10 +291,10 @@ namespace Presentacion
                 bool resultado;
                 if (_modoEdicion)
                     resultado = await _cn.ActualizarAsync(_idSeleccionado, idAsignacion, idEmpleado,
-                                                          idSubtotal, tipo, monto, fecha);
+                                                          tipo, monto, fecha);
                 else
                     resultado = await _cn.InsertarAsync(idAsignacion, idEmpleado,
-                                                        idSubtotal, tipo, monto, fecha);
+                                                        tipo, monto, fecha);
 
                 if (resultado)
                 {
@@ -321,8 +358,8 @@ namespace Presentacion
 
         private void LimpiarFormulario()
         {
-            txtEmpleado.Text = "";
-            txtAsignacion.Text = "";
+            cmbEmpleado.SelectedIndex = -1;
+            cmbAsignacion.SelectedIndex = -1;
             txtMonto.Text = "";
             cmbTipo.SelectedIndex = 0;
             dtpFechaEfectividad.Value = DateTime.Today;
@@ -356,6 +393,12 @@ namespace Presentacion
 
         private bool ValidarFormulario()
         {
+            if (cmbEmpleado.SelectedValue == null || cmbEmpleado.SelectedIndex < 0)
+            { MostrarMensaje("Debe seleccionar un empleado.", false); cmbEmpleado.Focus(); return false; }
+
+            if (cmbAsignacion.SelectedValue == null || cmbAsignacion.SelectedIndex < 0)
+            { MostrarMensaje("Debe seleccionar una asignación.", false); cmbAsignacion.Focus(); return false; }
+
             if (string.IsNullOrWhiteSpace(txtMonto.Text))
             { MostrarMensaje("El campo Monto es obligatorio.", false); txtMonto.Focus(); return false; }
 
@@ -365,8 +408,8 @@ namespace Presentacion
             if (cmbTipo.SelectedIndex < 0)
             { MostrarMensaje("Debe seleccionar un tipo de asignación.", false); cmbTipo.Focus(); return false; }
 
-            if (dtpFechaEfectividad.Value.Date > DateTime.Today)
-            { MostrarMensaje("La fecha de efectividad no puede ser futura.", false); dtpFechaEfectividad.Focus(); return false; }
+            if (dtpFechaEfectividad.Value.Date < DateTime.Today)
+            { MostrarMensaje("La fecha de efectividad no puede ser anterior a hoy.", false); dtpFechaEfectividad.Focus(); return false; }
 
             return true;
         }

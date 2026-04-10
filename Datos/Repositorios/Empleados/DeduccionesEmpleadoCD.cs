@@ -48,6 +48,34 @@ namespace Datos.Repositorios.Empleados
             }
         }
 
+        public DataTable MostrarDeducciones()
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                SqlDataAdapter da = new SqlDataAdapter(
+                    "SELECT Id, Nombre FROM Deducciones", con);
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        public DataTable MostrarEmpleados()
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                SqlDataAdapter da = new SqlDataAdapter(
+                    @"SELECT Id, 
+                     Nombre + ' ' + Apellido AS NombreCompleto 
+              FROM Empleados", con);
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
         public override async Task<DataTable> ObtenerTodosAsync()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())

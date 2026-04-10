@@ -52,7 +52,8 @@
     <Compile Include="Repositorios\Empleados\AsignacionesEmpleadoCD.cs" />
     <Compile Include="Repositorios\Empleados\DeduccionesEmpleadoCD.cs" />
     <Compile Include="Repositorios\Empleados\EmpleadosCD.cs" />
-    <Compile Include="Repositorios\Nomina\VolantesPagoCD.cs" />
+    <Compile Include="Repositorios\Nomina\SueldoNetoCD.cs" />
+    <Compile Include="Repositorios\Nomina\VolantePagoCD.cs" />
     <Compile Include="Repositorios\Seguridad\LogginCD.cs" />
   </ItemGroup>
   <ItemGroup />

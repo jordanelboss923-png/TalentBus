@@ -3,7 +3,6 @@
     partial class FrmDeduccionesEmpleado
     {
         private System.ComponentModel.IContainer components = null;
-
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null)) components.Dispose();
@@ -20,13 +19,11 @@
             this.pnlFormulario = new System.Windows.Forms.Panel();
             this.lblTituloFormulario = new System.Windows.Forms.Label();
 
-            // Fila 1: Empleado | Asignación
+            // Fila 1: Empleado (combo) | Asignación (combo)
             this.lblLblEmpleado = new System.Windows.Forms.Label();
-            this.pnlNombre = new System.Windows.Forms.Panel();
-            this.txtEmpleado = new System.Windows.Forms.TextBox();
+            this.cmbEmpleado = new System.Windows.Forms.ComboBox();
             this.lblLblDeduccion = new System.Windows.Forms.Label();
-            this.pnlDeduccion = new System.Windows.Forms.Panel();
-            this.txtDeduccion = new System.Windows.Forms.TextBox();
+            this.cmbDeduccion = new System.Windows.Forms.ComboBox();
 
             // Fila 2: Tipo | Monto | Fecha
             this.lblLblTipo = new System.Windows.Forms.Label();
@@ -47,8 +44,6 @@
 
             this.pnlHeader.SuspendLayout();
             this.pnlFormulario.SuspendLayout();
-            this.pnlNombre.SuspendLayout();
-            this.pnlDeduccion.SuspendLayout();
             this.pnlMonto.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDeducciones)).BeginInit();
             this.SuspendLayout();
@@ -97,9 +92,9 @@
             this.pnlFormulario.BackColor = System.Drawing.Color.FromArgb(18, 24, 48);
             this.pnlFormulario.Controls.Add(this.lblTituloFormulario);
             this.pnlFormulario.Controls.Add(this.lblLblEmpleado);
-            this.pnlFormulario.Controls.Add(this.pnlNombre);
+            this.pnlFormulario.Controls.Add(this.cmbEmpleado);
             this.pnlFormulario.Controls.Add(this.lblLblDeduccion);
-            this.pnlFormulario.Controls.Add(this.pnlDeduccion);
+            this.pnlFormulario.Controls.Add(this.cmbDeduccion);
             this.pnlFormulario.Controls.Add(this.lblLblTipo);
             this.pnlFormulario.Controls.Add(this.cmbTipo);
             this.pnlFormulario.Controls.Add(this.lblLblMonto);
@@ -131,58 +126,44 @@
             this.lblLblEmpleado.Location = new System.Drawing.Point(18, 40);
             this.lblLblEmpleado.Name = "lblLblEmpleado";
             this.lblLblEmpleado.TabIndex = 1;
-            this.lblLblEmpleado.Text = "Empleado";
+            this.lblLblEmpleado.Text = "Empleado *";
 
-            this.pnlNombre.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
-            this.pnlNombre.Controls.Add(this.txtEmpleado);
-            this.pnlNombre.Location = new System.Drawing.Point(18, 58);
-            this.pnlNombre.Name = "pnlNombre";
-            this.pnlNombre.Size = new System.Drawing.Size(280, 36);
-            this.pnlNombre.TabIndex = 2;
-
-            this.txtEmpleado.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
-            this.txtEmpleado.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtEmpleado.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtEmpleado.ForeColor = System.Drawing.Color.White;
-            this.txtEmpleado.Location = new System.Drawing.Point(10, 7);
-            this.txtEmpleado.Name = "txtEmpleado";
-            this.txtEmpleado.ReadOnly = true;
-            this.txtEmpleado.Size = new System.Drawing.Size(260, 21);
-            this.txtEmpleado.TabIndex = 0;
+            this.cmbEmpleado.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
+            this.cmbEmpleado.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbEmpleado.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbEmpleado.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.cmbEmpleado.ForeColor = System.Drawing.Color.White;
+            this.cmbEmpleado.Location = new System.Drawing.Point(18, 58);
+            this.cmbEmpleado.Name = "cmbEmpleado";
+            this.cmbEmpleado.Size = new System.Drawing.Size(300, 23);
+            this.cmbEmpleado.TabIndex = 2;
 
             this.lblLblDeduccion.AutoSize = true;
             this.lblLblDeduccion.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblLblDeduccion.ForeColor = System.Drawing.Color.White;
-            this.lblLblDeduccion.Location = new System.Drawing.Point(316, 40);
+            this.lblLblDeduccion.Location = new System.Drawing.Point(336, 40);
             this.lblLblDeduccion.Name = "lblLblDeduccion";
             this.lblLblDeduccion.TabIndex = 3;
-            this.lblLblDeduccion.Text = "Deducción";
+            this.lblLblDeduccion.Text = "Deducción *";
 
-            this.pnlDeduccion.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
-            this.pnlDeduccion.Controls.Add(this.txtDeduccion);
-            this.pnlDeduccion.Location = new System.Drawing.Point(316, 58);
-            this.pnlDeduccion.Name = "pnlDeduccion";
-            this.pnlDeduccion.Size = new System.Drawing.Size(280, 36);
-            this.pnlDeduccion.TabIndex = 4;
-
-            this.txtDeduccion.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
-            this.txtDeduccion.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtDeduccion.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtDeduccion.ForeColor = System.Drawing.Color.White;
-            this.txtDeduccion.Location = new System.Drawing.Point(10, 7);
-            this.txtDeduccion.Name = "txtDeduccion";
-            this.txtDeduccion.ReadOnly = true;
-            this.txtDeduccion.Size = new System.Drawing.Size(260, 21);
-            this.txtDeduccion.TabIndex = 0;
+            this.cmbDeduccion.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
+            this.cmbDeduccion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbDeduccion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbDeduccion.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.cmbDeduccion.ForeColor = System.Drawing.Color.White;
+            this.cmbDeduccion.Location = new System.Drawing.Point(336, 58);
+            this.cmbDeduccion.Name = "cmbDeduccion";
+            this.cmbDeduccion.Size = new System.Drawing.Size(240, 23);
+            this.cmbDeduccion.TabIndex = 4;
 
             // ── Fila 2: Tipo | Monto | Fecha ─────────────────────────────
             this.lblLblTipo.AutoSize = true;
             this.lblLblTipo.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblLblTipo.ForeColor = System.Drawing.Color.White;
-            this.lblLblTipo.Location = new System.Drawing.Point(18, 106);
+            this.lblLblTipo.Location = new System.Drawing.Point(18, 96);
             this.lblLblTipo.Name = "lblLblTipo";
             this.lblLblTipo.TabIndex = 5;
-            this.lblLblTipo.Text = "Tipo";
+            this.lblLblTipo.Text = "Tipo *";
 
             this.cmbTipo.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
             this.cmbTipo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -190,43 +171,43 @@
             this.cmbTipo.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.cmbTipo.ForeColor = System.Drawing.Color.White;
             this.cmbTipo.Items.AddRange(new object[] { "Mensual", "Quincenal" });
-            this.cmbTipo.Location = new System.Drawing.Point(18, 124);
+            this.cmbTipo.Location = new System.Drawing.Point(18, 114);
             this.cmbTipo.Name = "cmbTipo";
-            this.cmbTipo.Size = new System.Drawing.Size(160, 23);
+            this.cmbTipo.Size = new System.Drawing.Size(140, 23);
             this.cmbTipo.TabIndex = 6;
             this.cmbTipo.SelectedIndex = 0;
 
             this.lblLblMonto.AutoSize = true;
             this.lblLblMonto.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblLblMonto.ForeColor = System.Drawing.Color.White;
-            this.lblLblMonto.Location = new System.Drawing.Point(196, 106);
+            this.lblLblMonto.Location = new System.Drawing.Point(174, 96);
             this.lblLblMonto.Name = "lblLblMonto";
             this.lblLblMonto.TabIndex = 7;
-            this.lblLblMonto.Text = "Monto (RD$)";
+            this.lblLblMonto.Text = "Monto (RD$) *";
 
             this.pnlMonto.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
             this.pnlMonto.Controls.Add(this.txtMonto);
-            this.pnlMonto.Location = new System.Drawing.Point(196, 124);
+            this.pnlMonto.Location = new System.Drawing.Point(174, 114);
             this.pnlMonto.Name = "pnlMonto";
-            this.pnlMonto.Size = new System.Drawing.Size(180, 36);
+            this.pnlMonto.Size = new System.Drawing.Size(170, 28);
             this.pnlMonto.TabIndex = 8;
 
             this.txtMonto.BackColor = System.Drawing.Color.FromArgb(20, 28, 58);
             this.txtMonto.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtMonto.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtMonto.ForeColor = System.Drawing.Color.White;
-            this.txtMonto.Location = new System.Drawing.Point(10, 7);
+            this.txtMonto.Location = new System.Drawing.Point(8, 5);
             this.txtMonto.Name = "txtMonto";
-            this.txtMonto.Size = new System.Drawing.Size(160, 21);
+            this.txtMonto.Size = new System.Drawing.Size(154, 18);
             this.txtMonto.TabIndex = 0;
 
             this.lblLblFecha.AutoSize = true;
             this.lblLblFecha.Font = new System.Drawing.Font("Segoe UI", 8.5F);
             this.lblLblFecha.ForeColor = System.Drawing.Color.White;
-            this.lblLblFecha.Location = new System.Drawing.Point(394, 106);
+            this.lblLblFecha.Location = new System.Drawing.Point(360, 96);
             this.lblLblFecha.Name = "lblLblFecha";
             this.lblLblFecha.TabIndex = 9;
-            this.lblLblFecha.Text = "Fecha de Efectividad";
+            this.lblLblFecha.Text = "Fecha de Efectividad *";
 
             this.dtpFechaEfectividad.CalendarForeColor = System.Drawing.Color.White;
             this.dtpFechaEfectividad.CalendarMonthBackground = System.Drawing.Color.FromArgb(18, 24, 48);
@@ -234,8 +215,8 @@
             this.dtpFechaEfectividad.CalendarTitleForeColor = System.Drawing.Color.White;
             this.dtpFechaEfectividad.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.dtpFechaEfectividad.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpFechaEfectividad.Location = new System.Drawing.Point(394, 124);
-            this.dtpFechaEfectividad.MaxDate = System.DateTime.Today;
+            this.dtpFechaEfectividad.Location = new System.Drawing.Point(360, 114);
+            this.dtpFechaEfectividad.MinDate = System.DateTime.Today;
             this.dtpFechaEfectividad.Name = "dtpFechaEfectividad";
             this.dtpFechaEfectividad.Size = new System.Drawing.Size(200, 23);
             this.dtpFechaEfectividad.TabIndex = 10;
@@ -248,7 +229,7 @@
             this.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGuardar.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnGuardar.ForeColor = System.Drawing.Color.White;
-            this.btnGuardar.Location = new System.Drawing.Point(612, 124);
+            this.btnGuardar.Location = new System.Drawing.Point(578, 110);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(100, 34);
             this.btnGuardar.TabIndex = 11;
@@ -262,7 +243,7 @@
             this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelar.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnCancelar.ForeColor = System.Drawing.Color.FromArgb(130, 150, 190);
-            this.btnCancelar.Location = new System.Drawing.Point(722, 124);
+            this.btnCancelar.Location = new System.Drawing.Point(688, 110);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(100, 34);
             this.btnCancelar.TabIndex = 12;
@@ -276,7 +257,7 @@
             this.btnEliminar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEliminar.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnEliminar.ForeColor = System.Drawing.Color.White;
-            this.btnEliminar.Location = new System.Drawing.Point(612, 162);
+            this.btnEliminar.Location = new System.Drawing.Point(578, 152);
             this.btnEliminar.Name = "btnEliminar";
             this.btnEliminar.Size = new System.Drawing.Size(210, 28);
             this.btnEliminar.TabIndex = 13;
@@ -348,10 +329,6 @@
             this.pnlHeader.PerformLayout();
             this.pnlFormulario.ResumeLayout(false);
             this.pnlFormulario.PerformLayout();
-            this.pnlNombre.ResumeLayout(false);
-            this.pnlNombre.PerformLayout();
-            this.pnlDeduccion.ResumeLayout(false);
-            this.pnlDeduccion.PerformLayout();
             this.pnlMonto.ResumeLayout(false);
             this.pnlMonto.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDeducciones)).EndInit();
@@ -363,15 +340,12 @@
         private System.Windows.Forms.Label lblTituloPagina;
         private System.Windows.Forms.Label lblSubtituloPagina;
         private System.Windows.Forms.Button btnNuevo;
-
         private System.Windows.Forms.Panel pnlFormulario;
         private System.Windows.Forms.Label lblTituloFormulario;
         private System.Windows.Forms.Label lblLblEmpleado;
-        private System.Windows.Forms.Panel pnlNombre;
-        private System.Windows.Forms.TextBox txtEmpleado;
+        private System.Windows.Forms.ComboBox cmbEmpleado;
         private System.Windows.Forms.Label lblLblDeduccion;
-        private System.Windows.Forms.Panel pnlDeduccion;
-        private System.Windows.Forms.TextBox txtDeduccion;
+        private System.Windows.Forms.ComboBox cmbDeduccion;
         private System.Windows.Forms.Label lblLblTipo;
         private System.Windows.Forms.ComboBox cmbTipo;
         private System.Windows.Forms.Label lblLblMonto;
@@ -382,7 +356,6 @@
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnCancelar;
         private System.Windows.Forms.Button btnEliminar;
-
         private System.Windows.Forms.Label lblMensaje;
         private System.Windows.Forms.DataGridView dgvDeducciones;
     }

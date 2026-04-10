@@ -9,32 +9,28 @@ namespace Datos.Repositorios.Empleados
 {
     public class AsignacionesEmpleadoCD : BaseCD
     {
-        protected override string ObtenerNombreTabla()
-        {
-            return "AsignacionesEmpleado";
-        }
+        protected override string ObtenerNombreTabla() => "AsignacionesEmpleado";
 
-        // ─────────────────────────────────────────────────────
-        // Propiedades para Insertar/Actualizar
-        // ─────────────────────────────────────────────────────
+        // ─── Propiedades ──────────────────────────────────────────────────
+        // IdSubtotal eliminado: AsignacionesEmpleado NO tiene esa columna en BD.
+        // SalarioST se crea automáticamente via trigger trg_SalarioST_Calcular.
         public int IdAsignacion { get; set; }
         public int IdEmpleado { get; set; }
-        public int IdSubtotal { get; set; }
-        public int Tipo { get; set; } // 1 = Mensual, 2 = Quincenal
+        public int Tipo { get; set; } // 1=Mensual, 2=Quincenal
         public decimal Monto { get; set; }
         public DateTime FechaEfectividad { get; set; }
 
-        // ─────────────────────────────────────────────────────
-        // ObtenerTodos
-        // ─────────────────────────────────────────────────────
+        // ─── ObtenerTodos ─────────────────────────────────────────────────
         public override DataTable ObtenerTodos()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
-                    @"SELECT ae.Id, 
+                    @"SELECT ae.Id,
+                             ae.IdEmpleado,
                              e.Nombre + ' ' + e.Apellido AS Empleado,
-                             a.Nombre AS Asignacion,
+                             ae.IdAsignacion,
+                             a.Nombre        AS Asignacion,
                              ae.Tipo,
                              ae.Monto,
                              ae.FechaEfectividad,
@@ -54,9 +50,11 @@ namespace Datos.Repositorios.Empleados
             {
                 await con.OpenAsync();
                 SqlDataAdapter da = new SqlDataAdapter(
-                    @"SELECT ae.Id, 
+                    @"SELECT ae.Id,
+                             ae.IdEmpleado,
                              e.Nombre + ' ' + e.Apellido AS Empleado,
-                             a.Nombre AS Asignacion,
+                             ae.IdAsignacion,
+                             a.Nombre        AS Asignacion,
                              ae.Tipo,
                              ae.Monto,
                              ae.FechaEfectividad,
@@ -70,17 +68,17 @@ namespace Datos.Repositorios.Empleados
             }
         }
 
-        // ─────────────────────────────────────────────────────
-        // ObtenerPorId
-        // ─────────────────────────────────────────────────────
+        // ─── ObtenerPorId ─────────────────────────────────────────────────
         public override DataTable ObtenerPorId(int id)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 SqlDataAdapter da = new SqlDataAdapter(
-                    @"SELECT ae.Id, 
+                    @"SELECT ae.Id,
+                             ae.IdEmpleado,
                              e.Nombre + ' ' + e.Apellido AS Empleado,
-                             a.Nombre AS Asignacion,
+                             ae.IdAsignacion,
+                             a.Nombre        AS Asignacion,
                              ae.Tipo,
                              ae.Monto,
                              ae.FechaEfectividad,
@@ -102,9 +100,11 @@ namespace Datos.Repositorios.Empleados
             {
                 await con.OpenAsync();
                 SqlDataAdapter da = new SqlDataAdapter(
-                    @"SELECT ae.Id, 
+                    @"SELECT ae.Id,
+                             ae.IdEmpleado,
                              e.Nombre + ' ' + e.Apellido AS Empleado,
-                             a.Nombre AS Asignacion,
+                             ae.IdAsignacion,
+                             a.Nombre        AS Asignacion,
                              ae.Tipo,
                              ae.Monto,
                              ae.FechaEfectividad,
@@ -120,20 +120,42 @@ namespace Datos.Repositorios.Empleados
             }
         }
 
-        // ─────────────────────────────────────────────────────
-        // Insertar
-        // ─────────────────────────────────────────────────────
+        // ─── Helpers ComboBox ─────────────────────────────────────────────
+        public DataTable MostrarAsignaciones()
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                SqlDataAdapter da = new SqlDataAdapter(
+                    "SELECT Id, Nombre FROM Asignaciones", con);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        public DataTable MostrarEmpleados()
+        {
+            using (SqlConnection con = ConexionDB.AbrirConexion())
+            {
+                SqlDataAdapter da = new SqlDataAdapter(
+                    "SELECT Id, Nombre + ' ' + Apellido AS NombreCompleto FROM Empleados", con);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+        }
+
+        // ─── Insertar ─────────────────────────────────────────────────────
         public override bool Insertar()
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 string sql = @"INSERT INTO AsignacionesEmpleado
-                               (IdAsignacion, IdEmpleado, IdSubtotal, Tipo, Monto, FechaEfectividad)
-                               VALUES (@IdAsignacion, @IdEmpleado, @IdSubtotal, @Tipo, @Monto, @FechaEfectividad)";
+                               (IdAsignacion, IdEmpleado, Tipo, Monto, FechaEfectividad)
+                               VALUES (@IdAsignacion, @IdEmpleado, @Tipo, @Monto, @FechaEfectividad)";
                 SqlCommand cmd = new SqlCommand(sql, con);
                 cmd.Parameters.AddWithValue("@IdAsignacion", IdAsignacion);
                 cmd.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
-                cmd.Parameters.AddWithValue("@IdSubtotal", IdSubtotal);
                 cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 cmd.Parameters.AddWithValue("@Monto", Monto);
                 cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
@@ -146,24 +168,20 @@ namespace Datos.Repositorios.Empleados
             using (SqlConnection con = ConexionDB.AbrirConexion())
             {
                 string sql = @"INSERT INTO AsignacionesEmpleado
-                               (IdAsignacion, IdEmpleado, IdSubtotal, Tipo, Monto, FechaEfectividad)
-                               VALUES (@IdAsignacion, @IdEmpleado, @IdSubtotal, @Tipo, @Monto, @FechaEfectividad)";
+                               (IdAsignacion, IdEmpleado, Tipo, Monto, FechaEfectividad)
+                               VALUES (@IdAsignacion, @IdEmpleado, @Tipo, @Monto, @FechaEfectividad)";
                 SqlCommand cmd = new SqlCommand(sql, con);
                 cmd.Parameters.AddWithValue("@IdAsignacion", IdAsignacion);
                 cmd.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
-                cmd.Parameters.AddWithValue("@IdSubtotal", IdSubtotal);
                 cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 cmd.Parameters.AddWithValue("@Monto", Monto);
                 cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
                 await con.OpenAsync();
-                int filas = await cmd.ExecuteNonQueryAsync();
-                return filas > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
         }
 
-        // ─────────────────────────────────────────────────────
-        // Actualizar
-        // ─────────────────────────────────────────────────────
+        // ─── Actualizar ───────────────────────────────────────────────────
         public override bool Actualizar(int id)
         {
             using (SqlConnection con = ConexionDB.AbrirConexion())
@@ -171,7 +189,6 @@ namespace Datos.Repositorios.Empleados
                 string sql = @"UPDATE AsignacionesEmpleado SET
                                IdAsignacion     = @IdAsignacion,
                                IdEmpleado       = @IdEmpleado,
-                               IdSubtotal       = @IdSubtotal,
                                Tipo             = @Tipo,
                                Monto            = @Monto,
                                FechaEfectividad = @FechaEfectividad
@@ -179,7 +196,6 @@ namespace Datos.Repositorios.Empleados
                 SqlCommand cmd = new SqlCommand(sql, con);
                 cmd.Parameters.AddWithValue("@IdAsignacion", IdAsignacion);
                 cmd.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
-                cmd.Parameters.AddWithValue("@IdSubtotal", IdSubtotal);
                 cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 cmd.Parameters.AddWithValue("@Monto", Monto);
                 cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
@@ -195,7 +211,6 @@ namespace Datos.Repositorios.Empleados
                 string sql = @"UPDATE AsignacionesEmpleado SET
                                IdAsignacion     = @IdAsignacion,
                                IdEmpleado       = @IdEmpleado,
-                               IdSubtotal       = @IdSubtotal,
                                Tipo             = @Tipo,
                                Monto            = @Monto,
                                FechaEfectividad = @FechaEfectividad
@@ -203,14 +218,12 @@ namespace Datos.Repositorios.Empleados
                 SqlCommand cmd = new SqlCommand(sql, con);
                 cmd.Parameters.AddWithValue("@IdAsignacion", IdAsignacion);
                 cmd.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
-                cmd.Parameters.AddWithValue("@IdSubtotal", IdSubtotal);
                 cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 cmd.Parameters.AddWithValue("@Monto", Monto);
                 cmd.Parameters.AddWithValue("@FechaEfectividad", FechaEfectividad);
                 cmd.Parameters.AddWithValue("@Id", id);
                 await con.OpenAsync();
-                int filas = await cmd.ExecuteNonQueryAsync();
-                return filas > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
         }
     }

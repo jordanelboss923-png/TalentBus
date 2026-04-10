@@ -88,6 +88,18 @@
     <Compile Include="FrmDepartamentos.Designer.cs">
       <DependentUpon>FrmDepartamentos.cs</DependentUpon>
     </Compile>
+    <Compile Include="Frmdetallevolante.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frmdetallevolante.Designer.cs">
+      <DependentUpon>Frmdetallevolante.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frmdetallevolantepago.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frmdetallevolantepago.Designer.cs">
+      <DependentUpon>Frmdetallevolantepago.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmEmpleados.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -106,6 +118,12 @@
     <Compile Include="FrmNuevoVolante.Designer.cs">
       <DependentUpon>FrmNuevoVolante.cs</DependentUpon>
     </Compile>
+    <Compile Include="Frmnuevovolantepago.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frmnuevovolantepago.Designer.cs">
+      <DependentUpon>Frmnuevovolantepago.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmPosiciones.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,6 +135,12 @@
     </Compile>
     <Compile Include="FrmPrincipal.Designer.cs">
       <DependentUpon>FrmPrincipal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frmvolanteslista.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frmvolanteslista.Designer.cs">
+      <DependentUpon>Frmvolanteslista.cs</DependentUpon>
     </Compile>
     <Compile Include="FrmVolantesPago.cs">
       <SubType>Form</SubType>

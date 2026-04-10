@@ -1,46 +1,27 @@
 ﻿using Datos.Repositorios.Empleados;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Negocios.Empleados
 {
     public class DeduccionesEmpleadoCN
     {
-
-        // Constantes de tipo de deducción
-
         public const int TIPO_MENSUAL = 1;
         public const int TIPO_QUINCENAL = 2;
 
-        // Instancia de la capa de datos
-
         private readonly DeduccionesEmpleadoCD _cd = new DeduccionesEmpleadoCD();
 
-
-        //TODO: ObtenerTodos, metodo para obtener todos los registros de deducciones de empleados
-
-        public DataTable ObtenerTodos()
-        {
-            return _cd.ObtenerTodos();
-        }
-
-        public async Task<DataTable> ObtenerTodosAsync()
-        {
-            return await _cd.ObtenerTodosAsync();
-        }
-
-
-        // TODO: ObtenerPorId, metodo para obtener una deducción de empleado por su Id, con validaciones para asegurar que el Id sea un valor positivo
+        // ─── Obtener ──────────────────────────────────────────────────────
+        public DataTable ObtenerTodos() => _cd.ObtenerTodos();
+        public async Task<DataTable> ObtenerTodosAsync() => await _cd.ObtenerTodosAsync();
+        public DataTable MostrarDeducciones() => _cd.MostrarDeducciones();
+        public DataTable MostrarEmpleados() => _cd.MostrarEmpleados();
 
         public DataTable ObtenerPorId(int id)
         {
             if (id <= 0)
                 throw new ArgumentException("El Id debe ser un valor positivo.", nameof(id));
-
             return _cd.ObtenerPorId(id);
         }
 
@@ -48,15 +29,10 @@ namespace Negocios.Empleados
         {
             if (id <= 0)
                 throw new ArgumentException("El Id debe ser un valor positivo.", nameof(id));
-
             return await _cd.ObtenerPorIdAsync(id);
         }
 
-
-        //TODO: creacion de metodo Insertar, Actualizar, con validaciones para asegurar que los campos requeridos sean válidos
-
-        // Insertar
-
+        // ─── Insertar ─────────────────────────────────────────────────────
         public bool Insertar(int idDeduccion, int idEmpleado, int idSubtotal,
                              int tipo, decimal monto, DateTime fechaEfectividad)
         {
@@ -87,9 +63,7 @@ namespace Negocios.Empleados
             return await _cd.InsertarAsync();
         }
 
-
-        // Actualizar
-
+        // ─── Actualizar ───────────────────────────────────────────────────
         public bool Actualizar(int id, int idDeduccion, int idEmpleado, int idSubtotal,
                                int tipo, decimal monto, DateTime fechaEfectividad)
         {
@@ -126,9 +100,7 @@ namespace Negocios.Empleados
             return await _cd.ActualizarAsync(id);
         }
 
-
-        // Validaciones centralizadas, para evitar duplicación de código en los métodos Insertar y Actualizar
-
+        // ─── Validaciones ─────────────────────────────────────────────────
         private void ValidarCampos(int idDeduccion, int idEmpleado, int idSubtotal,
                                    int tipo, decimal monto, DateTime fechaEfectividad)
         {
@@ -142,16 +114,17 @@ namespace Negocios.Empleados
                 throw new ArgumentException("Debe asociar un subtotal válido.", nameof(idSubtotal));
 
             if (tipo != TIPO_MENSUAL && tipo != TIPO_QUINCENAL)
-                throw new ArgumentException("El tipo de deducción debe ser 1 (Mensual) o 2 (Quincenal).", nameof(tipo));
+                throw new ArgumentException("El tipo debe ser 1 (Mensual) o 2 (Quincenal).", nameof(tipo));
 
             if (monto <= 0)
-                throw new ArgumentException("El monto de la deducción debe ser mayor a cero.", nameof(monto));
+                throw new ArgumentException("El monto debe ser mayor a cero.", nameof(monto));
 
             if (fechaEfectividad == default)
                 throw new ArgumentException("Debe indicar una fecha de efectividad válida.", nameof(fechaEfectividad));
 
-            if (fechaEfectividad > DateTime.Today)
-                throw new InvalidOperationException("La fecha de efectividad no puede ser futura.");
+            // Fecha debe ser hoy o futura (pago a futuro)
+            if (fechaEfectividad.Date < DateTime.Today)
+                throw new InvalidOperationException("La fecha de efectividad no puede ser anterior a hoy.");
         }
     }
 }

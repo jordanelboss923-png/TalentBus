@@ -1,6 +1,6 @@
 ﻿namespace Presentacion
 {
-    partial class FrmVolantesPago
+    partial class FrmVolantesLista
     {
         private System.ComponentModel.IContainer components = null;
         protected override void Dispose(bool disposing)
@@ -14,6 +14,7 @@
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.lblTituloPagina = new System.Windows.Forms.Label();
             this.lblSubtituloPagina = new System.Windows.Forms.Label();
+            this.btnNuevo = new System.Windows.Forms.Button();
 
             this.pnlFiltro = new System.Windows.Forms.Panel();
             this.lblFiltroTitulo = new System.Windows.Forms.Label();
@@ -38,6 +39,7 @@
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(18, 24, 48);
             this.pnlHeader.Controls.Add(this.lblTituloPagina);
             this.pnlHeader.Controls.Add(this.lblSubtituloPagina);
+            this.pnlHeader.Controls.Add(this.btnNuevo);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
@@ -50,7 +52,7 @@
             this.lblTituloPagina.Location = new System.Drawing.Point(28, 12);
             this.lblTituloPagina.Name = "lblTituloPagina";
             this.lblTituloPagina.TabIndex = 0;
-            this.lblTituloPagina.Text = "Sueldo Neto";
+            this.lblTituloPagina.Text = "Volantes de Pago";
 
             this.lblSubtituloPagina.AutoSize = true;
             this.lblSubtituloPagina.Font = new System.Drawing.Font("Segoe UI", 8.5F);
@@ -58,7 +60,20 @@
             this.lblSubtituloPagina.Location = new System.Drawing.Point(30, 40);
             this.lblSubtituloPagina.Name = "lblSubtituloPagina";
             this.lblSubtituloPagina.TabIndex = 1;
-            this.lblSubtituloPagina.Text = "Consulta y gestión de sueldos netos por empleado";
+            this.lblSubtituloPagina.Text = "Gestión de volantes de pago";
+
+            this.btnNuevo.BackColor = System.Drawing.Color.FromArgb(0, 210, 230);
+            this.btnNuevo.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNuevo.FlatAppearance.BorderSize = 0;
+            this.btnNuevo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNuevo.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnNuevo.ForeColor = System.Drawing.Color.FromArgb(13, 17, 35);
+            this.btnNuevo.Location = new System.Drawing.Point(762, 16);
+            this.btnNuevo.Name = "btnNuevo";
+            this.btnNuevo.Size = new System.Drawing.Size(120, 34);
+            this.btnNuevo.TabIndex = 2;
+            this.btnNuevo.Text = "+ Nuevo";
+            this.btnNuevo.UseVisualStyleBackColor = false;
 
             // ── pnlFiltro ─────────────────────────────────────────────────
             this.pnlFiltro.BackColor = System.Drawing.Color.FromArgb(18, 24, 48);
@@ -193,7 +208,7 @@
                                       System.Windows.Forms.AnchorStyles.Right |
                                       System.Windows.Forms.AnchorStyles.Bottom;
 
-            // ── FrmVolantesPago ───────────────────────────────────────────
+            // ── FrmVolantesLista ──────────────────────────────────────────
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(13, 17, 35);
@@ -203,9 +218,9 @@
             this.Controls.Add(this.lblMensaje);
             this.Controls.Add(this.pnlTabla);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "FrmVolantesPago";
-            this.Text = "Sueldo Neto";
-            this.Load += new System.EventHandler(this.FrmVolantesPago_Load);
+            this.Name = "FrmVolantesLista";
+            this.Text = "Volantes de Pago";
+            this.Load += new System.EventHandler(this.FrmVolantesLista_Load);
 
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
@@ -220,6 +235,7 @@
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblTituloPagina;
         private System.Windows.Forms.Label lblSubtituloPagina;
+        private System.Windows.Forms.Button btnNuevo;
         private System.Windows.Forms.Panel pnlFiltro;
         private System.Windows.Forms.Label lblFiltroTitulo;
         private System.Windows.Forms.Label lblFiltroEmp;
