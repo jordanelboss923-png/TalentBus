@@ -1,5 +1,4 @@
 ﻿using Negocio.Configuracion;
-using Negocios;
 using System;
 using System.Data;
 using System.Drawing;
@@ -8,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Presentacion
 {
-    public partial class FrmEmpleados : Form
+    public partial class FrmAsignaciones : Form
     {
         // ─── Colores del tema ───
         private readonly Color ColorFondo = Color.FromArgb(13, 17, 35);
@@ -24,8 +23,7 @@ namespace Presentacion
         private readonly Color ColorEditar = Color.FromArgb(255, 180, 0);
 
         // ─── Negocio ───
-        private readonly EmpleadosCN _cnEmp = new EmpleadosCN();
-        private readonly PosicionesCN _cnPos = new PosicionesCN();
+        private readonly AsignacionesCN _cn = new AsignacionesCN();
 
         // ─── Estado ───
         private int _idSeleccionado = 0;
@@ -33,12 +31,9 @@ namespace Presentacion
 
         // ─── Controles ───
         private DataGridView _grid;
-        private TextBox _txtCodigo;
         private TextBox _txtNombre;
-        private TextBox _txtApellido;
-        private TextBox _txtCedula;
-        private ComboBox _cmbPosicion;
-        private ComboBox _cmbTipo;
+        private TextBox _txtPorcentaje;
+        private TextBox _txtDescripcion;
         private Label _lblTitulo;
         private Button _btnGuardar;
         private Button _btnCancelar;
@@ -46,7 +41,7 @@ namespace Presentacion
         private Label _lblMensaje;
         private Panel _pnlFormulario;
 
-        public FrmEmpleados()
+        public FrmAsignaciones()
         {
             InitializeComponent();
             ConfigurarFormulario();
@@ -54,18 +49,14 @@ namespace Presentacion
             CargarDatos();
         }
 
-        // ════════════════════════════════════════
-        //  CONFIGURACIÓN
-        // ════════════════════════════════════════
+       
         private void ConfigurarFormulario()
         {
             this.BackColor = ColorFondo;
             this.DoubleBuffered = true;
         }
 
-        // ════════════════════════════════════════
-        //  CONSTRUCCIÓN UI
-        // ════════════════════════════════════════
+        
         private void ConstruirUI()
         {
             // ── Encabezado ────────────────────────
@@ -79,7 +70,7 @@ namespace Presentacion
 
             new Label
             {
-                Text = "Empleados",
+                Text = "Asignaciones",
                 ForeColor = ColorTexto,
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
                 AutoSize = true,
@@ -89,7 +80,7 @@ namespace Presentacion
 
             new Label
             {
-                Text = "Gestión del personal de la empresa",
+                Text = "Gestión de asignaciones aplicadas a la nómina",
                 ForeColor = ColorSubTexto,
                 Font = new Font("Segoe UI", 9),
                 AutoSize = true,
@@ -97,7 +88,7 @@ namespace Presentacion
                 Parent = pnlHeader
             };
 
-            _btnNuevo = CrearBoton("+ Nuevo", ColorBoton, ColorBotonTexto);
+            _btnNuevo = CrearBoton("+ Nueva", ColorBoton, ColorBotonTexto);
             _btnNuevo.Size = new Size(110, 34);
             _btnNuevo.Location = new Point(this.Width - 160, 18);
             _btnNuevo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -107,7 +98,7 @@ namespace Presentacion
             // ── Panel formulario ──────────────────
             _pnlFormulario = new Panel
             {
-                Size = new Size(this.Width - 60, 230),
+                Size = new Size(this.Width - 60, 190),
                 Location = new Point(30, 70),
                 BackColor = ColorPanel,
                 Visible = false
@@ -155,7 +146,7 @@ namespace Presentacion
         {
             _lblTitulo = new Label
             {
-                Text = "Nuevo Empleado",
+                Text = "Nueva Asignación",
                 ForeColor = ColorCyan,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 AutoSize = true,
@@ -163,97 +154,57 @@ namespace Presentacion
             };
             _pnlFormulario.Controls.Add(_lblTitulo);
 
-            // ── Fila 1: Código | Nombre | Apellido ─
-            AgregarLabel(_pnlFormulario, "Código Empleado", 20, 45);
-            Panel pnlCodigo = CrearPanelInput(20, 65, 150, out _txtCodigo);
-            _pnlFormulario.Controls.Add(pnlCodigo);
-
-            AgregarLabel(_pnlFormulario, "Nombre", 185, 45);
-            Panel pnlNombre = CrearPanelInput(185, 65, 200, out _txtNombre);
+            // ── Fila 1 ────────────────────────────
+            AgregarLabel(_pnlFormulario, "Nombre", 20, 45);
+            Panel pnlNombre = CrearPanelInput(20, 65, 280, out _txtNombre);
             _pnlFormulario.Controls.Add(pnlNombre);
 
-            AgregarLabel(_pnlFormulario, "Apellido", 400, 45);
-            Panel pnlApellido = CrearPanelInput(400, 65, 200, out _txtApellido);
-            _pnlFormulario.Controls.Add(pnlApellido);
+            AgregarLabel(_pnlFormulario, "Porcentaje (%)", 320, 45);
+            Panel pnlPorc = CrearPanelInput(320, 65, 160, out _txtPorcentaje);
+            _pnlFormulario.Controls.Add(pnlPorc);
 
-            // ── Fila 2: Cédula | Posición | Tipo ──
-            AgregarLabel(_pnlFormulario, "Cédula", 20, 115);
-            Panel pnlCedula = CrearPanelInput(20, 135, 190, out _txtCedula);
-            _pnlFormulario.Controls.Add(pnlCedula);
-
-            AgregarLabel(_pnlFormulario, "Posición", 225, 115);
-            _cmbPosicion = CrearComboBox(225, 135, 240);
-            CargarPosicionesCombo();
-            _pnlFormulario.Controls.Add(_cmbPosicion);
-
-            AgregarLabel(_pnlFormulario, "Tipo", 480, 115);
-            _cmbTipo = CrearComboBox(480, 135, 140);
-            _cmbTipo.Items.Add("Fijo");
-            _cmbTipo.Items.Add("Por hora");
-            _cmbTipo.SelectedIndex = 0;
-            _pnlFormulario.Controls.Add(_cmbTipo);
+            // ── Fila 2: Descripción ───────────────
+            AgregarLabel(_pnlFormulario, "Descripción (opcional)", 20, 112);
+            Panel pnlDesc = CrearPanelInput(20, 132, 460, out _txtDescripcion);
+            _pnlFormulario.Controls.Add(pnlDesc);
 
             // ── Botones ───────────────────────────
             _btnGuardar = CrearBoton("Guardar", ColorBoton, ColorBotonTexto);
             _btnGuardar.Size = new Size(100, 34);
-            _btnGuardar.Location = new Point(20, 185);
+            _btnGuardar.Location = new Point(500, 132);
             _btnGuardar.Click += BtnGuardar_Click;
             _pnlFormulario.Controls.Add(_btnGuardar);
 
             _btnCancelar = CrearBoton("Cancelar", ColorInput, ColorSubTexto);
             _btnCancelar.Size = new Size(100, 34);
-            _btnCancelar.Location = new Point(130, 185);
+            _btnCancelar.Location = new Point(610, 132);
             _btnCancelar.Click += BtnCancelar_Click;
             _pnlFormulario.Controls.Add(_btnCancelar);
         }
 
-        // ════════════════════════════════════════
-        //  DATOS
-        // ════════════════════════════════════════
+        
         private void CargarDatos()
         {
             try
             {
-                DataTable dt = _cnEmp.ObtenerTodos();
+                DataTable dt = _cn.ObtenerTodos();
                 _grid.DataSource = null;
                 _grid.DataSource = dt;
 
-                // Ocultar columnas internas
-                foreach (string col in new[] { "Id", "IdPosicion" })
-                    if (_grid.Columns.Contains(col))
-                        _grid.Columns[col].Visible = false;
+                if (_grid.Columns.Contains("Id"))
+                    _grid.Columns["Id"].Visible = false;
 
-                // Renombrar encabezados
-                RenombrarColumna("CodigoEmpleado", "Código");
-                RenombrarColumna("Nombre", "Nombre");
-                RenombrarColumna("Apellido", "Apellido");
-                RenombrarColumna("Cedula", "Cédula");
-                RenombrarColumna("Posicion", "Posición");
-                RenombrarColumna("FechaIngreso", "Fecha Ingreso");
-                RenombrarColumna("SalarioBase", "Salario Base");
+                if (_grid.Columns.Contains("Nombre"))
+                    _grid.Columns["Nombre"].HeaderText = "Nombre";
 
-                // Formato de columnas numéricas / fecha
-                if (_grid.Columns.Contains("SalarioBase"))
-                    _grid.Columns["SalarioBase"].DefaultCellStyle.Format = "N2";
-
-                if (_grid.Columns.Contains("FechaIngreso"))
-                    _grid.Columns["FechaIngreso"].DefaultCellStyle.Format = "dd/MM/yyyy";
-
-                // Tipo: convertir 1/2 a texto
-                if (_grid.Columns.Contains("Tipo"))
+                if (_grid.Columns.Contains("Porcentaje"))
                 {
-                    _grid.Columns["Tipo"].HeaderText = "Tipo";
-                    _grid.CellFormatting += (s, e) =>
-                    {
-                        if (e.ColumnIndex == _grid.Columns["Tipo"].Index
-                            && e.Value != null)
-                        {
-                            e.Value = e.Value.ToString() == "1"
-                                        ? "Fijo" : "Por hora";
-                            e.FormattingApplied = true;
-                        }
-                    };
+                    _grid.Columns["Porcentaje"].HeaderText = "Porcentaje (%)";
+                    _grid.Columns["Porcentaje"].DefaultCellStyle.Format = "N2";
                 }
+
+                if (_grid.Columns.Contains("Descripcion"))
+                    _grid.Columns["Descripcion"].HeaderText = "Descripción";
 
                 AgregarColumnaBoton("Editar", ColorEditar, "btnEditar");
                 AgregarColumnaBoton("Eliminar", ColorEliminar, "btnEliminar");
@@ -262,28 +213,6 @@ namespace Presentacion
             {
                 MostrarMensaje("Error al cargar datos: " + ex.Message, false);
             }
-        }
-
-        private void CargarPosicionesCombo()
-        {
-            try
-            {
-                DataTable dt = _cnPos.ObtenerTodos();
-                _cmbPosicion.DataSource = dt;
-                _cmbPosicion.DisplayMember = "Nombre";
-                _cmbPosicion.ValueMember = "Id";
-                _cmbPosicion.SelectedIndex = -1;
-            }
-            catch (Exception ex)
-            {
-                MostrarMensaje("Error al cargar posiciones: " + ex.Message, false);
-            }
-        }
-
-        private void RenombrarColumna(string nombre, string encabezado)
-        {
-            if (_grid.Columns.Contains(nombre))
-                _grid.Columns[nombre].HeaderText = encabezado;
         }
 
         private void AgregarColumnaBoton(string texto, Color color, string nombre)
@@ -309,61 +238,48 @@ namespace Presentacion
             _grid.Columns.Add(col);
         }
 
-        // ════════════════════════════════════════
-        //  EVENTOS
-        // ════════════════════════════════════════
+       
         private void BtnNuevo_Click(object sender, EventArgs e)
         {
             _modoEdicion = false;
             _idSeleccionado = 0;
             LimpiarFormulario();
-            _lblTitulo.Text = "Nuevo Empleado";
+            _lblTitulo.Text = "Nueva Asignación";
             _btnGuardar.Text = "Guardar";
-            _txtCodigo.Enabled = true;
             _pnlFormulario.Visible = true;
             _lblMensaje.Text = "";
-            _txtCodigo.Focus();
+            _txtNombre.Focus();
             ActualizarPosicionGrid();
         }
 
         private void BtnGuardar_Click(object sender, EventArgs e)
         {
-            string codigo = _txtCodigo.Text.Trim();
             string nombre = _txtNombre.Text.Trim();
-            string apellido = _txtApellido.Text.Trim();
-            string cedula = _txtCedula.Text.Trim();
-            int tipo = _cmbTipo.SelectedIndex + 1; // 1=Fijo, 2=Por hora
+            string porcStr = _txtPorcentaje.Text.Trim();
+            string descripcion = _txtDescripcion.Text.Trim();
 
-            if (_cmbPosicion.SelectedValue == null)
+            if (!decimal.TryParse(porcStr, out decimal porcentaje))
             {
-                MostrarMensaje("Selecciona una posición.", false);
+                MostrarMensaje("El porcentaje debe ser un número válido (ej: 5.50).", false);
                 return;
             }
 
-            int idPosicion = Convert.ToInt32(_cmbPosicion.SelectedValue);
-
             try
             {
-                bool resultado;
+                (bool exito, string mensaje) resultado;
 
                 if (_modoEdicion)
-                    resultado = _cnEmp.Actualizar(
-                        _idSeleccionado, nombre, apellido,
-                        cedula, tipo, idPosicion);
+                    resultado = _cn.Actualizar(
+                        _idSeleccionado, nombre, porcentaje,
+                        string.IsNullOrEmpty(descripcion) ? null : descripcion);
                 else
-                    resultado = _cnEmp.Insertar(
-                        codigo, nombre, apellido,
-                        cedula, tipo, idPosicion);
+                    resultado = _cn.Insertar(
+                        nombre, porcentaje,
+                        string.IsNullOrEmpty(descripcion) ? null : descripcion);
 
-                MostrarMensaje(
-                    resultado
-                        ? (_modoEdicion
-                            ? "Empleado actualizado correctamente."
-                            : "Empleado registrado correctamente.")
-                        : "No se pudo guardar el empleado.",
-                    resultado);
+                MostrarMensaje(resultado.mensaje, resultado.exito);
 
-                if (resultado)
+                if (resultado.exito)
                 {
                     OcultarFormulario();
                     RefrescarGrid();
@@ -389,30 +305,17 @@ namespace Presentacion
 
             if (_grid.Columns[e.ColumnIndex].Name == "btnEditar")
             {
-                DataTable dt = _cnEmp.ObtenerPorId(id);
+                DataTable dt = _cn.ObtenerPorId(id);
                 if (dt.Rows.Count == 0) return;
 
                 DataRow row = dt.Rows[0];
                 _idSeleccionado = id;
                 _modoEdicion = true;
-
-                // Código no editable en modo edición
-                _txtCodigo.Text = row["CodigoEmpleado"].ToString();
-                _txtCodigo.Enabled = false;
                 _txtNombre.Text = row["Nombre"].ToString();
-                _txtApellido.Text = row["Apellido"].ToString();
-                _txtCedula.Text = row["Cedula"].ToString();
-
-                // Posición
-                if (row.Table.Columns.Contains("IdPosicion"))
-                    _cmbPosicion.SelectedValue =
-                        Convert.ToInt32(row["IdPosicion"]);
-
-                // Tipo: 1=Fijo(index 0), 2=Por hora(index 1)
-                _cmbTipo.SelectedIndex =
-                    Convert.ToInt32(row["Tipo"]) == 1 ? 0 : 1;
-
-                _lblTitulo.Text = "Editar Empleado";
+                _txtPorcentaje.Text = row["Porcentaje"].ToString();
+                _txtDescripcion.Text = row["Descripcion"] == DBNull.Value
+                                             ? "" : row["Descripcion"].ToString();
+                _lblTitulo.Text = "Editar Asignación";
                 _btnGuardar.Text = "Actualizar";
                 _pnlFormulario.Visible = true;
                 _lblMensaje.Text = "";
@@ -421,35 +324,18 @@ namespace Presentacion
             }
             else if (_grid.Columns[e.ColumnIndex].Name == "btnEliminar")
             {
-                string nombre = _grid.Rows[e.RowIndex].Cells["Nombre"].Value
-                                     .ToString() + " " +
-                                _grid.Rows[e.RowIndex].Cells["Apellido"].Value
-                                     .ToString();
+                string nombre = _grid.Rows[e.RowIndex]
+                                     .Cells["Nombre"].Value.ToString();
 
-                if (MessageBox.Show(
-                        $"¿Eliminar al empleado \"{nombre}\"?",
-                        "Confirmar", MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning) == DialogResult.Yes)
+                if (MessageBox.Show($"¿Eliminar la asignación \"{nombre}\"?",
+                    "Confirmar", MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     try
                     {
-                        // EmpleadosCN no hereda BaseCN,
-                        // usamos el CD directamente vía CN
-                        bool ok = _cnEmp.Actualizar(
-                            id,
-                            _grid.Rows[e.RowIndex].Cells["Nombre"].Value.ToString(),
-                            _grid.Rows[e.RowIndex].Cells["Apellido"].Value.ToString(),
-                            _grid.Rows[e.RowIndex].Cells["Cedula"].Value.ToString(),
-                            Convert.ToInt32(_grid.Rows[e.RowIndex].Cells["Tipo"].Value),
-                            Convert.ToInt32(_grid.Rows[e.RowIndex].Cells["IdPosicion"] != null
-                                ? _grid.Rows[e.RowIndex].Cells["IdPosicion"].Value : 1));
-
-                        // Eliminación real — llamar CD directamente
-                        // (EmpleadosCN no expone Eliminar, se puede extender)
-                        MostrarMensaje(
-                            "Para eliminar empleados use el módulo de Seguridad " +
-                            "o contáctese con el administrador.",
-                            false);
+                        var resultado = _cn.Eliminar(id);
+                        MostrarMensaje(resultado.mensaje, resultado.exito);
+                        if (resultado.exito) RefrescarGrid();
                     }
                     catch (Exception ex)
                     {
@@ -459,9 +345,7 @@ namespace Presentacion
             }
         }
 
-        // ════════════════════════════════════════
-        //  HELPERS
-        // ════════════════════════════════════════
+       
         private void OcultarFormulario()
         {
             _pnlFormulario.Visible = false;
@@ -473,13 +357,9 @@ namespace Presentacion
 
         private void LimpiarFormulario()
         {
-            _txtCodigo.Clear();
             _txtNombre.Clear();
-            _txtApellido.Clear();
-            _txtCedula.Clear();
-            _cmbPosicion.SelectedIndex = -1;
-            _cmbTipo.SelectedIndex = 0;
-            _txtCodigo.Enabled = true;
+            _txtPorcentaje.Clear();
+            _txtDescripcion.Clear();
         }
 
         private void RefrescarGrid()
@@ -495,10 +375,10 @@ namespace Presentacion
         {
             if (_pnlFormulario.Visible)
             {
-                _lblMensaje.Location = new Point(30, 310);
-                _grid.Location = new Point(30, 340);
+                _lblMensaje.Location = new Point(30, 270);
+                _grid.Location = new Point(30, 300);
                 _grid.Size = new Size(this.Width - 60,
-                                               this.Height - 360);
+                                               this.Height - 320);
             }
             else
             {
@@ -555,20 +435,6 @@ namespace Presentacion
             };
             pnl.Controls.Add(txt);
             return pnl;
-        }
-
-        private ComboBox CrearComboBox(int x, int y, int ancho)
-        {
-            return new ComboBox
-            {
-                Size = new Size(ancho, 36),
-                Location = new Point(x, y),
-                BackColor = ColorInput,
-                ForeColor = ColorTexto,
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 10),
-                DropDownStyle = ComboBoxStyle.DropDownList
-            };
         }
 
         private Button CrearBoton(string texto, Color fondo, Color fuente)
@@ -643,6 +509,11 @@ namespace Presentacion
                 path.CloseAllFigures();
                 e.Graphics.DrawPath(p, path);
             }
+        }
+
+        private void FrmAsignaciones_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

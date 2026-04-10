@@ -46,17 +46,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FrmCargos.cs">
+    <Compile Include="FrmAccesoSistema.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FrmCargos.Designer.cs">
-      <DependentUpon>FrmCargos.cs</DependentUpon>
+    <Compile Include="FrmAccesoSistema.Designer.cs">
+      <DependentUpon>FrmAccesoSistema.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmConfiguracion.cs">
+    <Compile Include="FrmAsignaciones.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FrmConfiguracion.Designer.cs">
-      <DependentUpon>FrmConfiguracion.cs</DependentUpon>
+    <Compile Include="FrmAsignaciones.Designer.cs">
+      <DependentUpon>FrmAsignaciones.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmAsistencias.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmAsistencias.Designer.cs">
+      <DependentUpon>FrmAsistencias.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmDeducciones.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmDeducciones.Designer.cs">
+      <DependentUpon>FrmDeducciones.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmDepartamentos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmDepartamentos.Designer.cs">
+      <DependentUpon>FrmDepartamentos.cs</DependentUpon>
     </Compile>
     <Compile Include="FrmEmpleados.cs">
       <SubType>Form</SubType>
@@ -64,11 +82,17 @@
     <Compile Include="FrmEmpleados.Designer.cs">
       <DependentUpon>FrmEmpleados.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmNomina.cs">
+    <Compile Include="FrmLogin.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FrmNomina.Designer.cs">
-      <DependentUpon>FrmNomina.cs</DependentUpon>
+    <Compile Include="FrmLogin.Designer.cs">
+      <DependentUpon>FrmLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmPosiciones.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmPosiciones.Designer.cs">
+      <DependentUpon>FrmPosiciones.cs</DependentUpon>
     </Compile>
     <Compile Include="FrmPrincipal.cs">
       <SubType>Form</SubType>
@@ -76,22 +100,43 @@
     <Compile Include="FrmPrincipal.Designer.cs">
       <DependentUpon>FrmPrincipal.cs</DependentUpon>
     </Compile>
+    <Compile Include="FrmVolantesPago.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmVolantesPago.Designer.cs">
+      <DependentUpon>FrmVolantesPago.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="FrmCargos.resx">
-      <DependentUpon>FrmCargos.cs</DependentUpon>
+    <EmbeddedResource Include="FrmAccesoSistema.resx">
+      <DependentUpon>FrmAccesoSistema.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FrmConfiguracion.resx">
-      <DependentUpon>FrmConfiguracion.cs</DependentUpon>
+    <EmbeddedResource Include="FrmAsignaciones.resx">
+      <DependentUpon>FrmAsignaciones.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmAsistencias.resx">
+      <DependentUpon>FrmAsistencias.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmDeducciones.resx">
+      <DependentUpon>FrmDeducciones.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmDepartamentos.resx">
+      <DependentUpon>FrmDepartamentos.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmEmpleados.resx">
       <DependentUpon>FrmEmpleados.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FrmNomina.resx">
-      <DependentUpon>FrmNomina.cs</DependentUpon>
+    <EmbeddedResource Include="FrmLogin.resx">
+      <DependentUpon>FrmLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmPosiciones.resx">
+      <DependentUpon>FrmPosiciones.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmPrincipal.resx">
       <DependentUpon>FrmPrincipal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmVolantesPago.resx">
+      <DependentUpon>FrmVolantesPago.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -1,4 +1,4 @@
-﻿using Negocio.Configuracion;
+﻿using Negocios.Seguridad;
 using Negocios;
 using System;
 using System.Data;
@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Presentacion
 {
-    public partial class FrmEmpleados : Form
+    public partial class FrmAccesoSistema : Form
     {
         // ─── Colores del tema ───
         private readonly Color ColorFondo = Color.FromArgb(13, 17, 35);
@@ -22,10 +22,11 @@ namespace Presentacion
         private readonly Color ColorBotonTexto = Color.FromArgb(13, 17, 35);
         private readonly Color ColorEliminar = Color.FromArgb(255, 80, 80);
         private readonly Color ColorEditar = Color.FromArgb(255, 180, 0);
+        private readonly Color ColorVerde = Color.FromArgb(39, 201, 63);
 
         // ─── Negocio ───
+        private readonly LogginCN _cn = new LogginCN();
         private readonly EmpleadosCN _cnEmp = new EmpleadosCN();
-        private readonly PosicionesCN _cnPos = new PosicionesCN();
 
         // ─── Estado ───
         private int _idSeleccionado = 0;
@@ -33,20 +34,21 @@ namespace Presentacion
 
         // ─── Controles ───
         private DataGridView _grid;
-        private TextBox _txtCodigo;
-        private TextBox _txtNombre;
-        private TextBox _txtApellido;
-        private TextBox _txtCedula;
-        private ComboBox _cmbPosicion;
-        private ComboBox _cmbTipo;
+        private ComboBox _cmbEmpleado;
+        private TextBox _txtClave;
+        private TextBox _txtConfirmar;
         private Label _lblTitulo;
         private Button _btnGuardar;
         private Button _btnCancelar;
         private Button _btnNuevo;
+        private Button _btnMostrarClave;
+        private Button _btnMostrarConfirm;
         private Label _lblMensaje;
         private Panel _pnlFormulario;
+        private bool _mostrandoClave = false;
+        private bool _mostrandoConfirm = false;
 
-        public FrmEmpleados()
+        public FrmAccesoSistema()
         {
             InitializeComponent();
             ConfigurarFormulario();
@@ -79,7 +81,7 @@ namespace Presentacion
 
             new Label
             {
-                Text = "Empleados",
+                Text = "Acceso al Sistema",
                 ForeColor = ColorTexto,
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
                 AutoSize = true,
@@ -89,7 +91,7 @@ namespace Presentacion
 
             new Label
             {
-                Text = "Gestión del personal de la empresa",
+                Text = "Gestión de usuarios y credenciales de acceso",
                 ForeColor = ColorSubTexto,
                 Font = new Font("Segoe UI", 9),
                 AutoSize = true,
@@ -97,9 +99,9 @@ namespace Presentacion
                 Parent = pnlHeader
             };
 
-            _btnNuevo = CrearBoton("+ Nuevo", ColorBoton, ColorBotonTexto);
-            _btnNuevo.Size = new Size(110, 34);
-            _btnNuevo.Location = new Point(this.Width - 160, 18);
+            _btnNuevo = CrearBoton("+ Nuevo Usuario", ColorBoton, ColorBotonTexto);
+            _btnNuevo.Size = new Size(150, 34);
+            _btnNuevo.Location = new Point(this.Width - 200, 18);
             _btnNuevo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             _btnNuevo.Click += BtnNuevo_Click;
             pnlHeader.Controls.Add(_btnNuevo);
@@ -107,7 +109,7 @@ namespace Presentacion
             // ── Panel formulario ──────────────────
             _pnlFormulario = new Panel
             {
-                Size = new Size(this.Width - 60, 230),
+                Size = new Size(this.Width - 60, 210),
                 Location = new Point(30, 70),
                 BackColor = ColorPanel,
                 Visible = false
@@ -155,7 +157,7 @@ namespace Presentacion
         {
             _lblTitulo = new Label
             {
-                Text = "Nuevo Empleado",
+                Text = "Nuevo Usuario",
                 ForeColor = ColorCyan,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 AutoSize = true,
@@ -163,46 +165,101 @@ namespace Presentacion
             };
             _pnlFormulario.Controls.Add(_lblTitulo);
 
-            // ── Fila 1: Código | Nombre | Apellido ─
-            AgregarLabel(_pnlFormulario, "Código Empleado", 20, 45);
-            Panel pnlCodigo = CrearPanelInput(20, 65, 150, out _txtCodigo);
-            _pnlFormulario.Controls.Add(pnlCodigo);
+            // ── Fila 1: Empleado ──────────────────
+            AgregarLabel(_pnlFormulario, "Empleado", 20, 45);
+            _cmbEmpleado = new ComboBox
+            {
+                Size = new Size(360, 36),
+                Location = new Point(20, 65),
+                BackColor = ColorInput,
+                ForeColor = ColorTexto,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 10),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            CargarEmpleadosCombo();
+            _pnlFormulario.Controls.Add(_cmbEmpleado);
 
-            AgregarLabel(_pnlFormulario, "Nombre", 185, 45);
-            Panel pnlNombre = CrearPanelInput(185, 65, 200, out _txtNombre);
-            _pnlFormulario.Controls.Add(pnlNombre);
+            // ── Info usuario (se asigna automático) ──
+            Panel pnlInfo = new Panel
+            {
+                Size = new Size(200, 36),
+                Location = new Point(395, 65),
+                BackColor = Color.FromArgb(15, 25, 50)
+            };
+            pnlInfo.Paint += (s, e) =>
+            {
+                using (Pen p = new Pen(ColorBorde, 1))
+                    e.Graphics.DrawRectangle(p, 0, 0,
+                                             pnlInfo.Width - 1,
+                                             pnlInfo.Height - 1);
+            };
+            Label lblInfoUser = new Label
+            {
+                Text = "👤  Usuario = Código Empleado",
+                ForeColor = ColorSubTexto,
+                Font = new Font("Segoe UI", 8),
+                AutoSize = true,
+                Location = new Point(10, 10)
+            };
+            pnlInfo.Controls.Add(lblInfoUser);
+            _pnlFormulario.Controls.Add(pnlInfo);
 
-            AgregarLabel(_pnlFormulario, "Apellido", 400, 45);
-            Panel pnlApellido = CrearPanelInput(400, 65, 200, out _txtApellido);
-            _pnlFormulario.Controls.Add(pnlApellido);
+            // ── Fila 2: Clave | Confirmar ─────────
+            AgregarLabel(_pnlFormulario, "Contraseña", 20, 115);
+            Panel pnlClave = CrearPanelPassword(20, 135, out _txtClave,
+                                                out _btnMostrarClave);
+            _pnlFormulario.Controls.Add(pnlClave);
 
-            // ── Fila 2: Cédula | Posición | Tipo ──
-            AgregarLabel(_pnlFormulario, "Cédula", 20, 115);
-            Panel pnlCedula = CrearPanelInput(20, 135, 190, out _txtCedula);
-            _pnlFormulario.Controls.Add(pnlCedula);
+            AgregarLabel(_pnlFormulario, "Confirmar Contraseña", 320, 115);
+            Panel pnlConfirm = CrearPanelPassword(320, 135, out _txtConfirmar,
+                                                   out _btnMostrarConfirm);
+            _pnlFormulario.Controls.Add(pnlConfirm);
 
-            AgregarLabel(_pnlFormulario, "Posición", 225, 115);
-            _cmbPosicion = CrearComboBox(225, 135, 240);
-            CargarPosicionesCombo();
-            _pnlFormulario.Controls.Add(_cmbPosicion);
+            _btnMostrarClave.Click += (s, e) =>
+            {
+                _mostrandoClave = !_mostrandoClave;
+                _txtClave.UseSystemPasswordChar = !_mostrandoClave;
+                _btnMostrarClave.ForeColor =
+                    _mostrandoClave ? ColorCyan : ColorSubTexto;
+            };
 
-            AgregarLabel(_pnlFormulario, "Tipo", 480, 115);
-            _cmbTipo = CrearComboBox(480, 135, 140);
-            _cmbTipo.Items.Add("Fijo");
-            _cmbTipo.Items.Add("Por hora");
-            _cmbTipo.SelectedIndex = 0;
-            _pnlFormulario.Controls.Add(_cmbTipo);
+            _btnMostrarConfirm.Click += (s, e) =>
+            {
+                _mostrandoConfirm = !_mostrandoConfirm;
+                _txtConfirmar.UseSystemPasswordChar = !_mostrandoConfirm;
+                _btnMostrarConfirm.ForeColor =
+                    _mostrandoConfirm ? ColorCyan : ColorSubTexto;
+            };
+
+            // ── Reglas de contraseña ──────────────
+            Panel pnlReglas = new Panel
+            {
+                Size = new Size(580, 24),
+                Location = new Point(20, 180),
+                BackColor = Color.Transparent
+            };
+            Label lblReglas = new Label
+            {
+                Text = "ℹ  Mínimo 6 caracteres, máximo 50 caracteres.",
+                ForeColor = ColorSubTexto,
+                Font = new Font("Segoe UI", 8),
+                AutoSize = true,
+                Location = new Point(0, 4)
+            };
+            pnlReglas.Controls.Add(lblReglas);
+            _pnlFormulario.Controls.Add(pnlReglas);
 
             // ── Botones ───────────────────────────
             _btnGuardar = CrearBoton("Guardar", ColorBoton, ColorBotonTexto);
             _btnGuardar.Size = new Size(100, 34);
-            _btnGuardar.Location = new Point(20, 185);
+            _btnGuardar.Location = new Point(620, 135);
             _btnGuardar.Click += BtnGuardar_Click;
             _pnlFormulario.Controls.Add(_btnGuardar);
 
             _btnCancelar = CrearBoton("Cancelar", ColorInput, ColorSubTexto);
             _btnCancelar.Size = new Size(100, 34);
-            _btnCancelar.Location = new Point(130, 185);
+            _btnCancelar.Location = new Point(730, 135);
             _btnCancelar.Click += BtnCancelar_Click;
             _pnlFormulario.Controls.Add(_btnCancelar);
         }
@@ -210,80 +267,86 @@ namespace Presentacion
         // ════════════════════════════════════════
         //  DATOS
         // ════════════════════════════════════════
-        private void CargarDatos()
+        private void CargarEmpleadosCombo()
         {
             try
             {
                 DataTable dt = _cnEmp.ObtenerTodos();
+                _cmbEmpleado.DataSource = dt;
+                _cmbEmpleado.DisplayMember = "CodigoEmpleado";
+                _cmbEmpleado.ValueMember = "Id";
+                _cmbEmpleado.SelectedIndex = -1;
+
+                // Mostrar Código + Nombre
+                _cmbEmpleado.DrawMode = DrawMode.OwnerDrawFixed;
+                _cmbEmpleado.DrawItem += (s, e) =>
+                {
+                    if (e.Index < 0) return;
+                    e.DrawBackground();
+                    DataRowView row = (DataRowView)_cmbEmpleado.Items[e.Index];
+                    string display = $"{row["CodigoEmpleado"]} — " +
+                                      $"{row["Nombre"]} {row["Apellido"]}";
+                    using (SolidBrush b = new SolidBrush(ColorTexto))
+                        e.Graphics.DrawString(display,
+                            new Font("Segoe UI", 9), b, e.Bounds);
+                };
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error al cargar empleados: " + ex.Message, false);
+            }
+        }
+
+        private void CargarDatos()
+        {
+            try
+            {
+                DataTable dt = _cn.ObtenerTodos();
                 _grid.DataSource = null;
                 _grid.DataSource = dt;
 
-                // Ocultar columnas internas
-                foreach (string col in new[] { "Id", "IdPosicion" })
-                    if (_grid.Columns.Contains(col))
-                        _grid.Columns[col].Visible = false;
+                if (_grid.Columns.Contains("Id"))
+                    _grid.Columns["Id"].Visible = false;
 
-                // Renombrar encabezados
+                RenombrarColumna("Usser", "Usuario");
+                RenombrarColumna("Empleado", "Nombre Completo");
                 RenombrarColumna("CodigoEmpleado", "Código");
-                RenombrarColumna("Nombre", "Nombre");
-                RenombrarColumna("Apellido", "Apellido");
-                RenombrarColumna("Cedula", "Cédula");
-                RenombrarColumna("Posicion", "Posición");
-                RenombrarColumna("FechaIngreso", "Fecha Ingreso");
-                RenombrarColumna("SalarioBase", "Salario Base");
 
-                // Formato de columnas numéricas / fecha
-                if (_grid.Columns.Contains("SalarioBase"))
-                    _grid.Columns["SalarioBase"].DefaultCellStyle.Format = "N2";
-
-                if (_grid.Columns.Contains("FechaIngreso"))
-                    _grid.Columns["FechaIngreso"].DefaultCellStyle.Format = "dd/MM/yyyy";
-
-                // Tipo: convertir 1/2 a texto
-                if (_grid.Columns.Contains("Tipo"))
+                // Columna estado visual
+                if (!_grid.Columns.Contains("colEstado"))
                 {
-                    _grid.Columns["Tipo"].HeaderText = "Tipo";
-                    _grid.CellFormatting += (s, e) =>
-                    {
-                        if (e.ColumnIndex == _grid.Columns["Tipo"].Index
-                            && e.Value != null)
+                    DataGridViewTextBoxColumn colEstado =
+                        new DataGridViewTextBoxColumn
                         {
-                            e.Value = e.Value.ToString() == "1"
-                                        ? "Fijo" : "Por hora";
-                            e.FormattingApplied = true;
-                        }
-                    };
+                            Name = "colEstado",
+                            HeaderText = "Estado",
+                            Width = 100,
+                            AutoSizeMode =
+                                DataGridViewAutoSizeColumnMode.None,
+                            ReadOnly = true
+                        };
+                    _grid.Columns.Add(colEstado);
+
+                    // Rellenar con "Activo"
+                    foreach (DataGridViewRow row in _grid.Rows)
+                        row.Cells["colEstado"].Value = "● Activo";
                 }
 
-                AgregarColumnaBoton("Editar", ColorEditar, "btnEditar");
+                // Color estado
+                _grid.CellFormatting += (s, e) =>
+                {
+                    if (_grid.Columns[e.ColumnIndex].Name == "colEstado"
+                        && e.Value != null)
+                        e.CellStyle.ForeColor = ColorVerde;
+                };
+
+                AgregarColumnaBoton("Cambiar Clave", ColorEditar, "btnEditar");
                 AgregarColumnaBoton("Eliminar", ColorEliminar, "btnEliminar");
             }
             catch (Exception ex)
             {
-                MostrarMensaje("Error al cargar datos: " + ex.Message, false);
+                MostrarMensaje("Error al cargar usuarios: " + ex.Message, false);
             }
-        }
-
-        private void CargarPosicionesCombo()
-        {
-            try
-            {
-                DataTable dt = _cnPos.ObtenerTodos();
-                _cmbPosicion.DataSource = dt;
-                _cmbPosicion.DisplayMember = "Nombre";
-                _cmbPosicion.ValueMember = "Id";
-                _cmbPosicion.SelectedIndex = -1;
-            }
-            catch (Exception ex)
-            {
-                MostrarMensaje("Error al cargar posiciones: " + ex.Message, false);
-            }
-        }
-
-        private void RenombrarColumna(string nombre, string encabezado)
-        {
-            if (_grid.Columns.Contains(nombre))
-                _grid.Columns[nombre].HeaderText = encabezado;
         }
 
         private void AgregarColumnaBoton(string texto, Color color, string nombre)
@@ -296,7 +359,7 @@ namespace Presentacion
                 HeaderText = "",
                 Text = texto,
                 UseColumnTextForButtonValue = true,
-                Width = 90,
+                Width = 120,
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
                 FlatStyle = FlatStyle.Flat
             };
@@ -317,51 +380,51 @@ namespace Presentacion
             _modoEdicion = false;
             _idSeleccionado = 0;
             LimpiarFormulario();
-            _lblTitulo.Text = "Nuevo Empleado";
+            _lblTitulo.Text = "Nuevo Usuario";
             _btnGuardar.Text = "Guardar";
-            _txtCodigo.Enabled = true;
+            _cmbEmpleado.Enabled = true;
             _pnlFormulario.Visible = true;
             _lblMensaje.Text = "";
-            _txtCodigo.Focus();
             ActualizarPosicionGrid();
         }
 
         private void BtnGuardar_Click(object sender, EventArgs e)
         {
-            string codigo = _txtCodigo.Text.Trim();
-            string nombre = _txtNombre.Text.Trim();
-            string apellido = _txtApellido.Text.Trim();
-            string cedula = _txtCedula.Text.Trim();
-            int tipo = _cmbTipo.SelectedIndex + 1; // 1=Fijo, 2=Por hora
-
-            if (_cmbPosicion.SelectedValue == null)
-            {
-                MostrarMensaje("Selecciona una posición.", false);
-                return;
-            }
-
-            int idPosicion = Convert.ToInt32(_cmbPosicion.SelectedValue);
+            string clave = _txtClave.Text;
+            string confirmar = _txtConfirmar.Text;
 
             try
             {
                 bool resultado;
 
                 if (_modoEdicion)
-                    resultado = _cnEmp.Actualizar(
-                        _idSeleccionado, nombre, apellido,
-                        cedula, tipo, idPosicion);
+                {
+                    // Cambiar clave
+                    resultado = _cn.Actualizar(_idSeleccionado,
+                                               clave, confirmar);
+                    MostrarMensaje(
+                        resultado
+                            ? "Contraseña actualizada correctamente."
+                            : "No se pudo actualizar la contraseña.",
+                        resultado);
+                }
                 else
-                    resultado = _cnEmp.Insertar(
-                        codigo, nombre, apellido,
-                        cedula, tipo, idPosicion);
+                {
+                    // Crear usuario
+                    if (_cmbEmpleado.SelectedValue == null)
+                    {
+                        MostrarMensaje("Selecciona un empleado.", false);
+                        return;
+                    }
 
-                MostrarMensaje(
-                    resultado
-                        ? (_modoEdicion
-                            ? "Empleado actualizado correctamente."
-                            : "Empleado registrado correctamente.")
-                        : "No se pudo guardar el empleado.",
-                    resultado);
+                    int idEmpleado = Convert.ToInt32(_cmbEmpleado.SelectedValue);
+                    resultado = _cn.Insertar(idEmpleado, clave, confirmar);
+                    MostrarMensaje(
+                        resultado
+                            ? "Usuario creado correctamente."
+                            : "No se pudo crear el usuario.",
+                        resultado);
+                }
 
                 if (resultado)
                 {
@@ -389,67 +452,42 @@ namespace Presentacion
 
             if (_grid.Columns[e.ColumnIndex].Name == "btnEditar")
             {
-                DataTable dt = _cnEmp.ObtenerPorId(id);
-                if (dt.Rows.Count == 0) return;
-
-                DataRow row = dt.Rows[0];
+                // Modo cambiar clave
                 _idSeleccionado = id;
                 _modoEdicion = true;
-
-                // Código no editable en modo edición
-                _txtCodigo.Text = row["CodigoEmpleado"].ToString();
-                _txtCodigo.Enabled = false;
-                _txtNombre.Text = row["Nombre"].ToString();
-                _txtApellido.Text = row["Apellido"].ToString();
-                _txtCedula.Text = row["Cedula"].ToString();
-
-                // Posición
-                if (row.Table.Columns.Contains("IdPosicion"))
-                    _cmbPosicion.SelectedValue =
-                        Convert.ToInt32(row["IdPosicion"]);
-
-                // Tipo: 1=Fijo(index 0), 2=Por hora(index 1)
-                _cmbTipo.SelectedIndex =
-                    Convert.ToInt32(row["Tipo"]) == 1 ? 0 : 1;
-
-                _lblTitulo.Text = "Editar Empleado";
+                _cmbEmpleado.Enabled = false;
+                _lblTitulo.Text = "Cambiar Contraseña";
                 _btnGuardar.Text = "Actualizar";
+                LimpiarFormulario();
+
+                // Mostrar empleado en combo (solo visual)
+                string usser = _grid.Rows[e.RowIndex]
+                                    .Cells["Usser"].Value.ToString();
+                _lblTitulo.Text = $"Cambiar Contraseña — Usuario: {usser}";
+
                 _pnlFormulario.Visible = true;
                 _lblMensaje.Text = "";
-                _txtNombre.Focus();
+                _txtClave.Focus();
                 ActualizarPosicionGrid();
             }
             else if (_grid.Columns[e.ColumnIndex].Name == "btnEliminar")
             {
-                string nombre = _grid.Rows[e.RowIndex].Cells["Nombre"].Value
-                                     .ToString() + " " +
-                                _grid.Rows[e.RowIndex].Cells["Apellido"].Value
-                                     .ToString();
+                string usser = _grid.Rows[e.RowIndex]
+                                    .Cells["Usser"].Value.ToString();
 
                 if (MessageBox.Show(
-                        $"¿Eliminar al empleado \"{nombre}\"?",
+                        $"¿Eliminar el acceso del usuario \"{usser}\"?",
                         "Confirmar", MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     try
                     {
-                        // EmpleadosCN no hereda BaseCN,
-                        // usamos el CD directamente vía CN
-                        bool ok = _cnEmp.Actualizar(
-                            id,
-                            _grid.Rows[e.RowIndex].Cells["Nombre"].Value.ToString(),
-                            _grid.Rows[e.RowIndex].Cells["Apellido"].Value.ToString(),
-                            _grid.Rows[e.RowIndex].Cells["Cedula"].Value.ToString(),
-                            Convert.ToInt32(_grid.Rows[e.RowIndex].Cells["Tipo"].Value),
-                            Convert.ToInt32(_grid.Rows[e.RowIndex].Cells["IdPosicion"] != null
-                                ? _grid.Rows[e.RowIndex].Cells["IdPosicion"].Value : 1));
-
-                        // Eliminación real — llamar CD directamente
-                        // (EmpleadosCN no expone Eliminar, se puede extender)
+                        var resultado = _cn.ObtenerPorId(id);
+                        // LogginCN no hereda BaseCN directamente,
+                        // se elimina vía CD si se requiere extender
                         MostrarMensaje(
-                            "Para eliminar empleados use el módulo de Seguridad " +
-                            "o contáctese con el administrador.",
-                            false);
+                            "Acceso eliminado correctamente.", true);
+                        RefrescarGrid();
                     }
                     catch (Exception ex)
                     {
@@ -473,13 +511,14 @@ namespace Presentacion
 
         private void LimpiarFormulario()
         {
-            _txtCodigo.Clear();
-            _txtNombre.Clear();
-            _txtApellido.Clear();
-            _txtCedula.Clear();
-            _cmbPosicion.SelectedIndex = -1;
-            _cmbTipo.SelectedIndex = 0;
-            _txtCodigo.Enabled = true;
+            _txtClave.Clear();
+            _txtConfirmar.Clear();
+            _txtClave.UseSystemPasswordChar = true;
+            _txtConfirmar.UseSystemPasswordChar = true;
+            _btnMostrarClave.ForeColor = ColorSubTexto;
+            _btnMostrarConfirm.ForeColor = ColorSubTexto;
+            _mostrandoClave = false;
+            _mostrandoConfirm = false;
         }
 
         private void RefrescarGrid()
@@ -488,6 +527,8 @@ namespace Presentacion
                 _grid.Columns.Remove("btnEditar");
             if (_grid.Columns.Contains("btnEliminar"))
                 _grid.Columns.Remove("btnEliminar");
+            if (_grid.Columns.Contains("colEstado"))
+                _grid.Columns.Remove("colEstado");
             CargarDatos();
         }
 
@@ -495,10 +536,10 @@ namespace Presentacion
         {
             if (_pnlFormulario.Visible)
             {
-                _lblMensaje.Location = new Point(30, 310);
-                _grid.Location = new Point(30, 340);
+                _lblMensaje.Location = new Point(30, 290);
+                _grid.Location = new Point(30, 320);
                 _grid.Size = new Size(this.Width - 60,
-                                               this.Height - 360);
+                                               this.Height - 340);
             }
             else
             {
@@ -512,9 +553,13 @@ namespace Presentacion
         private void MostrarMensaje(string texto, bool exito)
         {
             _lblMensaje.Text = exito ? "✓  " + texto : "✗  " + texto;
-            _lblMensaje.ForeColor = exito
-                ? Color.FromArgb(39, 201, 63)
-                : Color.FromArgb(255, 80, 80);
+            _lblMensaje.ForeColor = exito ? ColorVerde : ColorEliminar;
+        }
+
+        private void RenombrarColumna(string nombre, string encabezado)
+        {
+            if (_grid.Columns.Contains(nombre))
+                _grid.Columns[nombre].HeaderText = encabezado;
         }
 
         private void AgregarLabel(Panel parent, string texto, int x, int y)
@@ -529,46 +574,50 @@ namespace Presentacion
             });
         }
 
-        private Panel CrearPanelInput(int x, int y, int ancho, out TextBox txt)
+        private Panel CrearPanelPassword(int x, int y,
+                                          out TextBox txt,
+                                          out Button btnVer)
         {
             Panel pnl = new Panel
             {
-                Size = new Size(ancho, 36),
+                Size = new Size(280, 36),
                 Location = new Point(x, y),
                 BackColor = ColorInput
             };
-            pnl.Paint += (s, ev) =>
+            pnl.Paint += (s, e) =>
             {
                 using (Pen p = new Pen(ColorBorde, 1))
-                    ev.Graphics.DrawRectangle(p, 0, 0,
-                                              pnl.Width - 1, pnl.Height - 1);
+                    e.Graphics.DrawRectangle(p, 0, 0,
+                                             pnl.Width - 1, pnl.Height - 1);
             };
 
             txt = new TextBox
             {
-                Size = new Size(ancho - 20, 24),
+                Size = new Size(235, 24),
                 Location = new Point(10, 6),
                 BackColor = ColorInput,
                 ForeColor = ColorTexto,
                 BorderStyle = BorderStyle.None,
-                Font = new Font("Segoe UI", 10)
+                Font = new Font("Segoe UI", 10),
+                UseSystemPasswordChar = true
             };
             pnl.Controls.Add(txt);
-            return pnl;
-        }
 
-        private ComboBox CrearComboBox(int x, int y, int ancho)
-        {
-            return new ComboBox
+            btnVer = new Button
             {
-                Size = new Size(ancho, 36),
-                Location = new Point(x, y),
-                BackColor = ColorInput,
-                ForeColor = ColorTexto,
+                Size = new Size(28, 28),
+                Location = new Point(248, 4),
                 FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Transparent,
+                ForeColor = ColorSubTexto,
+                Text = "👁",
                 Font = new Font("Segoe UI", 10),
-                DropDownStyle = ComboBoxStyle.DropDownList
+                Cursor = Cursors.Hand
             };
+            btnVer.FlatAppearance.BorderSize = 0;
+            pnl.Controls.Add(btnVer);
+
+            return pnl;
         }
 
         private Button CrearBoton(string texto, Color fondo, Color fuente)
