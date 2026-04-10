@@ -1,6 +1,6 @@
-﻿namespace Presentacion  // ← corregido "Presentasion" → "Presentacion"
+﻿namespace Presentacion
 {
-    partial class FrmEmpleados
+    partial class FrmAsignaciones
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -14,13 +14,17 @@
         private void InitializeComponent()
         {
             this.SuspendLayout();
+            // 
+            // FrmAsignaciones
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(900, 600);
-            this.Name = "FrmEmpleados";
-            this.Text = "Empleados";
-            // ← eliminado: this.Load += ...FrmEmpleados_Load
+            this.Name = "FrmAsignaciones";
+            this.Text = "Asignaciones";
+            this.Load += new System.EventHandler(this.FrmAsignaciones_Load);
             this.ResumeLayout(false);
+
         }
     }
 }
