@@ -23,7 +23,7 @@ namespace Negocio.Asistencia
 
 
         // ─────────────────────────────────────────
-        // MÉTODOS ABSTRACTOS AUXILIARES
+        // MÉTODOS ABSTRACTOS
         // ─────────────────────────────────────────
 
         protected override string ObtenerNombreEntidad()
@@ -43,10 +43,7 @@ namespace Negocio.Asistencia
         }
 
 
-        // ─────────────────────────────────────────
-        // MÉTODO PRIVADO AUXILIAR
         // **Convierte el enum a string compatible con la BD**
-        // ─────────────────────────────────────────
 
         private string ConvertirTipoAString(EstadoRegistrado tipo)
         {
@@ -170,10 +167,5 @@ namespace Negocio.Asistencia
             return tabla;
         }
 
-
-        // ─────────────────────────────────────────
-        // DELETE — heredado completo de BaseCN
-        // Uso: var (exito, mensaje) = cn.Eliminar(id);
-        // ─────────────────────────────────────────
     }
 }

@@ -12,8 +12,7 @@ namespace Negocio.Servicios
 
 
         // ─────────────────────────────────────────
-        // MÉTODOS ABSTRACTOS AUXILIARES
-        // Implementaciones obligatorias que BaseCN necesita
+        // IMPLENTACION DE METODOS ABSTRACTOS CLASE PADRE
         // ─────────────────────────────────────────
 
         protected override string ObtenerNombreEntidad()
@@ -33,12 +32,6 @@ namespace Negocio.Servicios
         }
 
 
-        // ─────────────────────────────────────────
-        // MÉTODO PRIVADO AUXILIAR
-        // Centraliza la asignación de propiedades del CD
-        // para no repetir el bloque if/else de Descripcion
-        // en cada método que lo necesite
-        // ─────────────────────────────────────────
 
         private void AsignarPropiedades(string nombre, decimal porcentaje, string descripcion)
         {
@@ -57,15 +50,13 @@ namespace Negocio.Servicios
 
 
         // ─────────────────────────────────────────
-        // CREATE — método propio de DeduccionesCN
-        // DeduccionesCD usa el patrón de propiedades:
-        // se asignan los valores al objeto antes de llamar al método
+        // CREATE
         // ─────────────────────────────────────────
 
         public (bool exito, string mensaje) Insertar(string nombre, decimal porcentaje,
                                                       string descripcion)
         {
-            // Validamos el nombre — viene de BaseCN
+            // Validamos el nombre
             var validacionNombre = ValidarTexto(nombre, "Nombre");
 
             if (!validacionNombre.esValido)
@@ -73,7 +64,7 @@ namespace Negocio.Servicios
                 return (false, validacionNombre.mensaje);
             }
 
-            // Validamos el porcentaje — viene de BaseCN
+            // Validamos el porcentaje
             var validacionPorcentaje = ValidarPorcentaje(porcentaje);
 
             if (!validacionPorcentaje.esValido)
@@ -81,7 +72,7 @@ namespace Negocio.Servicios
                 return (false, validacionPorcentaje.mensaje);
             }
 
-            // Asignamos las propiedades del CD antes de llamar al método
+
             AsignarPropiedades(nombre, porcentaje, descripcion);
 
             bool resultado = _cd.Insertar();
@@ -126,7 +117,7 @@ namespace Negocio.Servicios
 
 
         // ─────────────────────────────────────────
-        // READ — implementaciones obligatorias de BaseCN
+        // READ
         // ─────────────────────────────────────────
 
         // Retorna todas las deducciones sin filtro
@@ -136,7 +127,6 @@ namespace Negocio.Servicios
             return tabla;
         }
 
-        // Versión asíncrona — no bloquea la interfaz mientras consulta la BD
         public override async Task<DataTable> ObtenerTodosAsync()
         {
             DataTable tabla = await _cd.ObtenerTodosAsync();
@@ -146,10 +136,10 @@ namespace Negocio.Servicios
         // Retorna una deduccion específica por su ID
         public override DataTable ObtenerPorId(int id)
         {
-            // ValidarId viene de BaseCN — verifica que el ID sea mayor a 0
+            // ValidarId verifica que el ID sea mayor a 0
             var validacion = ValidarId(id, "Deduccion");
 
-            // Si el ID no es válido retornamos una tabla vacía
+            // Si el ID no es válido retorna una tabla vacía
             // para evitar una consulta innecesaria a la BD
             if (!validacion.esValido)
             {
@@ -175,7 +165,7 @@ namespace Negocio.Servicios
 
 
         // ─────────────────────────────────────────
-        // UPDATE — método propio de DeduccionesCN
+        // UPDATE
         // ─────────────────────────────────────────
 
         public (bool exito, string mensaje) Actualizar(int id, string nombre,
@@ -205,7 +195,7 @@ namespace Negocio.Servicios
                 return (false, validacionPorcentaje.mensaje);
             }
 
-            // Asignamos las propiedades del CD antes de llamar al método
+            
             AsignarPropiedades(nombre, porcentaje, descripcion);
 
             bool resultado = _cd.Actualizar(id);

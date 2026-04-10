@@ -15,7 +15,7 @@ namespace Negocio.Configuracion
 
 
         // ─────────────────────────────────────────
-        // MÉTODOS ABSTRACTOS AUXILIARES
+        // MÉTODOS ABSTRACTOS
         // ─────────────────────────────────────────
 
         protected override string ObtenerNombreEntidad()
@@ -36,7 +36,6 @@ namespace Negocio.Configuracion
 
 
         // ─────────────────────────────────────────
-        // MÉTODO PRIVADO
         // Prepara la descripcion antes de asignarla al CD
         // Si viene null la deja null, si viene con texto la limpia
         // ─────────────────────────────────────────

@@ -22,7 +22,7 @@ namespace Datos.CD
         }
 
 
-        /// Implementación de métodos CRUD
+        /// Implementación de metodos CRUD
         public override DataTable ObtenerTodos()
         {
             string query = @"SELECT a.Id,
@@ -56,7 +56,8 @@ namespace Datos.CD
         }
 
 
-        //TODO: El método ObtenerPorId devuelve un DataTable con la información de la asistencia, incluyendo el nombre completo del empleado, en lugar de solo el IdEmpleado.
+        //TODO: El método ObtenerPorId devuelve un DataTable con la información de la asistencia,
+        //incluyendo el nombre completo del empleado, en lugar de solo el IdEmpleado.
         public override DataTable ObtenerPorId(int id)
         {
             string query = @"SELECT a.Id,

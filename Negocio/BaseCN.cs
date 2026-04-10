@@ -20,10 +20,6 @@ namespace Negocio
         Task<DataTable> ObtenerPorIdAsync(int id);
         Task<(bool exito, string mensaje)> EliminarAsync(int id);
 
-        /*
-        Nota: Insertar() y Actualizar() NO forman parte del contrato base
-        porque cada entidad tiene parámetros distintos.
-        */
     }
 
     public abstract class BaseCN : IOperacionesCN
@@ -77,7 +73,6 @@ namespace Negocio
 
         // ─────────────────────────────────────────
         // MÉTODOS NORMALES
-        // Validaciones comunes disponibles para todas las clases hijas
         // ─────────────────────────────────────────
 
         protected (bool esValido, string mensaje) ValidarTexto(string valor,
