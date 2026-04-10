@@ -63,7 +63,7 @@ namespace Presentacion
 
             // Solo dos tabs: Entrada y Nómina
             _tabActiva = btnTabEntrada;
-            foreach (Button btn in new[] { btnTabEntrada, btnTabNomina })
+            foreach (Button btn in new[] { btnTabEntrada, btnTabNomina, btnTabConsulta, btnTabSistema })
             {
                 btn.Paint += Tab_Paint;
                 btn.Click += Tab_Click;
@@ -143,7 +143,7 @@ namespace Presentacion
         {
             _tabActiva = (Button)sender;
 
-            foreach (Button btn in new[] { btnTabEntrada, btnTabNomina })
+            foreach (Button btn in new[] { btnTabEntrada, btnTabNomina, btnTabConsulta, btnTabSistema })
                 btn.ForeColor = ColorSubTexto;
 
             _tabActiva.ForeColor = ColorTexto;
@@ -157,6 +157,23 @@ namespace Presentacion
             else if (_tabActiva == btnTabNomina)
             {
                 MostrarSidebarNomina();
+                MostrarBienvenida();
+            }
+            else if (_tabActiva == btnTabConsulta)
+            {
+                MostrarSidebarVacio();
+                AbrirModulo("Consulta");
+            }
+            else if (_tabActiva == btnTabSistema)
+            {
+                MostrarSidebarVacio();
+                MostrarBienvenida();
+                // Abrir Acerca De como ventana emergente
+                using (FrmAcercaDe frm = new FrmAcercaDe())
+                    frm.ShowDialog(this);
+                // Regresar a tab anterior
+                _tabActiva = btnTabEntrada;
+                MostrarSidebarEntrada();
                 MostrarBienvenida();
             }
         }
@@ -204,6 +221,13 @@ namespace Presentacion
 
             lblSeccionNomina.Visible = true;
             RecalcularPosicionesNomina();
+        }
+
+        // TODO: Oculta todo el sidebar para tabs sin items (Consulta, Sistema)
+        private void MostrarSidebarVacio()
+        {
+            foreach (Control c in pnlSidebar.Controls)
+                c.Visible = false;
         }
 
         // ════════════════════════════════════════════════════════════════════
@@ -379,6 +403,7 @@ namespace Presentacion
                 case "VolantesPago": frm = new FrmVolantesPago(); break;  // Sueldo Neto
                 case "DeduccionesEmpleado": frm = new FrmDeduccionesEmpleado(); break;
                 case "AsignacionesEmpleado": frm = new FrmAsignacionesEmpleado(); break;
+                case "Consulta": frm = new FrmConsulta(); break;
                 default: MostrarBienvenida(); return;
             }
 

@@ -64,6 +64,12 @@
     <Compile Include="FrmAccesoSistema.Designer.cs">
       <DependentUpon>FrmAccesoSistema.cs</DependentUpon>
     </Compile>
+    <Compile Include="Frmacercade.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frmacercade.Designer.cs">
+      <DependentUpon>Frmacercade.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmAsignaciones.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -75,6 +81,12 @@
     </Compile>
     <Compile Include="FrmAsistencias.Designer.cs">
       <DependentUpon>FrmAsistencias.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frmconsulta.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frmconsulta.Designer.cs">
+      <DependentUpon>Frmconsulta.cs</DependentUpon>
     </Compile>
     <Compile Include="FrmDeducciones.cs">
       <SubType>Form</SubType>

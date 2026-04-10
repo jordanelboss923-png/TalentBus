@@ -16,6 +16,8 @@
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.btnSalir = new System.Windows.Forms.Button();
             this.btnTabNomina = new System.Windows.Forms.Button();
+            this.btnTabConsulta = new System.Windows.Forms.Button();
+            this.btnTabSistema = new System.Windows.Forms.Button();
             this.btnTabEntrada = new System.Windows.Forms.Button();
             this.lblMarca = new System.Windows.Forms.Label();
             this.picLogoMini = new System.Windows.Forms.PictureBox();
@@ -114,6 +116,8 @@
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(18, 24, 48);
             this.pnlHeader.Controls.Add(this.btnSalir);
             this.pnlHeader.Controls.Add(this.btnTabNomina);
+            this.pnlHeader.Controls.Add(this.btnTabConsulta);
+            this.pnlHeader.Controls.Add(this.btnTabSistema);
             this.pnlHeader.Controls.Add(this.btnTabEntrada);
             this.pnlHeader.Controls.Add(this.lblMarca);
             this.pnlHeader.Controls.Add(this.picLogoMini);
@@ -213,6 +217,34 @@
             this.btnCerrar.Size = new System.Drawing.Size(12, 12);
             this.btnCerrar.TabIndex = 0;
             this.btnCerrar.UseVisualStyleBackColor = false;
+
+            this.btnTabConsulta.BackColor = System.Drawing.Color.Transparent;
+            this.btnTabConsulta.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTabConsulta.FlatAppearance.BorderSize = 0;
+            this.btnTabConsulta.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.btnTabConsulta.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTabConsulta.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnTabConsulta.ForeColor = System.Drawing.Color.FromArgb(130, 150, 190);
+            this.btnTabConsulta.Location = new System.Drawing.Point(334, 0);
+            this.btnTabConsulta.Name = "btnTabConsulta";
+            this.btnTabConsulta.Size = new System.Drawing.Size(80, 43);
+            this.btnTabConsulta.TabIndex = 7;
+            this.btnTabConsulta.Text = "Consulta";
+            this.btnTabConsulta.UseVisualStyleBackColor = false;
+
+            this.btnTabSistema.BackColor = System.Drawing.Color.Transparent;
+            this.btnTabSistema.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTabSistema.FlatAppearance.BorderSize = 0;
+            this.btnTabSistema.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.btnTabSistema.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTabSistema.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnTabSistema.ForeColor = System.Drawing.Color.FromArgb(130, 150, 190);
+            this.btnTabSistema.Location = new System.Drawing.Point(418, 0);
+            this.btnTabSistema.Name = "btnTabSistema";
+            this.btnTabSistema.Size = new System.Drawing.Size(80, 43);
+            this.btnTabSistema.TabIndex = 8;
+            this.btnTabSistema.Text = "Sistema";
+            this.btnTabSistema.UseVisualStyleBackColor = false;
 
             // ── pnlSidebar ───────────────────────────────────────────────
             this.pnlSidebar.BackColor = System.Drawing.Color.FromArgb(18, 24, 48);
@@ -775,6 +807,8 @@
         private System.Windows.Forms.Label lblMarca;
         private System.Windows.Forms.Button btnTabEntrada;
         private System.Windows.Forms.Button btnTabNomina;
+        private System.Windows.Forms.Button btnTabConsulta;
+        private System.Windows.Forms.Button btnTabSistema;
         private System.Windows.Forms.Button btnSalir;
 
         private System.Windows.Forms.Panel pnlSidebar;
