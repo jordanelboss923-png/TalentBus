@@ -12,5 +12,7 @@ namespace Datos.Conexion
         {
             return new SqlConnection(cadena);
         }
+
+
     }
 }

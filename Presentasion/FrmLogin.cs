@@ -139,12 +139,14 @@ namespace Presentacion
             btnMostrar.ForeColor = _mostrandoClave ? ColorCyan : ColorSubTexto; // Cambia el color del botón según el estado
         }
 
+        public string UsuarioAutenticado { get; private set; }
+
         // Método para validar el acceso al hacer clic en el botón btnIngresar
         private void BtnIngresar_Click(object sender, EventArgs e)
         {
             lblError.Text = "";
-            string usuario = txtUsuario.Text.Trim(); // Elimina espacios en blanco al inicio y al final del nombre de usuario
-            string clave = txtClave.Text; // No se trimea la contraseña para permitir espacios si el usuario los incluye
+            string usuario = txtUsuario.Text.Trim();
+            string clave = txtClave.Text;
 
             if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(clave))
             {
@@ -152,15 +154,14 @@ namespace Presentacion
                 return;
             }
 
-            // Validar acceso utilizando la capa de negocios y manejar posibles excepciones de conexión
             try
             {
                 bool acceso = _cn.ValidarAcceso(usuario, clave);
                 if (acceso)
                 {
-                    FrmPrincipal principal = new FrmPrincipal(usuario);
-                    principal.Show();
-                    this.Hide();
+                    UsuarioAutenticado = usuario;   // Guarda el usuario
+                    this.DialogResult = DialogResult.OK;  // Cierra el login con resultado OK
+                    this.Close();                   // Cierra definitivamente el form
                 }
                 else
                 {
@@ -176,6 +177,11 @@ namespace Presentacion
         }
 
         private void FrmLogin_Load(object sender, EventArgs e) { }
+
+        private void FrmLogin_Load_1(object sender, EventArgs e)
+        {
+
+        }
     }
 
     // Clase para métodos nativos de Windows, utilizada para permitir el arrastre de la ventana sin barra de título

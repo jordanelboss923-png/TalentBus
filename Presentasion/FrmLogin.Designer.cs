@@ -270,6 +270,7 @@
             this.Name = "FrmLogin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "TalentBus — Iniciar Sesión";
+            this.Load += new System.EventHandler(this.FrmLogin_Load_1);
             this.pnlCard.ResumeLayout(false);
             this.pnlCard.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
