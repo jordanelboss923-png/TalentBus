@@ -9,7 +9,7 @@ namespace Presentacion
 {
     public partial class FrmAsignaciones : Form
     {
-        // ─── Colores del tema ───
+        // ─── Colores del tema ───────────────────────────────────────────────
         private readonly Color ColorFondo = Color.FromArgb(13, 17, 35);
         private readonly Color ColorPanel = Color.FromArgb(18, 24, 48);
         private readonly Color ColorCyan = Color.FromArgb(0, 210, 230);
@@ -22,189 +22,91 @@ namespace Presentacion
         private readonly Color ColorEliminar = Color.FromArgb(255, 80, 80);
         private readonly Color ColorEditar = Color.FromArgb(255, 180, 0);
 
-        // ─── Negocio ───
+        // ─── Negocio ────────────────────────────────────────────────────────
         private readonly AsignacionesCN _cn = new AsignacionesCN();
 
-        // ─── Estado ───
+        // ─── Estado ─────────────────────────────────────────────────────────
         private int _idSeleccionado = 0;
         private bool _modoEdicion = false;
-
-        // ─── Controles ───
-        private DataGridView _grid;
-        private TextBox _txtNombre;
-        private TextBox _txtPorcentaje;
-        private TextBox _txtDescripcion;
-        private Label _lblTitulo;
-        private Button _btnGuardar;
-        private Button _btnCancelar;
-        private Button _btnNuevo;
-        private Label _lblMensaje;
-        private Panel _pnlFormulario;
 
         public FrmAsignaciones()
         {
             InitializeComponent();
-            ConfigurarFormulario();
-            ConstruirUI();
+            ConfigurarEventos();
             CargarDatos();
         }
 
-       
-        private void ConfigurarFormulario()
+        // ══════════════════════════════════════════════════════════════════
+        //  CONFIGURACIÓN DE EVENTOS
+        // ══════════════════════════════════════════════════════════════════
+        private void ConfigurarEventos()
         {
-            this.BackColor = ColorFondo;
-            this.DoubleBuffered = true;
+            // Bordes de paneles
+            pnlFormulario.Paint += PnlBorde_Paint;
+            pnlNombre.Paint += PnlInput_Paint;
+            pnlPorcentaje.Paint += PnlInput_Paint;
+            pnlDescripcion.Paint += PnlInput_Paint;
+
+            // Botones
+            btnNuevo.Click += BtnNuevo_Click;
+            btnGuardar.Click += BtnGuardar_Click;
+            btnCancelar.Click += BtnCancelar_Click;
+
+            // Posicionar btnNuevo siempre a la derecha del header
+            pnlHeader.Resize += (s, e) =>
+                btnNuevo.Left = pnlHeader.Width - btnNuevo.Width - 20;
+            pnlHeader.HandleCreated += (s, e) =>
+                btnNuevo.Left = pnlHeader.Width - btnNuevo.Width - 20;
+
+            // Grid
+            dgvAsignaciones.CellClick += Grid_CellClick;
+
+            // Hover botones
+            ConfigurarHover(btnNuevo, ColorBoton, Color.FromArgb(0, 185, 205));
+            ConfigurarHover(btnGuardar, ColorBoton, Color.FromArgb(0, 185, 205));
+            ConfigurarHover(btnCancelar, ColorInput, Color.FromArgb(35, 48, 85));
+
+            // Regiones redondeadas
+            foreach (Button btn in new[] { btnNuevo, btnGuardar, btnCancelar })
+            {
+                btn.Region = CrearRegionRedondeada(btn.Size, 6);
+                btn.SizeChanged += (s, e) =>
+                    ((Button)s).Region = CrearRegionRedondeada(((Button)s).Size, 6);
+            }
         }
 
-        
-        private void ConstruirUI()
+        private void ConfigurarHover(Button btn, Color normal, Color hover)
         {
-            // ── Encabezado ────────────────────────
-            Panel pnlHeader = new Panel
-            {
-                Size = new Size(this.Width, 60),
-                Location = new Point(0, 0),
-                BackColor = Color.Transparent
-            };
-            this.Controls.Add(pnlHeader);
-
-            new Label
-            {
-                Text = "Asignaciones",
-                ForeColor = ColorTexto,
-                Font = new Font("Segoe UI", 16, FontStyle.Bold),
-                AutoSize = true,
-                Location = new Point(30, 15),
-                Parent = pnlHeader
-            };
-
-            new Label
-            {
-                Text = "Gestión de asignaciones aplicadas a la nómina",
-                ForeColor = ColorSubTexto,
-                Font = new Font("Segoe UI", 9),
-                AutoSize = true,
-                Location = new Point(32, 42),
-                Parent = pnlHeader
-            };
-
-            _btnNuevo = CrearBoton("+ Nueva", ColorBoton, ColorBotonTexto);
-            _btnNuevo.Size = new Size(110, 34);
-            _btnNuevo.Location = new Point(this.Width - 160, 18);
-            _btnNuevo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            _btnNuevo.Click += BtnNuevo_Click;
-            pnlHeader.Controls.Add(_btnNuevo);
-
-            // ── Panel formulario ──────────────────
-            _pnlFormulario = new Panel
-            {
-                Size = new Size(this.Width - 60, 190),
-                Location = new Point(30, 70),
-                BackColor = ColorPanel,
-                Visible = false
-            };
-            _pnlFormulario.Paint += PnlBorde_Paint;
-            this.Controls.Add(_pnlFormulario);
-            ConstruirFormulario();
-
-            // ── Mensaje ───────────────────────────
-            _lblMensaje = new Label
-            {
-                Text = "",
-                ForeColor = ColorCyan,
-                Font = new Font("Segoe UI", 9),
-                AutoSize = false,
-                Size = new Size(this.Width - 60, 24),
-                Location = new Point(30, 80),
-                TextAlign = ContentAlignment.MiddleLeft
-            };
-            this.Controls.Add(_lblMensaje);
-
-            // ── Grid ──────────────────────────────
-            _grid = new DataGridView
-            {
-                Size = new Size(this.Width - 60, this.Height - 130),
-                Location = new Point(30, 110),
-                BackgroundColor = ColorPanel,
-                BorderStyle = BorderStyle.None,
-                RowHeadersVisible = false,
-                AllowUserToAddRows = false,
-                AllowUserToDeleteRows = false,
-                ReadOnly = true,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                Font = new Font("Segoe UI", 9),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left |
-                                        AnchorStyles.Right | AnchorStyles.Bottom
-            };
-            EstilarGrid(_grid);
-            _grid.CellClick += Grid_CellClick;
-            this.Controls.Add(_grid);
+            btn.BackColor = normal;
+            btn.MouseEnter += (s, e) => btn.BackColor = hover;
+            btn.MouseLeave += (s, e) => btn.BackColor = normal;
         }
 
-        private void ConstruirFormulario()
-        {
-            _lblTitulo = new Label
-            {
-                Text = "Nueva Asignación",
-                ForeColor = ColorCyan,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                AutoSize = true,
-                Location = new Point(20, 15)
-            };
-            _pnlFormulario.Controls.Add(_lblTitulo);
-
-            // ── Fila 1 ────────────────────────────
-            AgregarLabel(_pnlFormulario, "Nombre", 20, 45);
-            Panel pnlNombre = CrearPanelInput(20, 65, 280, out _txtNombre);
-            _pnlFormulario.Controls.Add(pnlNombre);
-
-            AgregarLabel(_pnlFormulario, "Porcentaje (%)", 320, 45);
-            Panel pnlPorc = CrearPanelInput(320, 65, 160, out _txtPorcentaje);
-            _pnlFormulario.Controls.Add(pnlPorc);
-
-            // ── Fila 2: Descripción ───────────────
-            AgregarLabel(_pnlFormulario, "Descripción (opcional)", 20, 112);
-            Panel pnlDesc = CrearPanelInput(20, 132, 460, out _txtDescripcion);
-            _pnlFormulario.Controls.Add(pnlDesc);
-
-            // ── Botones ───────────────────────────
-            _btnGuardar = CrearBoton("Guardar", ColorBoton, ColorBotonTexto);
-            _btnGuardar.Size = new Size(100, 34);
-            _btnGuardar.Location = new Point(500, 132);
-            _btnGuardar.Click += BtnGuardar_Click;
-            _pnlFormulario.Controls.Add(_btnGuardar);
-
-            _btnCancelar = CrearBoton("Cancelar", ColorInput, ColorSubTexto);
-            _btnCancelar.Size = new Size(100, 34);
-            _btnCancelar.Location = new Point(610, 132);
-            _btnCancelar.Click += BtnCancelar_Click;
-            _pnlFormulario.Controls.Add(_btnCancelar);
-        }
-
-        
+        // ══════════════════════════════════════════════════════════════════
+        //  CARGA DE DATOS
+        // ══════════════════════════════════════════════════════════════════
         private void CargarDatos()
         {
             try
             {
                 DataTable dt = _cn.ObtenerTodos();
-                _grid.DataSource = null;
-                _grid.DataSource = dt;
+                dgvAsignaciones.DataSource = null;
+                dgvAsignaciones.DataSource = dt;
 
-                if (_grid.Columns.Contains("Id"))
-                    _grid.Columns["Id"].Visible = false;
+                if (dgvAsignaciones.Columns.Contains("Id"))
+                    dgvAsignaciones.Columns["Id"].Visible = false;
 
-                if (_grid.Columns.Contains("Nombre"))
-                    _grid.Columns["Nombre"].HeaderText = "Nombre";
+                if (dgvAsignaciones.Columns.Contains("Nombre"))
+                    dgvAsignaciones.Columns["Nombre"].HeaderText = "Nombre";
 
-                if (_grid.Columns.Contains("Porcentaje"))
+                if (dgvAsignaciones.Columns.Contains("Porcentaje"))
                 {
-                    _grid.Columns["Porcentaje"].HeaderText = "Porcentaje (%)";
-                    _grid.Columns["Porcentaje"].DefaultCellStyle.Format = "N2";
+                    dgvAsignaciones.Columns["Porcentaje"].HeaderText = "Porcentaje (%)";
+                    dgvAsignaciones.Columns["Porcentaje"].DefaultCellStyle.Format = "N2";
                 }
 
-                if (_grid.Columns.Contains("Descripcion"))
-                    _grid.Columns["Descripcion"].HeaderText = "Descripción";
+                if (dgvAsignaciones.Columns.Contains("Descripcion"))
+                    dgvAsignaciones.Columns["Descripcion"].HeaderText = "Descripción";
 
                 AgregarColumnaBoton("Editar", ColorEditar, "btnEditar");
                 AgregarColumnaBoton("Eliminar", ColorEliminar, "btnEliminar");
@@ -217,7 +119,7 @@ namespace Presentacion
 
         private void AgregarColumnaBoton(string texto, Color color, string nombre)
         {
-            if (_grid.Columns.Contains(nombre)) return;
+            if (dgvAsignaciones.Columns.Contains(nombre)) return;
 
             DataGridViewButtonColumn col = new DataGridViewButtonColumn
             {
@@ -235,28 +137,30 @@ namespace Presentacion
             col.DefaultCellStyle.SelectionBackColor = color;
             col.DefaultCellStyle.SelectionForeColor = ColorBotonTexto;
             col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            _grid.Columns.Add(col);
+            dgvAsignaciones.Columns.Add(col);
         }
 
-       
+        // ══════════════════════════════════════════════════════════════════
+        //  EVENTOS DE BOTONES
+        // ══════════════════════════════════════════════════════════════════
         private void BtnNuevo_Click(object sender, EventArgs e)
         {
             _modoEdicion = false;
             _idSeleccionado = 0;
             LimpiarFormulario();
-            _lblTitulo.Text = "Nueva Asignación";
-            _btnGuardar.Text = "Guardar";
-            _pnlFormulario.Visible = true;
-            _lblMensaje.Text = "";
-            _txtNombre.Focus();
+            lblTituloFormulario.Text = "Nueva Asignación";
+            btnGuardar.Text = "Guardar";
+            pnlFormulario.Visible = true;
+            lblMensaje.Text = "";
+            txtNombre.Focus();
             ActualizarPosicionGrid();
         }
 
         private void BtnGuardar_Click(object sender, EventArgs e)
         {
-            string nombre = _txtNombre.Text.Trim();
-            string porcStr = _txtPorcentaje.Text.Trim();
-            string descripcion = _txtDescripcion.Text.Trim();
+            string nombre = txtNombre.Text.Trim();
+            string porcStr = txtPorcentaje.Text.Trim();
+            string descripcion = txtDescripcion.Text.Trim();
 
             if (!decimal.TryParse(porcStr, out decimal porcentaje))
             {
@@ -294,16 +198,16 @@ namespace Presentacion
         private void BtnCancelar_Click(object sender, EventArgs e)
         {
             OcultarFormulario();
-            _lblMensaje.Text = "";
+            lblMensaje.Text = "";
         }
 
         private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
 
-            int id = Convert.ToInt32(_grid.Rows[e.RowIndex].Cells["Id"].Value);
+            int id = Convert.ToInt32(dgvAsignaciones.Rows[e.RowIndex].Cells["Id"].Value);
 
-            if (_grid.Columns[e.ColumnIndex].Name == "btnEditar")
+            if (dgvAsignaciones.Columns[e.ColumnIndex].Name == "btnEditar")
             {
                 DataTable dt = _cn.ObtenerPorId(id);
                 if (dt.Rows.Count == 0) return;
@@ -311,25 +215,27 @@ namespace Presentacion
                 DataRow row = dt.Rows[0];
                 _idSeleccionado = id;
                 _modoEdicion = true;
-                _txtNombre.Text = row["Nombre"].ToString();
-                _txtPorcentaje.Text = row["Porcentaje"].ToString();
-                _txtDescripcion.Text = row["Descripcion"] == DBNull.Value
-                                             ? "" : row["Descripcion"].ToString();
-                _lblTitulo.Text = "Editar Asignación";
-                _btnGuardar.Text = "Actualizar";
-                _pnlFormulario.Visible = true;
-                _lblMensaje.Text = "";
-                _txtNombre.Focus();
+
+                txtNombre.Text = row["Nombre"].ToString();
+                txtPorcentaje.Text = row["Porcentaje"].ToString();
+                txtDescripcion.Text = row["Descripcion"] == DBNull.Value
+                                        ? "" : row["Descripcion"].ToString();
+
+                lblTituloFormulario.Text = "Editar Asignación";
+                btnGuardar.Text = "Actualizar";
+                pnlFormulario.Visible = true;
+                lblMensaje.Text = "";
+                txtNombre.Focus();
                 ActualizarPosicionGrid();
             }
-            else if (_grid.Columns[e.ColumnIndex].Name == "btnEliminar")
+            else if (dgvAsignaciones.Columns[e.ColumnIndex].Name == "btnEliminar")
             {
-                string nombre = _grid.Rows[e.RowIndex]
-                                     .Cells["Nombre"].Value.ToString();
+                string nombre = dgvAsignaciones.Rows[e.RowIndex]
+                                               .Cells["Nombre"].Value.ToString();
 
                 if (MessageBox.Show($"¿Eliminar la asignación \"{nombre}\"?",
-                    "Confirmar", MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning) == DialogResult.Yes)
+                        "Confirmar", MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     try
                     {
@@ -345,10 +251,12 @@ namespace Presentacion
             }
         }
 
-       
+        // ══════════════════════════════════════════════════════════════════
+        //  HELPERS
+        // ══════════════════════════════════════════════════════════════════
         private void OcultarFormulario()
         {
-            _pnlFormulario.Visible = false;
+            pnlFormulario.Visible = false;
             _modoEdicion = false;
             _idSeleccionado = 0;
             LimpiarFormulario();
@@ -357,102 +265,39 @@ namespace Presentacion
 
         private void LimpiarFormulario()
         {
-            _txtNombre.Clear();
-            _txtPorcentaje.Clear();
-            _txtDescripcion.Clear();
+            txtNombre.Clear();
+            txtPorcentaje.Clear();
+            txtDescripcion.Clear();
         }
 
         private void RefrescarGrid()
         {
-            if (_grid.Columns.Contains("btnEditar"))
-                _grid.Columns.Remove("btnEditar");
-            if (_grid.Columns.Contains("btnEliminar"))
-                _grid.Columns.Remove("btnEliminar");
+            foreach (string col in new[] { "btnEditar", "btnEliminar" })
+                if (dgvAsignaciones.Columns.Contains(col))
+                    dgvAsignaciones.Columns.Remove(col);
             CargarDatos();
         }
 
         private void ActualizarPosicionGrid()
         {
-            if (_pnlFormulario.Visible)
+            if (pnlFormulario.Visible)
             {
-                _lblMensaje.Location = new Point(30, 270);
-                _grid.Location = new Point(30, 300);
-                _grid.Size = new Size(this.Width - 60,
-                                               this.Height - 320);
+                lblMensaje.Location = new Point(lblMensaje.Left, 272);
+                dgvAsignaciones.Location = new Point(dgvAsignaciones.Left, 302);
             }
             else
             {
-                _lblMensaje.Location = new Point(30, 80);
-                _grid.Location = new Point(30, 110);
-                _grid.Size = new Size(this.Width - 60,
-                                               this.Height - 130);
+                lblMensaje.Location = new Point(lblMensaje.Left, 80);
+                dgvAsignaciones.Location = new Point(dgvAsignaciones.Left, 110);
             }
         }
 
         private void MostrarMensaje(string texto, bool exito)
         {
-            _lblMensaje.Text = exito ? "✓  " + texto : "✗  " + texto;
-            _lblMensaje.ForeColor = exito
+            lblMensaje.Text = exito ? "✓  " + texto : "✗  " + texto;
+            lblMensaje.ForeColor = exito
                 ? Color.FromArgb(39, 201, 63)
                 : Color.FromArgb(255, 80, 80);
-        }
-
-        private void AgregarLabel(Panel parent, string texto, int x, int y)
-        {
-            parent.Controls.Add(new Label
-            {
-                Text = texto,
-                ForeColor = ColorTexto,
-                Font = new Font("Segoe UI", 9),
-                AutoSize = true,
-                Location = new Point(x, y)
-            });
-        }
-
-        private Panel CrearPanelInput(int x, int y, int ancho, out TextBox txt)
-        {
-            Panel pnl = new Panel
-            {
-                Size = new Size(ancho, 36),
-                Location = new Point(x, y),
-                BackColor = ColorInput
-            };
-            pnl.Paint += (s, ev) =>
-            {
-                using (Pen p = new Pen(ColorBorde, 1))
-                    ev.Graphics.DrawRectangle(p, 0, 0,
-                                              pnl.Width - 1, pnl.Height - 1);
-            };
-
-            txt = new TextBox
-            {
-                Size = new Size(ancho - 20, 24),
-                Location = new Point(10, 6),
-                BackColor = ColorInput,
-                ForeColor = ColorTexto,
-                BorderStyle = BorderStyle.None,
-                Font = new Font("Segoe UI", 10)
-            };
-            pnl.Controls.Add(txt);
-            return pnl;
-        }
-
-        private Button CrearBoton(string texto, Color fondo, Color fuente)
-        {
-            Button btn = new Button
-            {
-                Text = texto,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = fondo,
-                ForeColor = fuente,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btn.FlatAppearance.BorderSize = 0;
-            btn.Region = CrearRegionRedondeada(btn.Size, 6);
-            btn.SizeChanged += (s, e) =>
-                btn.Region = CrearRegionRedondeada(btn.Size, 6);
-            return btn;
         }
 
         private Region CrearRegionRedondeada(Size size, int radio)
@@ -460,37 +305,10 @@ namespace Presentacion
             GraphicsPath path = new GraphicsPath();
             path.AddArc(0, 0, radio * 2, radio * 2, 180, 90);
             path.AddArc(size.Width - radio * 2, 0, radio * 2, radio * 2, 270, 90);
-            path.AddArc(size.Width - radio * 2,
-                        size.Height - radio * 2, radio * 2, radio * 2, 0, 90);
-            path.AddArc(0, size.Height - radio * 2,
-                        radio * 2, radio * 2, 90, 90);
+            path.AddArc(size.Width - radio * 2, size.Height - radio * 2, radio * 2, radio * 2, 0, 90);
+            path.AddArc(0, size.Height - radio * 2, radio * 2, radio * 2, 90, 90);
             path.CloseAllFigures();
             return new Region(path);
-        }
-
-        private void EstilarGrid(DataGridView grid)
-        {
-            grid.DefaultCellStyle.BackColor = ColorPanel;
-            grid.DefaultCellStyle.ForeColor = ColorTexto;
-            grid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(25, 35, 70);
-            grid.DefaultCellStyle.SelectionForeColor = ColorCyan;
-            grid.DefaultCellStyle.Font = new Font("Segoe UI", 9);
-            grid.DefaultCellStyle.Padding = new Padding(4, 0, 4, 0);
-
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(20, 28, 58);
-            grid.ColumnHeadersDefaultCellStyle.ForeColor = ColorSubTexto;
-            grid.ColumnHeadersDefaultCellStyle.Font =
-                new Font("Segoe UI", 8, FontStyle.Bold);
-            grid.ColumnHeadersDefaultCellStyle.SelectionBackColor =
-                Color.FromArgb(20, 28, 58);
-
-            grid.ColumnHeadersHeight = 36;
-            grid.RowTemplate.Height = 40;
-            grid.GridColor = ColorBorde;
-            grid.EnableHeadersVisualStyles = false;
-
-            grid.AlternatingRowsDefaultCellStyle.BackColor =
-                Color.FromArgb(20, 28, 55);
         }
 
         private void PnlBorde_Paint(object sender, PaintEventArgs e)
@@ -503,17 +321,20 @@ namespace Presentacion
                 int r = 8;
                 path.AddArc(0, 0, r * 2, r * 2, 180, 90);
                 path.AddArc(pnl.Width - r * 2, 0, r * 2, r * 2, 270, 90);
-                path.AddArc(pnl.Width - r * 2, pnl.Height - r * 2,
-                            r * 2, r * 2, 0, 90);
+                path.AddArc(pnl.Width - r * 2, pnl.Height - r * 2, r * 2, r * 2, 0, 90);
                 path.AddArc(0, pnl.Height - r * 2, r * 2, r * 2, 90, 90);
                 path.CloseAllFigures();
                 e.Graphics.DrawPath(p, path);
             }
         }
 
-        private void FrmAsignaciones_Load(object sender, EventArgs e)
+        private void PnlInput_Paint(object sender, PaintEventArgs e)
         {
-
+            Panel pnl = (Panel)sender;
+            using (Pen p = new Pen(ColorBorde, 1))
+                e.Graphics.DrawRectangle(p, 0, 0, pnl.Width - 1, pnl.Height - 1);
         }
+
+        private void FrmAsignaciones_Load(object sender, EventArgs e) { }
     }
 }

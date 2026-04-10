@@ -9,7 +9,7 @@ namespace Presentacion
 {
     public partial class FrmDepartamentos : Form
     {
-        // ─── Colores del tema ───
+        // ─── Colores ────────────────────────────────────────────────────────
         private readonly Color ColorFondo = Color.FromArgb(13, 17, 35);
         private readonly Color ColorPanel = Color.FromArgb(18, 24, 48);
         private readonly Color ColorCyan = Color.FromArgb(0, 210, 230);
@@ -22,194 +22,82 @@ namespace Presentacion
         private readonly Color ColorEliminar = Color.FromArgb(255, 80, 80);
         private readonly Color ColorEditar = Color.FromArgb(255, 180, 0);
 
-        // ─── Negocio ───
+        // ─── Negocio ────────────────────────────────────────────────────────
         private readonly DepartamentosCN _cn = new DepartamentosCN();
 
-        // ─── Estado ───
+        // ─── Estado ─────────────────────────────────────────────────────────
         private int _idSeleccionado = 0;
         private bool _modoEdicion = false;
-
-        // ─── Controles principales ───
-        private DataGridView _grid;
-        private TextBox _txtNombre;
-        private Label _lblTitulo;
-        private Button _btnGuardar;
-        private Button _btnCancelar;
-        private Button _btnNuevo;
-        private Label _lblMensaje;
-        private Panel _pnlFormulario;
 
         public FrmDepartamentos()
         {
             InitializeComponent();
-            ConfigurarFormulario();
-            ConstruirUI();
+            ConfigurarEventos();
             CargarDatos();
         }
 
-        // ════════════════════════════════════════
-        //  CONFIGURACIÓN
-        // ════════════════════════════════════════
-        private void ConfigurarFormulario()
+        // ══════════════════════════════════════════════════════════════════
+        //  CONFIGURACIÓN DE EVENTOS
+        // ══════════════════════════════════════════════════════════════════
+        private void ConfigurarEventos()
         {
-            this.BackColor = ColorFondo;
-            this.DoubleBuffered = true;
+            // Bordes de paneles
+            pnlFormulario.Paint += PnlBorde_Paint;
+            pnlNombre.Paint += PnlInput_Paint;
+
+            // Botones
+            btnNuevo.Click += BtnNuevo_Click;
+            btnGuardar.Click += BtnGuardar_Click;
+            btnCancelar.Click += BtnCancelar_Click;
+
+            // Posicionar btnNuevo siempre a la derecha del header
+            pnlHeader.Resize += (s, e) =>
+                btnNuevo.Left = pnlHeader.Width - btnNuevo.Width - 20;
+            pnlHeader.HandleCreated += (s, e) =>
+                btnNuevo.Left = pnlHeader.Width - btnNuevo.Width - 20;
+
+            // Grid
+            dgvDepartamentos.CellClick += Grid_CellClick;
+
+            // Hover
+            ConfigurarHover(btnNuevo, ColorBoton, Color.FromArgb(0, 185, 205));
+            ConfigurarHover(btnGuardar, ColorBoton, Color.FromArgb(0, 185, 205));
+            ConfigurarHover(btnCancelar, ColorInput, Color.FromArgb(35, 48, 85));
+
+            // Regiones redondeadas
+            foreach (Button btn in new[] { btnNuevo, btnGuardar, btnCancelar })
+            {
+                btn.Region = CrearRegionRedondeada(btn.Size, 6);
+                btn.SizeChanged += (s, e) =>
+                    ((Button)s).Region = CrearRegionRedondeada(((Button)s).Size, 6);
+            }
         }
 
-        // ════════════════════════════════════════
-        //  CONSTRUCCIÓN UI
-        // ════════════════════════════════════════
-        private void ConstruirUI()
+        private void ConfigurarHover(Button btn, Color normal, Color hover)
         {
-            // ── Encabezado de página ──────────────
-            Panel pnlHeader = new Panel
-            {
-                Size = new Size(this.Width, 60),
-                Location = new Point(0, 0),
-                BackColor = Color.Transparent
-            };
-            this.Controls.Add(pnlHeader);
-
-            Label lblPagina = new Label
-            {
-                Text = "Departamentos",
-                ForeColor = ColorTexto,
-                Font = new Font("Segoe UI", 16, FontStyle.Bold),
-                AutoSize = true,
-                Location = new Point(30, 15)
-            };
-            pnlHeader.Controls.Add(lblPagina);
-
-            Label lblSub = new Label
-            {
-                Text = "Gestión de departamentos de la empresa",
-                ForeColor = ColorSubTexto,
-                Font = new Font("Segoe UI", 9),
-                AutoSize = true,
-                Location = new Point(32, 42)
-            };
-            pnlHeader.Controls.Add(lblSub);
-
-            // ── Botón Nuevo ───────────────────────
-            _btnNuevo = CrearBoton("+ Nuevo", ColorBoton, ColorBotonTexto);
-            _btnNuevo.Size = new Size(110, 34);
-            _btnNuevo.Location = new Point(this.Width - 160, 18);
-            _btnNuevo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            _btnNuevo.Click += BtnNuevo_Click;
-            pnlHeader.Controls.Add(_btnNuevo);
-
-            // ── Panel formulario ──────────────────
-            _pnlFormulario = new Panel
-            {
-                Size = new Size(this.Width - 60, 130),
-                Location = new Point(30, 70),
-                BackColor = ColorPanel,
-                Visible = false
-            };
-            _pnlFormulario.Paint += PnlBorde_Paint;
-            this.Controls.Add(_pnlFormulario);
-            ConstruirFormulario();
-
-            // ── Mensaje feedback ──────────────────
-            _lblMensaje = new Label
-            {
-                Text = "",
-                ForeColor = ColorCyan,
-                Font = new Font("Segoe UI", 9),
-                AutoSize = false,
-                Size = new Size(this.Width - 60, 24),
-                Location = new Point(30, 210),
-                TextAlign = ContentAlignment.MiddleLeft
-            };
-            this.Controls.Add(_lblMensaje);
-
-            // ── Grid ─────────────────────────────
-            _grid = new DataGridView
-            {
-                Size = new Size(this.Width - 60, this.Height - 260),
-                Location = new Point(30, 240),
-                BackgroundColor = ColorPanel,
-                BorderStyle = BorderStyle.None,
-                RowHeadersVisible = false,
-                AllowUserToAddRows = false,
-                AllowUserToDeleteRows = false,
-                ReadOnly = true,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                Font = new Font("Segoe UI", 9),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left |
-                                         AnchorStyles.Right | AnchorStyles.Bottom
-            };
-            EstilarGrid(_grid);
-            _grid.CellClick += Grid_CellClick;
-            this.Controls.Add(_grid);
+            btn.BackColor = normal;
+            btn.MouseEnter += (s, e) => btn.BackColor = hover;
+            btn.MouseLeave += (s, e) => btn.BackColor = normal;
         }
 
-        private void ConstruirFormulario()
-        {
-            _lblTitulo = new Label
-            {
-                Text = "Nuevo Departamento",
-                ForeColor = ColorCyan,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                AutoSize = true,
-                Location = new Point(20, 15)
-            };
-            _pnlFormulario.Controls.Add(_lblTitulo);
-
-            // Label Nombre
-            Label lblNombre = new Label
-            {
-                Text = "Nombre",
-                ForeColor = ColorTexto,
-                Font = new Font("Segoe UI", 9),
-                AutoSize = true,
-                Location = new Point(20, 45)
-            };
-            _pnlFormulario.Controls.Add(lblNombre);
-
-            // Input Nombre
-            Panel pnlInput = CrearPanelInput(20, 65, out _txtNombre);
-            _pnlFormulario.Controls.Add(pnlInput);
-
-            // Botón Guardar
-            _btnGuardar = CrearBoton("Guardar", ColorBoton, ColorBotonTexto);
-            _btnGuardar.Size = new Size(100, 34);
-            _btnGuardar.Location = new Point(pnlInput.Right + 15, 65);
-            _btnGuardar.Click += BtnGuardar_Click;
-            _pnlFormulario.Controls.Add(_btnGuardar);
-
-            // Botón Cancelar
-            _btnCancelar = CrearBoton("Cancelar", ColorInput, ColorSubTexto);
-            _btnCancelar.Size = new Size(100, 34);
-            _btnCancelar.Location = new Point(_btnGuardar.Right + 10, 65);
-            _btnCancelar.Click += BtnCancelar_Click;
-            _pnlFormulario.Controls.Add(_btnCancelar);
-        }
-
-        // ════════════════════════════════════════
-        //  DATOS
-        // ════════════════════════════════════════
+        // ══════════════════════════════════════════════════════════════════
+        //  CARGA DE DATOS
+        // ══════════════════════════════════════════════════════════════════
         private void CargarDatos()
         {
             try
             {
                 DataTable dt = _cn.ObtenerTodos();
-                _grid.DataSource = null;
-                _grid.DataSource = dt;
+                dgvDepartamentos.DataSource = null;
+                dgvDepartamentos.DataSource = dt;
 
-                // Ocultar columna Id del grid pero mantenerla disponible
-                if (_grid.Columns.Contains("Id"))
-                    _grid.Columns["Id"].Visible = false;
+                if (dgvDepartamentos.Columns.Contains("Id"))
+                    dgvDepartamentos.Columns["Id"].Visible = false;
 
-                // Renombrar encabezado
-                if (_grid.Columns.Contains("Nombre"))
-                    _grid.Columns["Nombre"].HeaderText = "Nombre del Departamento";
+                if (dgvDepartamentos.Columns.Contains("Nombre"))
+                    dgvDepartamentos.Columns["Nombre"].HeaderText = "Nombre del Departamento";
 
-                // Columna Editar
                 AgregarColumnaBoton("Editar", ColorEditar, "btnEditar");
-
-                // Columna Eliminar
                 AgregarColumnaBoton("Eliminar", ColorEliminar, "btnEliminar");
             }
             catch (Exception ex)
@@ -220,8 +108,7 @@ namespace Presentacion
 
         private void AgregarColumnaBoton(string texto, Color color, string nombre)
         {
-            // Evitar duplicados al recargar
-            if (_grid.Columns.Contains(nombre)) return;
+            if (dgvDepartamentos.Columns.Contains(nombre)) return;
 
             DataGridViewButtonColumn col = new DataGridViewButtonColumn
             {
@@ -239,28 +126,28 @@ namespace Presentacion
             col.DefaultCellStyle.SelectionBackColor = color;
             col.DefaultCellStyle.SelectionForeColor = ColorBotonTexto;
             col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            _grid.Columns.Add(col);
+            dgvDepartamentos.Columns.Add(col);
         }
 
-        // ════════════════════════════════════════
-        //  EVENTOS
-        // ════════════════════════════════════════
+        // ══════════════════════════════════════════════════════════════════
+        //  EVENTOS DE BOTONES
+        // ══════════════════════════════════════════════════════════════════
         private void BtnNuevo_Click(object sender, EventArgs e)
         {
             _modoEdicion = false;
             _idSeleccionado = 0;
-            _txtNombre.Clear();
-            _lblTitulo.Text = "Nuevo Departamento";
-            _btnGuardar.Text = "Guardar";
-            _pnlFormulario.Visible = true;
-            _lblMensaje.Text = "";
-            _txtNombre.Focus();
+            txtNombre.Clear();
+            lblTituloFormulario.Text = "Nuevo Departamento";
+            btnGuardar.Text = "Guardar";
+            pnlFormulario.Visible = true;
+            lblMensaje.Text = "";
+            txtNombre.Focus();
             ActualizarPosicionGrid();
         }
 
         private void BtnGuardar_Click(object sender, EventArgs e)
         {
-            string nombre = _txtNombre.Text.Trim();
+            string nombre = txtNombre.Text.Trim();
 
             try
             {
@@ -288,50 +175,43 @@ namespace Presentacion
         private void BtnCancelar_Click(object sender, EventArgs e)
         {
             OcultarFormulario();
-            _lblMensaje.Text = "";
+            lblMensaje.Text = "";
         }
 
         private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
 
-            // Obtener Id de la fila
-            int id = Convert.ToInt32(_grid.Rows[e.RowIndex].Cells["Id"].Value);
+            int id = Convert.ToInt32(dgvDepartamentos.Rows[e.RowIndex].Cells["Id"].Value);
 
-            if (_grid.Columns[e.ColumnIndex].Name == "btnEditar")
+            if (dgvDepartamentos.Columns[e.ColumnIndex].Name == "btnEditar")
             {
-                string nombre = _grid.Rows[e.RowIndex]
-                                     .Cells["Nombre"].Value.ToString();
+                string nombre = dgvDepartamentos.Rows[e.RowIndex].Cells["Nombre"].Value.ToString();
                 _idSeleccionado = id;
                 _modoEdicion = true;
-                _txtNombre.Text = nombre;
-                _lblTitulo.Text = "Editar Departamento";
-                _btnGuardar.Text = "Actualizar";
-                _pnlFormulario.Visible = true;
-                _lblMensaje.Text = "";
-                _txtNombre.Focus();
+                txtNombre.Text = nombre;
+                lblTituloFormulario.Text = "Editar Departamento";
+                btnGuardar.Text = "Actualizar";
+                pnlFormulario.Visible = true;
+                lblMensaje.Text = "";
+                txtNombre.Focus();
                 ActualizarPosicionGrid();
             }
-            else if (_grid.Columns[e.ColumnIndex].Name == "btnEliminar")
+            else if (dgvDepartamentos.Columns[e.ColumnIndex].Name == "btnEliminar")
             {
-                string nombre = _grid.Rows[e.RowIndex]
-                                     .Cells["Nombre"].Value.ToString();
+                string nombre = dgvDepartamentos.Rows[e.RowIndex].Cells["Nombre"].Value.ToString();
 
-                var confirm = MessageBox.Show(
-                    $"¿Eliminar el departamento \"{nombre}\"?",
-                    "Confirmar eliminación",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
-
-                if (confirm == DialogResult.Yes)
+                if (MessageBox.Show(
+                        $"¿Eliminar el departamento \"{nombre}\"?",
+                        "Confirmar eliminación",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     try
                     {
                         var resultado = _cn.Eliminar(id);
                         MostrarMensaje(resultado.mensaje, resultado.exito);
-
-                        if (resultado.exito)
-                            RefrescarGrid();
+                        if (resultado.exito) RefrescarGrid();
                     }
                     catch (Exception ex)
                     {
@@ -341,94 +221,46 @@ namespace Presentacion
             }
         }
 
-        // ════════════════════════════════════════
+        // ══════════════════════════════════════════════════════════════════
         //  HELPERS
-        // ════════════════════════════════════════
+        // ══════════════════════════════════════════════════════════════════
         private void OcultarFormulario()
         {
-            _pnlFormulario.Visible = false;
+            pnlFormulario.Visible = false;
             _modoEdicion = false;
             _idSeleccionado = 0;
-            _txtNombre.Clear();
+            txtNombre.Clear();
             ActualizarPosicionGrid();
         }
 
         private void RefrescarGrid()
         {
-            // Limpiar columnas de botones antes de recargar
-            if (_grid.Columns.Contains("btnEditar"))
-                _grid.Columns.Remove("btnEditar");
-            if (_grid.Columns.Contains("btnEliminar"))
-                _grid.Columns.Remove("btnEliminar");
-
+            foreach (string col in new[] { "btnEditar", "btnEliminar" })
+                if (dgvDepartamentos.Columns.Contains(col))
+                    dgvDepartamentos.Columns.Remove(col);
             CargarDatos();
         }
 
         private void ActualizarPosicionGrid()
         {
-            if (_pnlFormulario.Visible)
+            if (pnlFormulario.Visible)
             {
-                _lblMensaje.Location = new Point(30, 210);
-                _grid.Location = new Point(30, 240);
-                _grid.Size = new Size(this.Width - 60,
-                                               this.Height - 260);
+                lblMensaje.Location = new Point(lblMensaje.Left, 210);
+                dgvDepartamentos.Location = new Point(dgvDepartamentos.Left, 240);
             }
             else
             {
-                _lblMensaje.Location = new Point(30, 80);
-                _grid.Location = new Point(30, 110);
-                _grid.Size = new Size(this.Width - 60,
-                                               this.Height - 130);
+                lblMensaje.Location = new Point(lblMensaje.Left, 80);
+                dgvDepartamentos.Location = new Point(dgvDepartamentos.Left, 110);
             }
         }
 
         private void MostrarMensaje(string texto, bool exito)
         {
-            _lblMensaje.Text = exito ? "✓  " + texto : "✗  " + texto;
-            _lblMensaje.ForeColor = exito
+            lblMensaje.Text = exito ? "✓  " + texto : "✗  " + texto;
+            lblMensaje.ForeColor = exito
                 ? Color.FromArgb(39, 201, 63)
                 : Color.FromArgb(255, 80, 80);
-        }
-
-        private Panel CrearPanelInput(int x, int y, out TextBox txt)
-        {
-            Panel pnl = new Panel
-            {
-                Size = new Size(280, 36),
-                Location = new Point(x, y),
-                BackColor = ColorInput
-            };
-            pnl.Paint += PnlBordeInput_Paint;
-
-            txt = new TextBox
-            {
-                Size = new Size(255, 24),
-                Location = new Point(10, 6),
-                BackColor = ColorInput,
-                ForeColor = ColorTexto,
-                BorderStyle = BorderStyle.None,
-                Font = new Font("Segoe UI", 10)
-            };
-            pnl.Controls.Add(txt);
-            return pnl;
-        }
-
-        private Button CrearBoton(string texto, Color fondo, Color fuente)
-        {
-            Button btn = new Button
-            {
-                Text = texto,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = fondo,
-                ForeColor = fuente,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btn.FlatAppearance.BorderSize = 0;
-            btn.Region = CrearRegionRedondeada(btn.Size, 6);
-            btn.SizeChanged += (s, e) =>
-                btn.Region = CrearRegionRedondeada(btn.Size, 6);
-            return btn;
         }
 
         private Region CrearRegionRedondeada(Size size, int radio)
@@ -436,40 +268,11 @@ namespace Presentacion
             GraphicsPath path = new GraphicsPath();
             path.AddArc(0, 0, radio * 2, radio * 2, 180, 90);
             path.AddArc(size.Width - radio * 2, 0, radio * 2, radio * 2, 270, 90);
-            path.AddArc(size.Width - radio * 2,
-                        size.Height - radio * 2, radio * 2, radio * 2, 0, 90);
-            path.AddArc(0, size.Height - radio * 2,
-                        radio * 2, radio * 2, 90, 90);
+            path.AddArc(size.Width - radio * 2, size.Height - radio * 2, radio * 2, radio * 2, 0, 90);
+            path.AddArc(0, size.Height - radio * 2, radio * 2, radio * 2, 90, 90);
             path.CloseAllFigures();
             return new Region(path);
         }
-
-        private void EstilarGrid(DataGridView grid)
-        {
-            grid.DefaultCellStyle.BackColor = ColorPanel;
-            grid.DefaultCellStyle.ForeColor = ColorTexto;
-            grid.DefaultCellStyle.SelectionBackColor = ColorItemActivo();
-            grid.DefaultCellStyle.SelectionForeColor = ColorCyan;
-            grid.DefaultCellStyle.Font = new Font("Segoe UI", 9);
-            grid.DefaultCellStyle.Padding = new Padding(4, 0, 4, 0);
-
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(20, 28, 58);
-            grid.ColumnHeadersDefaultCellStyle.ForeColor = ColorSubTexto;
-            grid.ColumnHeadersDefaultCellStyle.Font =
-                new Font("Segoe UI", 8, FontStyle.Bold);
-            grid.ColumnHeadersDefaultCellStyle.SelectionBackColor =
-                Color.FromArgb(20, 28, 58);
-
-            grid.ColumnHeadersHeight = 36;
-            grid.RowTemplate.Height = 40;
-            grid.GridColor = ColorBorde;
-            grid.EnableHeadersVisualStyles = false;
-
-            grid.AlternatingRowsDefaultCellStyle.BackColor =
-                Color.FromArgb(20, 28, 55);
-        }
-
-        private Color ColorItemActivo() => Color.FromArgb(25, 35, 70);
 
         private void PnlBorde_Paint(object sender, PaintEventArgs e)
         {
@@ -481,20 +284,20 @@ namespace Presentacion
                 int r = 8;
                 path.AddArc(0, 0, r * 2, r * 2, 180, 90);
                 path.AddArc(pnl.Width - r * 2, 0, r * 2, r * 2, 270, 90);
-                path.AddArc(pnl.Width - r * 2, pnl.Height - r * 2,
-                            r * 2, r * 2, 0, 90);
+                path.AddArc(pnl.Width - r * 2, pnl.Height - r * 2, r * 2, r * 2, 0, 90);
                 path.AddArc(0, pnl.Height - r * 2, r * 2, r * 2, 90, 90);
                 path.CloseAllFigures();
                 e.Graphics.DrawPath(p, path);
             }
         }
 
-        private void PnlBordeInput_Paint(object sender, PaintEventArgs e)
+        private void PnlInput_Paint(object sender, PaintEventArgs e)
         {
             Panel pnl = (Panel)sender;
             using (Pen p = new Pen(ColorBorde, 1))
-                e.Graphics.DrawRectangle(p, 0, 0,
-                                         pnl.Width - 1, pnl.Height - 1);
+                e.Graphics.DrawRectangle(p, 0, 0, pnl.Width - 1, pnl.Height - 1);
         }
+
+        private void FrmDepartamentos_Load(object sender, EventArgs e) { }
     }
 }
